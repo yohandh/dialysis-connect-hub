@@ -39,7 +39,7 @@ const FaqSection = () => {
   ];
 
   return (
-    <section id="faq" className="py-16 bg-light-gray-bg">
+    <section id="faq" className="py-8 bg-light-gray-bg">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-dark-slate mb-4">Frequently Asked Questions</h2>
@@ -74,6 +74,7 @@ const FaqSection = () => {
             </Card>
           ))}
           
+          {/* 
           <div className="text-center">
             <Button
               variant="outline"
@@ -87,7 +88,8 @@ const FaqSection = () => {
             >
               See More FAQs
             </Button>
-          </div>
+          </div> 
+          */}
         </div>
       </div>
     </section>

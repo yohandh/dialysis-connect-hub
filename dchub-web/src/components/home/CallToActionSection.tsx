@@ -11,7 +11,7 @@ const CallToActionSection = () => {
   };
 
   return (
-    <section className="py-16 bg-medical-blue text-white">
+    <section className="py-8 bg-medical-blue text-white">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
         <p className="text-xl max-w-2xl mx-auto mb-8">
@@ -21,18 +21,11 @@ const CallToActionSection = () => {
         <div className="flex flex-wrap justify-center gap-4">
           <Button
             variant="secondary"
-            className="bg-white text-medical-blue hover:bg-gray-100 px-6 py-3 text-lg"
+             className="border-white text-medical-blue hover:bg-white/80 px-6 py-3 text-lg"
             onClick={() => handleGetStarted('patient')}
           >
             Patient Login
-          </Button>
-          <Button
-            variant="outline"
-            className="border-white text-white hover:bg-white/20 px-6 py-3 text-lg"
-            onClick={() => handleGetStarted('staff')}
-          >
-            Staff Login
-          </Button>
+          </Button>          
         </div>
       </div>
     </section>

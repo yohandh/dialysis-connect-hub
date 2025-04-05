@@ -11,7 +11,7 @@ import Map from '@/components/Map';
 
 const ContactSection = () => {
   return (
-    <section id="contact" className="py-16 bg-white">
+    <section id="contact" className="py-8 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-dark-slate mb-4">Contact Us</h2>
@@ -92,9 +92,9 @@ const ContactSection = () => {
                   <div>
                     <p className="font-medium">Dialysis Connect Hub Headquarters</p>
                     <p className="text-gray-700">
-                      1234 Health Avenue, Suite 500<br />
-                      Medical District<br />
-                      San Francisco, CA 94103
+                      349<br />
+                      Jayantha Weerasekara Mawatha<br />
+                      Colombo, Western Province, 01000
                     </p>
                   </div>
                 </div>
@@ -103,14 +103,14 @@ const ContactSection = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-medical-blue mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <p className="text-gray-700">1-800-KIDNEY-HELP (1-800-543-6394)</p>
+                  <p className="text-gray-700">9-411-KIDNEY-HELP (94-11-242-2335)</p>
                 </div>
                 
                 <div className="flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-medical-blue mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
-                  <p className="text-gray-700">contact@dialysisconnecthub.example.com</p>
+                  <p className="text-gray-700">dialysis.connect.hub@gmail.com</p>
                 </div>
               </CardContent>
             </Card>

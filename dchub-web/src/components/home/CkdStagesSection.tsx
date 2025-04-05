@@ -9,7 +9,7 @@ const CkdStagesSection = () => {
   const navigate = useNavigate();
   
   return (
-    <section className="py-16 bg-light-gray-bg">
+    <section className="py-8 bg-light-gray-bg">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-dark-slate mb-4">Understanding CKD Stages</h2>

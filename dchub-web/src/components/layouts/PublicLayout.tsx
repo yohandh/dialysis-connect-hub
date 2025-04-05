@@ -66,7 +66,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
   };
   
   return (
-    <div className="min-h-screen flex flex-col">
+    <div id="top" className="min-h-screen flex flex-col">
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between">
@@ -87,8 +87,9 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                   key={link.path}
                   to={link.path}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    (location.pathname === link.path || 
-                    (link.isSection && location.hash === link.path.substring(1)))
+                    ((!link.isSection && location.pathname === link.path && !location.hash) || 
+                     (link.isSection && location.pathname === '/' && location.hash === link.path.substring(1)) ||
+                     (!link.isSection && location.pathname === link.path))
                       ? 'bg-medical-blue/10 text-medical-blue'
                       : 'text-gray-700 hover:text-medical-blue hover:bg-medical-blue/5'
                   }`}
@@ -101,15 +102,10 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
             
             <div className="flex items-center gap-4 mt-4 md:mt-0">
               <Link to="/patient/login">
-                <Button variant="outline" className="border-medical-blue text-medical-blue hover:bg-medical-blue hover:text-white">
+                <Button variant="outline" className="bg-medical-blue text-white hover:bg-medical-blue hover:text-white">
                   Patient Login
                 </Button>
-              </Link>
-              <Link to="/staff/login">
-                <Button className="bg-medical-blue text-white hover:bg-medical-blue/90">
-                  Staff Login
-                </Button>
-              </Link>
+              </Link>              
             </div>
           </div>
         </div>
@@ -130,25 +126,16 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
               </p>
             </div>
             
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols gap-8">
               <div>
                 <h4 className="font-semibold mb-3 text-white">Quick Links</h4>
                 <ul className="space-y-2">
-                  <li><Link to="/" className="text-gray-300 hover:text-white">Home</Link></li>
+                  <li><a href="#top" className="text-gray-300 hover:text-white">Home</a></li>
                   <li><Link to="/#about" className="text-gray-300 hover:text-white">About</Link></li>
-                  <li><Link to="/ckd-awareness" className="text-gray-300 hover:text-white">CKD Awareness</Link></li>
+                  <li><Link to="/ckd-awareness#top" className="text-gray-300 hover:text-white">CKD Awareness</Link></li>
                   <li><Link to="/#faq" className="text-gray-300 hover:text-white">FAQ</Link></li>
                 </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-semibold mb-3 text-white">Portals</h4>
-                <ul className="space-y-2">
-                  <li><Link to="/patient/login" className="text-gray-300 hover:text-white">Patient Portal</Link></li>
-                  <li><Link to="/staff/login" className="text-gray-300 hover:text-white">Staff Portal</Link></li>
-                  <li><Link to="/admin/login" className="text-gray-300 hover:text-white">Admin Portal</Link></li>
-                </ul>
-              </div>
+              </div>              
             </div>
           </div>
           
@@ -159,15 +146,13 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
       </footer>
 
       {/* Back to top button */}
-      {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-6 right-6 p-3 rounded-full bg-medical-blue text-white shadow-lg transition-all hover:bg-medical-blue/90 focus:outline-none animate-fade-in"
-          aria-label="Back to top"
-        >
-          <ChevronUp size={24} />
-        </button>
-      )}
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-6 right-6 p-3 rounded-full bg-medical-blue text-white shadow-lg transition-all hover:bg-medical-blue/90 focus:outline-none ${showScrollTop ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        aria-label="Back to top"
+      >
+        <ChevronUp size={24} />
+      </button>
     </div>
   );
 }

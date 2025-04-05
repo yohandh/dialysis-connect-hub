@@ -28,14 +28,7 @@ const HeroSection = () => {
                 onClick={() => handleGetStarted('patient')}
               >
                 Patient Portal
-              </Button>
-              <Button
-                variant="outline"
-                className="border-medical-blue text-medical-blue hover:bg-medical-blue hover:text-white px-6 py-3 text-lg"
-                onClick={() => handleGetStarted('staff')}
-              >
-                Staff Portal
-              </Button>
+              </Button>              
             </div>
           </div>
           <div className="md:w-1/2">
