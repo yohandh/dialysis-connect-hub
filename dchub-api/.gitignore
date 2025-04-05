@@ -1,0 +1,13 @@
+# Node.js backend
+node_modules/
+.env
+.env.local
+*.log
+
+# Output
+dist/
+coverage/
+
+# Editor/OS
+.DS_Store
+*.swp

@@ -1,0 +1,21 @@
+# Global ignores (OS, Editor)
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.swn
+*.sublime-workspace
+*.sublime-project
+*.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Log files
+*.log
+logs/
+
+# Docs or temp files you don't want in Git
+Git_GitHub.docx
+*.bak
+*.tmp
+*.backup
