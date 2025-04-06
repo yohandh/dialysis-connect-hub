@@ -87,7 +87,8 @@ const Contact = () => {
                 <CardDescription>Find us on the map</CardDescription>
               </CardHeader>
               <CardContent>
-                <Map className="h-[400px] rounded-md" />
+                {/* <Map className="h-[400px] rounded-md" /> */}
+                <Map />
               </CardContent>
             </Card>
             

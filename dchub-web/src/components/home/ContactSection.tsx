@@ -19,7 +19,7 @@ const ContactSection = () => {
             Have questions about Dialysis Connect Hub? We're here to help
           </p>
         </div>
-        
+
         <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
           <div>
             <h2 className="text-2xl font-semibold mb-6">Send Us a Message</h2>
@@ -42,12 +42,12 @@ const ContactSection = () => {
                       <Input id="lastName" placeholder="Enter your last name" required />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" placeholder="Enter your email address" required />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="topic">Topic</Label>
                     <Select defaultValue="general">
@@ -62,7 +62,7 @@ const ContactSection = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="message">Message</Label>
                     <Textarea id="message" placeholder="Enter your message here" rows={5} required />
@@ -75,7 +75,7 @@ const ContactSection = () => {
               </form>
             </Card>
           </div>
-          
+
           <div>
             <h2 className="text-2xl font-semibold mb-6">Contact Information</h2>
             <Card className="mb-6">
@@ -98,14 +98,14 @@ const ContactSection = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-medical-blue mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
                   <p className="text-gray-700">9-411-KIDNEY-HELP (94-11-242-2335)</p>
                 </div>
-                
+
                 <div className="flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-medical-blue mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -114,15 +114,17 @@ const ContactSection = () => {
                 </div>
               </CardContent>
             </Card>
-            
+
             {/* Map Component */}
             <Card>
               <CardHeader>
                 <CardTitle>Find Us</CardTitle>
-                <CardDescription>Our headquarters location in San Francisco</CardDescription>
+                <CardDescription>Our headquarters location in Colombo, Sri Lanka</CardDescription>
               </CardHeader>
+              
               <CardContent>
-                <Map className="h-64 w-full rounded-md" />
+                {/* <Map className="h-64 w-full rounded-md" /> */}
+                <Map />
               </CardContent>
             </Card>
           </div>

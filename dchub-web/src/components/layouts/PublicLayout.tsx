@@ -12,6 +12,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
   
   const isHomePage = location.pathname === '/';
   
@@ -23,6 +24,28 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     { name: 'FAQ', path: '/#faq', isSection: true },
     { name: 'Contact', path: '/#contact', isSection: true },
   ];
+  
+  // Function to determine if a link is active
+  const isLinkActive = (link: typeof navLinks[0]) => {
+    // For the Home link, it's active when we're at exactly '/' with no hash
+    // OR when we're at the top of the page (scrollY near 0)
+    if (link.path === '/' && !link.isSection) {
+      // If we're at the root path with no hash OR we're at the top of the page
+      return (location.pathname === '/' && !location.hash) || 
+             (location.pathname === '/' && scrollPosition < 100);
+    }
+    
+    // For section links (About, FAQ, Contact)
+    if (link.isSection) {
+      // Only active when we're on the home page, the hash matches, and we're not at the top of the page
+      return location.pathname === '/' && 
+             location.hash === link.path.substring(link.path.indexOf('#')) && 
+             scrollPosition >= 100;
+    }
+    
+    // For regular page links (Centers, CKD Awareness)
+    return location.pathname === link.path;
+  };
 
   // Handle smooth scrolling for section links when on home page
   useEffect(() => {
@@ -37,18 +60,22 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     }
   }, [location.hash, isHomePage]);
 
-  // Handle scroll to top button visibility
+  // Handle scroll to top button visibility and update scroll position
   useEffect(() => {
-    const toggleVisibility = () => {
-      if (window.pageYOffset > 300) {
+    const handleScroll = () => {
+      const currentPosition = window.pageYOffset;
+      setScrollPosition(currentPosition);
+      
+      // Toggle scroll-to-top button visibility
+      if (currentPosition > 300) {
         setShowScrollTop(true);
       } else {
         setShowScrollTop(false);
       }
     };
 
-    window.addEventListener('scroll', toggleVisibility);
-    return () => window.removeEventListener('scroll', toggleVisibility);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: typeof navLinks[0]) => {
@@ -87,9 +114,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                   key={link.path}
                   to={link.path}
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    ((!link.isSection && location.pathname === link.path && !location.hash) || 
-                     (link.isSection && location.pathname === '/' && location.hash === link.path.substring(1)) ||
-                     (!link.isSection && location.pathname === link.path))
+                    isLinkActive(link)
                       ? 'bg-medical-blue/10 text-medical-blue'
                       : 'text-gray-700 hover:text-medical-blue hover:bg-medical-blue/5'
                   }`}
