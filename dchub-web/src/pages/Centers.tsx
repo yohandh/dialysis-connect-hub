@@ -64,19 +64,19 @@ const Centers = () => {
                           <h4 className="font-medium mb-1">Operating Hours:</h4>
                           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                             <div>Monday:</div>
-                            <div>{center.operatingHours.monday}</div>
+                            <div>{center.centerHours.monday}</div>
                             <div>Tuesday:</div>
-                            <div>{center.operatingHours.tuesday}</div>
+                            <div>{center.centerHours.tuesday}</div>
                             <div>Wednesday:</div>
-                            <div>{center.operatingHours.wednesday}</div>
+                            <div>{center.centerHours.wednesday}</div>
                             <div>Thursday:</div>
-                            <div>{center.operatingHours.thursday}</div>
+                            <div>{center.centerHours.thursday}</div>
                             <div>Friday:</div>
-                            <div>{center.operatingHours.friday}</div>
+                            <div>{center.centerHours.friday}</div>
                             <div>Saturday:</div>
-                            <div>{center.operatingHours.saturday}</div>
+                            <div>{center.centerHours.saturday}</div>
                             <div>Sunday:</div>
-                            <div>{center.operatingHours.sunday}</div>
+                            <div>{center.centerHours.sunday}</div>
                           </div>
                         </div>
                         
@@ -116,10 +116,10 @@ const Centers = () => {
                           <TableCell>{center.address.city}, {center.address.state}</TableCell>
                           <TableCell>{center.phone}</TableCell>
                           <TableCell>{center.currentPatients}/{center.capacity}</TableCell>
-                          <TableCell className="text-xs">{center.operatingHours.monday}</TableCell>
+                          <TableCell className="text-xs">{center.centerHours.monday}</TableCell>
                           <TableCell className="text-xs">
-                            Sat: {center.operatingHours.saturday}<br />
-                            Sun: {center.operatingHours.sunday}
+                            Sat: {center.centerHours.saturday}<br />
+                            Sun: {center.centerHours.sunday}
                           </TableCell>
                         </TableRow>
                       ))}

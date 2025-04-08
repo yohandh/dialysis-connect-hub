@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Plus } from "lucide-react";
+import { Plus, LayoutDashboard, Building2, Users, FileBarChart2, BookOpen } from "lucide-react";
 import PortalLayout from "@/components/layouts/PortalLayout";
 import CenterTable from "@/components/admin/centers/CenterTable";
 import CenterFormDialog from "@/components/admin/centers/CenterFormDialog";
@@ -18,13 +17,13 @@ import {
   updateCenter, 
   deleteCenter 
 } from "@/api/centerApi";
-import { DialysisCenter } from '@/data/centerData';
+import { DialysisCenter } from '@/types/centerTypes';
 
 const AdminCenters = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentCenter, setCurrentCenter] = useState<string | null>(null);
+  const [currentCenter, setCurrentCenter] = useState<number | null>(null);
 
   // Fetch centers
   const { data: centers = [], isLoading } = useQuery({
@@ -38,13 +37,10 @@ const AdminCenters = () => {
     defaultValues: {
       name: "",
       address: "",
-      city: "",
-      state: "",
-      zip: "",
-      phone: "",
+      contactNo: "",
       email: "",
-      capacity: 1,
-      operatingHours: {
+      totalCapacity: 10,
+      centerHours: {
         monday: "6:00 AM - 9:00 PM",
         tuesday: "6:00 AM - 9:00 PM",
         wednesday: "6:00 AM - 9:00 PM",
@@ -117,20 +113,75 @@ const AdminCenters = () => {
   });
 
   // Handle dialog open for editing
-  const handleEditCenter = (centerId: string) => {
+  const handleEditCenter = (centerId: number) => {
     const center = centers.find(c => c.id === centerId);
     if (center) {
+      console.log('Center data from API:', center);
+      console.log('Center hours from API:', center.centerHours);
+      
+      // Create default operating hours
+      const defaultHours = {
+        monday: 'Closed',
+        tuesday: 'Closed',
+        wednesday: 'Closed',
+        thursday: 'Closed',
+        friday: 'Closed',
+        saturday: 'Closed',
+        sunday: 'Closed'
+      };
+
+      // Map centerHours from API to form format if available
+      let formattedHours = { ...defaultHours };
+      
+      if (center.centerHours && center.centerHours.length > 0) {
+        // Create a mapping from short day names to full day names
+        const dayMap: Record<string, string> = {
+          'mon': 'monday',
+          'tue': 'tuesday',
+          'wed': 'wednesday',
+          'thu': 'thursday',
+          'fri': 'friday',
+          'sat': 'saturday',
+          'sun': 'sunday'
+        };
+        
+        // Update formattedHours with actual data from API
+        center.centerHours.forEach(hour => {
+          // Get the weekday value
+          const weekday = hour.weekday;
+          const day = dayMap[weekday];
+          
+          // Format the time from 24-hour format to 12-hour format with AM/PM
+          if (day && hour.openTime && hour.closeTime) {
+            // Convert database time format (HH:MM:SS) to display format (HH:MM AM/PM)
+            const formatTime = (timeStr: string) => {
+              const [hours, minutes] = timeStr.split(':');
+              const hourNum = parseInt(hours, 10);
+              const ampm = hourNum >= 12 ? 'PM' : 'AM';
+              const hour12 = hourNum % 12 || 12; // Convert 0 to 12 for 12 AM
+              return `${hour12}:${minutes} ${ampm}`;
+            };
+            
+            const openTimeFormatted = formatTime(hour.openTime);
+            const closeTimeFormatted = formatTime(hour.closeTime);
+            
+            formattedHours[day] = `${openTimeFormatted} - ${closeTimeFormatted}`;
+          } else if (day) {
+            formattedHours[day] = 'Closed';
+          }
+        });
+      }
+      
+      console.log('Formatted hours for editing:', formattedHours);
+      
       form.reset({
         name: center.name,
-        address: center.address.street,
-        city: center.address.city,
-        state: center.address.state,
-        zip: center.address.zipCode,
-        phone: center.phone,
-        email: center.email,
-        capacity: center.capacity,
-        operatingHours: center.operatingHours,
-        type: center.type || "Independent"
+        address: center.address || '',
+        contactNo: center.contactNo || '',
+        email: center.email || '',
+        totalCapacity: center.totalCapacity || 0,
+        centerHours: formattedHours,
+        type: 'Independent'
       });
       setCurrentCenter(centerId);
       setIsDialogOpen(true);
@@ -142,13 +193,10 @@ const AdminCenters = () => {
     form.reset({
       name: "",
       address: "",
-      city: "",
-      state: "",
-      zip: "",
-      phone: "",
+      contactNo: "",
       email: "",
-      capacity: 1,
-      operatingHours: {
+      totalCapacity: 1,
+      centerHours: {
         monday: "6:00 AM - 9:00 PM",
         tuesday: "6:00 AM - 9:00 PM",
         wednesday: "6:00 AM - 9:00 PM",
@@ -163,39 +211,60 @@ const AdminCenters = () => {
     setIsDialogOpen(true);
   };
 
-  // Handle center deletion
-  const handleDeleteCenter = (centerId: string) => {
-    if (window.confirm("Are you sure you want to delete this center?")) {
-      deleteMutation.mutate(centerId);
+  // Handle center deletion (soft delete)
+  const handleDeleteCenter = (centerId: number) => {
+    if (window.confirm("Are you sure you want to deactivate this center? This will make it unavailable for new appointments.")) {
+      deleteMutation.mutate(centerId.toString());
     }
   };
 
   // Form submission handler
   const onSubmit = (data: CenterFormValues) => {
+    // Process operating hours data
+    const centerHoursData = Object.entries(data.centerHours || {}).map(([day, hours]) => {
+      // Convert day names to database format (mon, tue, wed, etc.)
+      const dayMap: Record<string, string> = {
+        monday: 'mon',
+        tuesday: 'tue',
+        wednesday: 'wed',
+        thursday: 'thu',
+        friday: 'fri',
+        saturday: 'sat',
+        sunday: 'sun'
+      };
+      
+      // Parse hours to extract open and close times
+      let openTime = null;
+      let closeTime = null;
+      
+      if (hours && hours !== 'Closed' && hours !== 'custom') {
+        const timeMatch = hours.match(/(\d+:\d+ [AP]M) - (\d+:\d+ [AP]M)/);
+        if (timeMatch) {
+          openTime = timeMatch[1];
+          closeTime = timeMatch[2];
+        }
+      }
+      
+      return {
+        day: dayMap[day],
+        openTime,
+        closeTime
+      };
+    });
+    
     // Ensure all required fields are present
     const formData = {
       name: data.name,
-      address: {
-        street: data.address,
-        city: data.city,
-        state: data.state,
-        zipCode: data.zip
-      },
-      phone: data.phone,
+      address: data.address,
+      contactNo: data.contactNo,
       email: data.email,
-      capacity: data.capacity,
-      operatingHours: {
-        monday: data.operatingHours?.monday || "",
-        tuesday: data.operatingHours?.tuesday || "",
-        wednesday: data.operatingHours?.wednesday || "",
-        thursday: data.operatingHours?.thursday || "",
-        friday: data.operatingHours?.friday || "",
-        saturday: data.operatingHours?.saturday || "",
-        sunday: data.operatingHours?.sunday || ""
-      },
-      type: data.type
+      totalCapacity: data.totalCapacity,
+      isActive: true,
+      centerHours: centerHoursData
     };
 
+    console.log('Submitting center data:', formData);
+    
     if (currentCenter) {
       // Update existing center
       updateMutation.mutate({
@@ -212,10 +281,11 @@ const AdminCenters = () => {
     <PortalLayout
       portalName="Admin Portal"
       navLinks={[
-        { name: "Dashboard", path: "/admin/dashboard" },
-        { name: "Centers", path: "/admin/centers" },
-        { name: "Users", path: "/admin/users" },
-        { name: "Reports", path: "/admin/reports" },
+        { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+        { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
+        { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
       userName="Michael Adams"
       userRole="System Administrator"
@@ -242,7 +312,6 @@ const AdminCenters = () => {
                 centers={centers} 
                 onEditCenter={handleEditCenter}
                 onDeleteCenter={handleDeleteCenter}
-                formatOperatingHours={formatOperatingHours}
               />
             ) : (
               <div>Error loading centers</div>

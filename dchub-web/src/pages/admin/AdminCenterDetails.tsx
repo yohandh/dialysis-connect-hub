@@ -1,6 +1,5 @@
-
-import React, { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   Card,
@@ -23,9 +22,21 @@ import { fetchCenterById } from '@/api/centerApi';
 import { formatOperatingHours } from '@/utils/centerUtils';
 import AppointmentSlotManagement from '@/components/admin/appointments/AppointmentSlotManagement';
 
+interface Center {
+  id: number;
+  name: string;
+  address: string;
+  contactNo: string;
+  email: string;
+  totalCapacity: number;
+  centerHours: { [day: string]: string };
+}
+
 const AdminCenterDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState("overview");
+  const navigate = useNavigate();
+  const [formattedHours, setFormattedHours] = useState<Record<string, string>>({});
 
   // Fetch center details
   const { data: center, isLoading } = useQuery({
@@ -33,6 +44,65 @@ const AdminCenterDetails = () => {
     queryFn: () => fetchCenterById(id!),
     enabled: !!id,
   });
+
+  // Format center hours when center data is loaded
+  useEffect(() => {
+    if (center && center.centerHours) {
+      console.log('Center hours data:', center.centerHours);
+      
+      // Check if centerHours is an array (from API) or object (already formatted)
+      if (Array.isArray(center.centerHours)) {
+        // Format hours from array format to object format
+        const hoursMap: Record<string, string> = {};
+        
+        // Create a mapping from short day names to full day names
+        const dayMap: Record<string, string> = {
+          'mon': 'monday',
+          'tue': 'tuesday',
+          'wed': 'wednesday',
+          'thu': 'thursday',
+          'fri': 'friday',
+          'sat': 'saturday',
+          'sun': 'sunday'
+        };
+        
+        center.centerHours.forEach(hour => {
+          const day = dayMap[hour.weekday] || hour.weekday;
+          
+          if (hour.openTime && hour.closeTime) {
+            // Format time from 24-hour to 12-hour format
+            const formatTime = (timeStr: string) => {
+              const [hours, minutes] = timeStr.split(':');
+              const hourNum = parseInt(hours, 10);
+              const ampm = hourNum >= 12 ? 'PM' : 'AM';
+              const hour12 = hourNum % 12 || 12; // Convert 0 to 12 for 12 AM
+              return `${hour12}:${minutes} ${ampm}`;
+            };
+            
+            const openTimeFormatted = formatTime(hour.openTime);
+            const closeTimeFormatted = formatTime(hour.closeTime);
+            
+            hoursMap[day] = `${openTimeFormatted} - ${closeTimeFormatted}`;
+          } else {
+            hoursMap[day] = 'Closed';
+          }
+        });
+        
+        // Sort the hours by day of week
+        const sortedHours = Object.fromEntries(
+          Object.entries(hoursMap).sort(([dayA], [dayB]) => {
+            const daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            return daysOfWeek.indexOf(dayA) - daysOfWeek.indexOf(dayB);
+          })
+        );
+        
+        setFormattedHours(sortedHours);
+      } else {
+        // If centerHours is already an object, use it directly
+        setFormattedHours(center.centerHours);
+      }
+    }
+  }, [center]);
 
   if (isLoading) {
     return (
@@ -98,12 +168,10 @@ const AdminCenterDetails = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Link to="/admin/centers">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back
-              </Button>
-            </Link>
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
+            </Button>
             <h1 className="text-3xl font-bold tracking-tight ml-2">{center.name}</h1>
           </div>
         </div>
@@ -118,19 +186,18 @@ const AdminCenterDetails = () => {
           
           <div className="mt-6">
             <TabsContent value="overview">
-              <div className="grid gap-6 md:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card>
                   <CardHeader>
                     <CardTitle>Center Information</CardTitle>
-                    <CardDescription>Details about this dialysis center.</CardDescription>
+                    <CardDescription>Basic details about this dialysis center.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-start">
                       <MapPin className="mr-2 h-4 w-4 mt-1" />
                       <div>
                         <p className="font-medium">Address</p>
-                        <p className="text-muted-foreground">{center.address.street}</p>
-                        <p className="text-muted-foreground">{center.address.city}, {center.address.state} {center.address.zipCode}</p>
+                        <p className="text-muted-foreground">{center.address}</p>
                       </div>
                     </div>
                     
@@ -138,7 +205,7 @@ const AdminCenterDetails = () => {
                       <Phone className="mr-2 h-4 w-4" />
                       <div>
                         <p className="font-medium">Phone</p>
-                        <p className="text-muted-foreground">{center.phone}</p>
+                        <p className="text-muted-foreground">{center.contactNo}</p>
                       </div>
                     </div>
                     
@@ -155,12 +222,9 @@ const AdminCenterDetails = () => {
                       <div>
                         <p className="font-medium">Capacity</p>
                         <div>
-                          <Badge variant={center.currentPatients / center.capacity > 0.9 ? "destructive" : "default"}>
-                            {center.currentPatients} / {center.capacity}
+                          <Badge variant="default">
+                            {center.totalCapacity}
                           </Badge>
-                          <span className="ml-2 text-muted-foreground">
-                            ({Math.round((center.currentPatients / center.capacity) * 100)}% occupied)
-                          </span>
                         </div>
                       </div>
                     </div>
@@ -176,12 +240,18 @@ const AdminCenterDetails = () => {
                     <div className="flex items-start">
                       <Clock className="mr-2 h-4 w-4 mt-1" />
                       <div className="space-y-2 w-full">
-                        {Object.entries(center.operatingHours).map(([day, hours]) => (
-                          <div key={day} className="flex justify-between w-full">
-                            <p className="font-medium capitalize">{day}</p>
-                            <p className="text-muted-foreground">{hours}</p>
+                        {Object.keys(formattedHours).length > 0 ? (
+                          Object.entries(formattedHours).map(([day, hours]) => (
+                            <div key={day} className="flex justify-between w-full">
+                              <p className="font-medium capitalize w-3/5  ">{day}</p>
+                              <p className="text-muted-foreground text-left w-2/5">{hours}</p>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center text-muted-foreground py-2">
+                            No operating hours available
                           </div>
-                        ))}
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -190,7 +260,7 @@ const AdminCenterDetails = () => {
             </TabsContent>
             
             <TabsContent value="appointments">
-              <AppointmentSlotManagement centerId={center.id} />
+              <AppointmentSlotManagement centerId={center.id.toString()} />
             </TabsContent>
             
             <TabsContent value="staff">

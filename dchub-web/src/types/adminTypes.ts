@@ -57,7 +57,7 @@ export type Center = {
   phoneNo: string;
   email: string;
   totalCapacity: number;
-  operatingHours?: CenterHours[];
+  centerHours?: CenterHours[];
 };
 
 export type CenterHours = {

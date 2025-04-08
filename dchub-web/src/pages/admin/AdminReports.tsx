@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { ResponsiveBar } from '@nivo/bar';
 import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveLine } from '@nivo/line';
-import { Download } from "lucide-react";
+import { Download, LayoutDashboard, Building2, Users, BookOpen, FileBarChart2 } from "lucide-react";
 import PortalLayout from "@/components/layouts/PortalLayout";
 import { ckdStages, centers, patients } from '@/data/adminMockData';
 
@@ -85,10 +85,11 @@ const AdminReports = () => {
     <PortalLayout
       portalName="Admin Portal"
       navLinks={[
-        { name: "Dashboard", path: "/admin/dashboard" },
-        { name: "Centers", path: "/admin/centers" },
-        { name: "Users", path: "/admin/users" },
-        { name: "Reports", path: "/admin/reports" },
+        { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+        { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
+        { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
       userName="Michael Adams"
       userRole="System Administrator"

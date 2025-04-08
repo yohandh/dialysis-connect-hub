@@ -121,10 +121,23 @@ const ContactSection = () => {
                 <CardTitle>Find Us</CardTitle>
                 <CardDescription>Our headquarters location in Colombo, Sri Lanka</CardDescription>
               </CardHeader>
-              
+
               <CardContent>
                 {/* <Map className="h-64 w-full rounded-md" /> */}
-                <Map />
+                
+                {/* 
+                <iframe
+                  width="100%"
+                  height="400"
+                  frameBorder="0"
+                  style={{ border: 0 }}
+                  referrerPolicy="no-referrer-when-downgrade"
+                  src="https://www.google.com/maps/embed/v1/place?key=AIzaSyCzZgILi0ov9SEGebFf9AVL2dGYq8eECfg&q=349+Jayantha+Weerasekara+Mawatha,+Colombo,+Sri+Lanka"
+                  allowFullScreen
+                /> 
+                */}
+
+<Map />
               </CardContent>
             </Card>
           </div>
