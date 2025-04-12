@@ -21,6 +21,8 @@ import PortalLayout from "@/components/layouts/PortalLayout";
 import { fetchCenterById } from '@/api/centerApi';
 import { formatOperatingHours } from '@/utils/centerUtils';
 import AppointmentSlotManagement from '@/components/admin/appointments/AppointmentSlotManagement';
+import BedManagement from '@/components/admin/equipment/BedManagement';
+import SessionManagement from '@/components/admin/sessions/SessionManagement';
 
 interface Center {
   id: number;
@@ -177,11 +179,12 @@ const AdminCenterDetails = () => {
         </div>
 
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="appointments">Appointments</TabsTrigger>
-            <TabsTrigger value="staff">Staff</TabsTrigger>
+            <TabsTrigger value="sessions">Sessions</TabsTrigger>
             <TabsTrigger value="equipment">Equipment</TabsTrigger>
+            <TabsTrigger value="staff">Staff</TabsTrigger>
           </TabsList>
           
           <div className="mt-6">
@@ -263,6 +266,30 @@ const AdminCenterDetails = () => {
               <AppointmentSlotManagement centerId={center.id.toString()} />
             </TabsContent>
             
+            <TabsContent value="sessions">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recurring Sessions</CardTitle>
+                  <CardDescription>Define and manage recurring dialysis sessions.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <SessionManagement centerId={center.id.toString()} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="equipment">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Equipments</CardTitle>
+                  <CardDescription>Manage dialysis beds, machines and other equipment.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <BedManagement centerId={center.id.toString()} />
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
             <TabsContent value="staff">
               <Card>
                 <CardHeader>
@@ -271,18 +298,6 @@ const AdminCenterDetails = () => {
                 </CardHeader>
                 <CardContent>
                   <p>Staff management UI will be implemented here.</p>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="equipment">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Equipment</CardTitle>
-                  <CardDescription>Manage dialysis machines and other equipment.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Equipment management UI will be implemented here.</p>
                 </CardContent>
               </Card>
             </TabsContent>

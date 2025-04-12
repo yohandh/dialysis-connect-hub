@@ -41,6 +41,9 @@ interface CenterHoursFormProps {
 const CenterHoursForm: React.FC<CenterHoursFormProps> = ({ form }) => {
   // Track custom input values separately
   const [customValues, setCustomValues] = useState<Record<string, string>>({});
+  
+  // Add state to track if the form has been initialized
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Common hours to select from
   const commonHours = [
@@ -76,6 +79,7 @@ const CenterHoursForm: React.FC<CenterHoursFormProps> = ({ form }) => {
   useEffect(() => {
     const centerHours = form.getValues('centerHours');
     if (centerHours) {
+      console.log('Center hours on mount:', centerHours);
       const newCustomValues: Record<string, string> = {};
       
       // For each day, check if it has a custom value
@@ -90,6 +94,13 @@ const CenterHoursForm: React.FC<CenterHoursFormProps> = ({ form }) => {
       if (Object.keys(newCustomValues).length > 0) {
         setCustomValues(newCustomValues);
       }
+      
+      // Set Sunday to "Closed" by default if it's empty
+      if (!centerHours.sunday) {
+        form.setValue('centerHours.sunday', 'Closed');
+      }
+      
+      setIsInitialized(true);
     }
   }, [form, commonHours]);
 
@@ -146,7 +157,8 @@ const CenterHoursForm: React.FC<CenterHoursFormProps> = ({ form }) => {
                                   field.onChange(value);
                                 }
                               }}
-                              value={customValueFlag ? 'custom' : field.value || ""}
+                              value={customValueFlag ? 'custom' : field.value}
+                              defaultValue={day.name === 'sunday' ? 'Closed' : ''}
                             >
                               <FormControl>
                                 <SelectTrigger className="h-9 text-sm w-full px-2 border border-input">

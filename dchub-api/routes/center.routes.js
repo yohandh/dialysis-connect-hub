@@ -4,6 +4,7 @@ const { body } = require('express-validator');
 // We'll create this controller next
 const centerController = require('../controllers/center.controller');
 const authMiddleware = require('../middleware/auth.middleware');
+const bedController = require('../controllers/bed.controller');
 
 // Get all centers
 router.get('/', centerController.getAllCenters);
@@ -41,5 +42,8 @@ router.delete('/:id',
   // authMiddleware, 
   centerController.deleteCenter
 );
+
+// Get all beds for a center
+router.get('/:centerId/beds', bedController.getBedsByCenter);
 
 module.exports = router;

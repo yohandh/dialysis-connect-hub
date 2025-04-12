@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -13,6 +12,8 @@ const appointmentRoutes = require('./routes/appointment.routes');
 const centerRoutes = require('./routes/center.routes');
 const userRoutes = require('./routes/user.routes');
 const ckdRoutes = require('./routes/ckd.routes');
+const bedRoutes = require('./routes/bed.routes');
+const sessionRoutes = require('./routes/session.routes');
 
 // Initialize Express app
 const app = express();
@@ -20,9 +21,7 @@ const PORT = process.env.PORT || 5000;
 
 // Improved CORS configuration for development and production
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.CLIENT_URL 
-    : ['http://localhost:8080', 'http://localhost:5173', 'http://127.0.0.1:8080', 'http://127.0.0.1:5173'],
+  origin: '*', // Allow all origins for now
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -53,6 +52,13 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/centers', centerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/ckd-records', ckdRoutes);
+app.use('/api/beds', bedRoutes);
+app.use('/api', sessionRoutes);
+
+// Test endpoint
+app.get('/api/test', (req, res) => {
+  res.status(200).json({ message: 'API is working correctly' });
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -70,7 +76,9 @@ app.get('/api', (req, res) => {
       appointments: '/api/appointments',
       centers: '/api/centers',
       users: '/api/users',
-      ckdRecords: '/api/ckd-records'
+      ckdRecords: '/api/ckd-records',
+      beds: '/api/beds',
+      sessions: '/api/centers/:centerId/sessions'
     }
   });
 });

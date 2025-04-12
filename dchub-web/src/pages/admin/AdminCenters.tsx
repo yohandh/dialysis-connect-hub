@@ -41,12 +41,12 @@ const AdminCenters = () => {
       email: "",
       totalCapacity: 10,
       centerHours: {
-        monday: "6:00 AM - 9:00 PM",
-        tuesday: "6:00 AM - 9:00 PM",
-        wednesday: "6:00 AM - 9:00 PM",
-        thursday: "6:00 AM - 9:00 PM",
-        friday: "6:00 AM - 9:00 PM",
-        saturday: "8:00 AM - 4:00 PM",
+        monday: "",
+        tuesday: "",
+        wednesday: "",
+        thursday: "",
+        friday: "",
+        saturday: "",
         sunday: "Closed"
       },
       type: "Independent"
@@ -190,6 +190,7 @@ const AdminCenters = () => {
 
   // Handle dialog open for new center
   const handleNewCenter = () => {
+    // Reset form to default values
     form.reset({
       name: "",
       address: "",
@@ -197,12 +198,12 @@ const AdminCenters = () => {
       email: "",
       totalCapacity: 1,
       centerHours: {
-        monday: "6:00 AM - 9:00 PM",
-        tuesday: "6:00 AM - 9:00 PM",
-        wednesday: "6:00 AM - 9:00 PM",
-        thursday: "6:00 AM - 9:00 PM",
-        friday: "6:00 AM - 9:00 PM",
-        saturday: "8:00 AM - 4:00 PM",
+        monday: "",
+        tuesday: "",
+        wednesday: "",
+        thursday: "",
+        friday: "",
+        saturday: "",
         sunday: "Closed"
       },
       type: "Independent"
