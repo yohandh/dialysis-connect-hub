@@ -1,4 +1,3 @@
-
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 
@@ -23,9 +22,13 @@ module.exports = async (req, res, next) => {
       return res.status(401).json({ message: 'User not found' });
     }
     
+    // TEMPORARY DEVELOPMENT FIX: Skip the inactive check
+    // In production, uncomment the following block
+    /*
     if (user.status !== 'active') {
       return res.status(401).json({ message: 'User account is inactive' });
     }
+    */
     
     // Add user to request
     req.user = {

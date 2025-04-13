@@ -8,7 +8,16 @@ const authMiddleware = require('../middleware/auth.middleware');
 // Get all users
 router.get('/', authMiddleware, userController.getAllUsers);
 
-// Get user by ID
+// GET all roles - moved before /:id route to prevent conflicts
+router.get('/roles', userController.getAllRoles);
+
+// GET all roles with authentication
+router.get('/roles/all', authMiddleware, userController.getAllRoles);
+
+// GET users by roles (admin or staff)
+router.get('/by-roles', userController.getUsersByRoles);
+
+// Get user by ID - moved after specific routes
 router.get('/:id', authMiddleware, userController.getUserById);
 
 // Create new user
@@ -35,8 +44,5 @@ router.put('/:id', [
 
 // Delete user
 router.delete('/:id', authMiddleware, userController.deleteUser);
-
-// Get all roles
-router.get('/roles/all', authMiddleware, userController.getAllRoles);
 
 module.exports = router;

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
@@ -139,15 +138,24 @@ export function useUserManagement() {
         });
         break;
       case 'activate':
-        // In real implementation, this would reactivate a user
+        // In a real implementation, this would call an API to reactivate the user
+        // For now, we'll just show a success message
         toast({
           title: "Success",
           description: `${user.name} has been activated`,
         });
+        // In a real implementation, we would invalidate the queries here
+        queryClient.invalidateQueries({ queryKey: ['users'] });
         break;
       default:
         break;
     }
+  };
+
+  const getUserStatus = (user: User) => {
+    if (user.status === 'active') return 'Active';
+    if (user.status === 'inactive') return 'Inactive';
+    return 'Unknown';
   };
 
   return {
@@ -177,5 +185,6 @@ export function useUserManagement() {
     isCreatingUser,
     isUpdatingUser,
     selectedUserId,
+    getUserStatus,
   };
 }

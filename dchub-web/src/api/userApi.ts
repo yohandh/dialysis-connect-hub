@@ -1,6 +1,5 @@
-
 import { User, Patient, Doctor, Role } from "@/types/adminTypes";
-import { users, patients, doctors, roles } from "@/data/adminMockData";
+import axios from 'axios'; // Import axios
 
 // Types for API requests and responses
 export interface CreateUserRequest {
@@ -37,155 +36,254 @@ export interface UserResponse {
 
 // Mock API functions
 export const fetchUsers = async (): Promise<User[]> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return users;
+  try {
+    // Get authentication token from localStorage
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in.');
+    }
+    
+    const response = await axios.get('/api/users', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    // Map the response data to ensure consistent structure
+    return response.data.map((user: any) => ({
+      id: user.id,
+      name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      email: user.email,
+      mobileNo: user.mobileNo || user.mobile_no || '',
+      roleId: user.roleId || user.role_id,
+      roleName: user.roleName || getRoleName(user.roleId || user.role_id),
+      status: user.status || 'active',
+      createdAt: user.createdAt || user.created_at,
+      updatedAt: user.updatedAt || user.updated_at
+    }));
+  } catch (error: any) {
+    console.error('Error fetching users:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Helper function to get role name from role ID
+const getRoleName = (roleId: number) => {
+  switch (roleId) {
+    case 1: return 'admin';
+    case 2: return 'staff';
+    case 3: return 'patient';
+    case 4: return 'doctor';
+    default: return 'unknown';
+  }
 };
 
 export const fetchUserById = async (userId: number): Promise<UserResponse> => {
   await new Promise(resolve => setTimeout(resolve, 300));
   
-  const user = users.find(u => u.id === userId);
-  if (!user) throw new Error("User not found");
-  
-  let patient;
-  let doctor;
-  
-  if (user.roleId === 3) { // Patient
-    patient = patients.find(p => p.userId === user.id);
-  } else if (user.roleId === 4) { // Doctor
-    doctor = doctors.find(d => d.userId === user.id);
+  try {
+    const response = await axios.get(`/api/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    const user = response.data;
+    
+    let patient;
+    let doctor;
+    
+    if (user.roleId === 3) { // Patient
+      const patientResponse = await axios.get(`/api/patients/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      patient = patientResponse.data;
+    } else if (user.roleId === 4) { // Doctor
+      const doctorResponse = await axios.get(`/api/doctors/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      doctor = doctorResponse.data;
+    }
+    
+    return { user, patient, doctor };
+  } catch (error: any) {
+    console.error('Error fetching user:', error.response?.data || error.message);
+    throw error;
   }
-  
-  return { user, patient, doctor };
 };
 
 export const createUser = async (data: CreateUserRequest): Promise<UserResponse> => {
   await new Promise(resolve => setTimeout(resolve, 700));
   
-  // In a real API this would create the user in the database
-  // For now, we'll simulate a successful response
-  
-  const newId = Math.max(...users.map(u => u.id)) + 1;
-  
-  const newUser: User = {
-    id: newId,
-    roleId: data.roleId,
-    name: data.name,
-    email: data.email,
-    mobileNo: data.mobileNo,
-    status: data.status,
-    roleName: roles.find(r => r.id === data.roleId)?.name
-  };
-  
-  // Simulate creating role-specific records
-  let newPatient: Patient | undefined;
-  let newDoctor: Doctor | undefined;
-  
-  if (data.roleId === 3) { // Patient
-    newPatient = {
-      id: patients.length + 1,
-      userId: newId,
-      gender: data.gender as 'male' | 'female' | 'other',
-      dob: data.dob as string,
-      address: data.address || '',
-      bloodGroup: data.bloodGroup || '',
-      emergencyContactNo: data.emergencyContactNo || '',
-      emergencyContact: data.emergencyContact || '',
-      insuranceProvider: data.insuranceProvider || '',
-      allergies: data.allergies || '',
-      chronicConditions: data.chronicConditions || '',
+  try {
+    const response = await axios.post('/api/users', data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    const newUser = response.data;
+    
+    let newPatient: Patient | undefined;
+    let newDoctor: Doctor | undefined;
+    
+    if (data.roleId === 3) { // Patient
+      const patientResponse = await axios.post('/api/patients', {
+        userId: newUser.id,
+        gender: data.gender,
+        dob: data.dob,
+        address: data.address,
+        bloodGroup: data.bloodGroup,
+        emergencyContactNo: data.emergencyContactNo,
+        emergencyContact: data.emergencyContact,
+        insuranceProvider: data.insuranceProvider,
+        allergies: data.allergies,
+        chronicConditions: data.chronicConditions,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      newPatient = patientResponse.data;
+    } else if (data.roleId === 4) { // Doctor
+      const doctorResponse = await axios.post('/api/doctors', {
+        userId: newUser.id,
+        gender: data.gender,
+        specialization: data.specialization,
+        address: data.address,
+        emergencyContactNo: data.emergencyContactNo,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      newDoctor = doctorResponse.data;
+    }
+    
+    console.log("Created new user:", { user: newUser, patient: newPatient, doctor: newDoctor });
+    
+    return {
+      user: newUser,
+      patient: newPatient,
+      doctor: newDoctor
     };
-  } else if (data.roleId === 4) { // Doctor
-    newDoctor = {
-      id: doctors.length + 1,
-      userId: newId,
-      gender: data.gender as 'male' | 'female' | 'other',
-      specialization: data.specialization || '',
-      address: data.address || '',
-      emergencyContactNo: data.emergencyContactNo || '',
-    };
+  } catch (error: any) {
+    console.error('Error creating user:', error.response?.data || error.message);
+    throw error;
   }
-  
-  console.log("Created new user:", { user: newUser, patient: newPatient, doctor: newDoctor });
-  
-  return {
-    user: newUser,
-    patient: newPatient,
-    doctor: newDoctor
-  };
 };
 
 export const updateUser = async (data: UpdateUserRequest): Promise<UserResponse> => {
   await new Promise(resolve => setTimeout(resolve, 700));
   
-  // In a real API this would update the user in the database
-  // For now, we'll simulate a successful response
-  const existingUser = users.find(u => u.id === data.id);
-  if (!existingUser) throw new Error("User not found");
-  
-  const updatedUser: User = {
-    ...existingUser,
-    name: data.name,
-    email: data.email,
-    mobileNo: data.mobileNo,
-    status: data.status,
-    roleId: data.roleId,
-    roleName: roles.find(r => r.id === data.roleId)?.name
-  };
-  
-  // Simulate updating role-specific records
-  let updatedPatient: Patient | undefined;
-  let updatedDoctor: Doctor | undefined;
-  
-  if (data.roleId === 3) { // Patient
-    const existingPatient = patients.find(p => p.userId === data.id);
+  try {
+    const response = await axios.put(`/api/users/${data.id}`, data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
     
-    updatedPatient = {
-      id: existingPatient?.id || patients.length + 1,
-      userId: data.id,
-      gender: data.gender as 'male' | 'female' | 'other',
-      dob: data.dob as string,
-      address: data.address || '',
-      bloodGroup: data.bloodGroup || '',
-      emergencyContactNo: data.emergencyContactNo || '',
-      emergencyContact: data.emergencyContact || '',
-      insuranceProvider: data.insuranceProvider || '',
-      allergies: data.allergies || '',
-      chronicConditions: data.chronicConditions || '',
-    };
-  } else if (data.roleId === 4) { // Doctor
-    const existingDoctor = doctors.find(d => d.userId === data.id);
+    const updatedUser = response.data;
     
-    updatedDoctor = {
-      id: existingDoctor?.id || doctors.length + 1,
-      userId: data.id,
-      gender: data.gender as 'male' | 'female' | 'other',
-      specialization: data.specialization || '',
-      address: data.address || '',
-      emergencyContactNo: data.emergencyContactNo || '',
+    let updatedPatient: Patient | undefined;
+    let updatedDoctor: Doctor | undefined;
+    
+    if (data.roleId === 3) { // Patient
+      const patientResponse = await axios.put(`/api/patients/${data.id}`, {
+        gender: data.gender,
+        dob: data.dob,
+        address: data.address,
+        bloodGroup: data.bloodGroup,
+        emergencyContactNo: data.emergencyContactNo,
+        emergencyContact: data.emergencyContact,
+        insuranceProvider: data.insuranceProvider,
+        allergies: data.allergies,
+        chronicConditions: data.chronicConditions,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      updatedPatient = patientResponse.data;
+    } else if (data.roleId === 4) { // Doctor
+      const doctorResponse = await axios.put(`/api/doctors/${data.id}`, {
+        gender: data.gender,
+        specialization: data.specialization,
+        address: data.address,
+        emergencyContactNo: data.emergencyContactNo,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      updatedDoctor = doctorResponse.data;
+    }
+    
+    console.log("Updated user:", { user: updatedUser, patient: updatedPatient, doctor: updatedDoctor });
+    
+    return {
+      user: updatedUser,
+      patient: updatedPatient,
+      doctor: updatedDoctor
     };
+  } catch (error: any) {
+    console.error('Error updating user:', error.response?.data || error.message);
+    throw error;
   }
-  
-  console.log("Updated user:", { user: updatedUser, patient: updatedPatient, doctor: updatedDoctor });
-  
-  return {
-    user: updatedUser,
-    patient: updatedPatient,
-    doctor: updatedDoctor
-  };
 };
 
 export const deleteUser = async (userId: number): Promise<boolean> => {
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  // In a real API this would delete or deactivate the user
-  console.log(`User ${userId} deleted/deactivated`);
-  
-  return true;
+  try {
+    await axios.delete(`/api/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    console.log(`User ${userId} deleted/deactivated`);
+    
+    return true;
+  } catch (error: any) {
+    console.error('Error deleting user:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const fetchRoles = async (): Promise<Role[]> => {
   await new Promise(resolve => setTimeout(resolve, 300));
-  return roles;
+  
+  try {
+    const response = await axios.get('/api/roles', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching roles:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Get users by roles (admin or staff)
+export const getUsersByRoles = async (roles: string[] = ['admin', 'staff']) => {
+  try {
+    const response = await axios.get(`/api/users/by-roles?roles=${roles.join(',')}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching managers:', error);
+    return [];
+  }
 };

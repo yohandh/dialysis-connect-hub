@@ -9,6 +9,7 @@ export interface DialysisCenter {
   email: string;
   totalCapacity: number;
   isActive: boolean;
+  manageById?: number;
   centerHours?: {
     id?: number;
     weekday: string;
@@ -24,6 +25,7 @@ export const centerFormSchema = z.object({
   contactNo: z.string().min(10, "Contact number is required"),
   email: z.string().email("Invalid email address"),
   totalCapacity: z.coerce.number().min(1, "Capacity must be at least 1"),
+  manageById: z.coerce.number().optional(),
   centerHours: z.object({
     monday: z.string().optional(),
     tuesday: z.string().optional(),

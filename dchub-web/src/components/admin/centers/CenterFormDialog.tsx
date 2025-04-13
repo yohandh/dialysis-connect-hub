@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,14 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { CenterFormValues } from "@/types/centerTypes";
 import CenterOperatingHoursForm from './CenterOperatingHoursForm';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { getUsersByRoles } from "@/api/userApi";
 
 interface CenterFormDialogProps {
   isOpen: boolean;
@@ -29,6 +37,13 @@ interface CenterFormDialogProps {
   form: UseFormReturn<CenterFormValues>;
   onSubmit: (data: CenterFormValues) => void;
   isEditing: boolean;
+}
+
+interface Manager {
+  id: number;
+  name: string;
+  email: string;
+  roleName: string;
 }
 
 const CenterFormDialog: React.FC<CenterFormDialogProps> = ({
@@ -40,12 +55,25 @@ const CenterFormDialog: React.FC<CenterFormDialogProps> = ({
 }) => {
   const [step, setStep] = useState(1);
   const totalSteps = 2;
+  const [managers, setManagers] = useState<Manager[]>([]);
   
+  useEffect(() => {
+    const fetchManagers = async () => {
+      try {
+        const data = await getUsersByRoles(['admin', 'staff']);
+        setManagers(data);
+      } catch (error) {
+        console.error('Error fetching managers:', error);
+      }
+    };
+    fetchManagers();
+  }, []);
+
   const nextStep = () => {
     if (step < totalSteps) {
       // Validate current step fields before proceeding
       const fieldsToValidate = step === 1 
-        ? ['name', 'address', 'contactNo', 'email', 'totalCapacity'] as const
+        ? ['name', 'address', 'contactNo', 'email', 'totalCapacity', 'manageById'] as const
         : [];
         
       form.trigger(fieldsToValidate).then(isValid => {
@@ -162,7 +190,34 @@ const CenterFormDialog: React.FC<CenterFormDialogProps> = ({
                       </FormItem>
                     )}
                   />
-                  <div></div> {/* Empty div for alignment */}
+                  <FormField
+                    control={form.control}
+                    name="manageById"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Manager</FormLabel>
+                        <FormControl>
+                          <Select 
+                            onValueChange={(value) => field.onChange(value === "0" ? null : Number(value))}
+                            value={field.value ? String(field.value) : "0"}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a manager" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="0">None</SelectItem>
+                              {managers.map((manager) => (
+                                <SelectItem key={manager.id} value={String(manager.id)}>
+                                  {manager.name} ({manager.roleName})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </>
             )}

@@ -1,4 +1,5 @@
 import { useMockApi, apiCall } from "@/config/api.config";
+import axios from 'axios'; // Import axios
 
 // Mock API delay
 const API_DELAY = 300;
@@ -39,45 +40,41 @@ const mockUsers = [
   }
 ];
 
-// Login function
-export const login = async (credentials: { email: string; password: string }) => {
+// Login user
+export const loginUser = async (credentials: { email: string; password: string }) => {
   try {
-    if (useMockApi()) {
-      await new Promise(resolve => setTimeout(resolve, API_DELAY));
+    // Direct API call to the backend
+    const response = await axios.post('/api/auth/login', credentials);
+    
+    if (response.data && response.data.token) {
+      // Store auth token in localStorage
+      localStorage.setItem('authToken', response.data.token);
       
-      const user = mockUsers.find(u => 
-        u.email === credentials.email && 
-        u.password === credentials.password &&
-        u.is_active
-      );
+      // Also store user data
+      localStorage.setItem('userData', JSON.stringify({
+        id: response.data.user.id,
+        name: response.data.user.name,
+        email: response.data.user.email,
+        roleId: response.data.user.roleId,
+        roleName: response.data.user.roleName
+      }));
       
-      if (!user) {
-        throw new Error("Invalid credentials");
-      }
-      
-      // Create a mock token (in a real app, this would be a JWT)
-      const token = `mock-token-${user.id}-${Date.now()}`;
-      
-      // Return user data without the password
-      const { password, ...userWithoutPassword } = user;
-      
-      return {
-        user: userWithoutPassword,
-        token
-      };
-    } else {
-      // Real API call
-      const response = await apiCall('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify(credentials)
-      });
-      
-      return response;
+      console.log('Authentication successful, token stored');
     }
-  } catch (error) {
-    console.error("Login failed:", error);
+    
+    return response.data;
+  } catch (error: any) {
+    console.error('Login error:', error.response?.data || error.message);
     throw error;
   }
+};
+
+// Logout user
+export const logoutUser = () => {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('userData');
+  // Any other cleanup needed
+  return { success: true };
 };
 
 // Get current user
@@ -117,26 +114,6 @@ export const getCurrentUser = async (token: string) => {
     }
   } catch (error) {
     console.error("Failed to get current user:", error);
-    throw error;
-  }
-};
-
-// Logout function
-export const logout = async () => {
-  try {
-    if (useMockApi()) {
-      await new Promise(resolve => setTimeout(resolve, API_DELAY));
-      return { success: true };
-    } else {
-      // Real API call
-      const response = await apiCall('/auth/logout', {
-        method: 'POST'
-      });
-      
-      return response;
-    }
-  } catch (error) {
-    console.error("Logout failed:", error);
     throw error;
   }
 };

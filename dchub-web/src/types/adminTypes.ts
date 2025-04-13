@@ -1,4 +1,3 @@
-
 // Admin portal type definitions based on DB schema
 
 export type Role = {
@@ -12,7 +11,7 @@ export type User = {
   name: string;
   email: string;
   mobileNo: string;
-  status: 'active' | 'inactive';
+  status: 'Active' | 'Inactive';
   password?: string; // Only used for creation/updates, never returned from API
   roleName?: string; // Joined data
   lastLogin?: string;

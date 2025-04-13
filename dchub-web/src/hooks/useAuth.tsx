@@ -57,17 +57,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.setItem('auth', JSON.stringify(authState));
     } else {
       localStorage.removeItem('auth');
+      localStorage.removeItem('authToken');
     }
   }, [authState]);
 
   // Login function
   const login = (data: { user: User; token: string; role: number }) => {
+    // Store token directly in localStorage for API calls
+    localStorage.setItem('authToken', data.token);
+    
+    // Update auth state
     setAuthState({
       user: data.user,
       token: data.token,
       role: data.role,
       isAuthenticated: true
     });
+    
+    console.log('Auth token stored:', data.token);
   };
 
   // Logout function

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
-import { login as authLogin } from '@/api/authApi';
+import { loginUser } from '@/api/authApi';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
@@ -31,8 +30,8 @@ const AdminLogin = () => {
     setIsLoading(true);
     
     try {
-      // Use the authApi login function which handles mock data
-      const response = await authLogin({ email, password });
+      // Call the authentication API
+      const response = await loginUser({ email, password });
       
       if (response && response.token) {
         // Get user data and role from the API response
@@ -60,11 +59,11 @@ const AdminLogin = () => {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       toast({
         title: "Login Failed",
-        description: "Authentication failed. Please check your credentials.",
+        description: error.response?.data?.message || "Authentication failed. Please check your credentials.",
         variant: "destructive",
       });
     } finally {

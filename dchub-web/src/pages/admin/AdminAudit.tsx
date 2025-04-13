@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -20,6 +20,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "@/components/ui/card";
 import {
   Select,
@@ -39,6 +40,13 @@ import {
   FileText,
   FileMinus,
   Search,
+  LayoutDashboard,
+  Building2,
+  Users,
+  BookOpen,
+  FileBarChart2,
+  Bell,
+  ClipboardList
 } from "lucide-react";
 import { format } from "date-fns";
 import PortalLayout from "@/components/layouts/PortalLayout";
@@ -113,7 +121,7 @@ const auditLogs: AuditLog[] = [
   }
 ];
 
-const AdminAuditLogs = () => {
+const AdminAudit = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [tableFilter, setTableFilter] = useState('all');
   const [actionFilter, setActionFilter] = useState('all');
@@ -153,7 +161,7 @@ const AdminAuditLogs = () => {
       case 'create':
         return { icon: <FilePlus className="h-4 w-4" />, color: 'bg-green-500' };
       case 'update':
-        return { icon: <FileText className="h-4 w-4" />, color: 'bg-yellow-500' };
+        return { icon: <FileText className="h-4 w-4" />, color: 'bg-blue-500' };
       case 'delete':
         return { icon: <FileMinus className="h-4 w-4" />, color: 'bg-red-500' };
       default:
@@ -164,89 +172,104 @@ const AdminAuditLogs = () => {
   // Format date
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'MMM dd, yyyy HH:mm:ss');
-    } catch (e) {
+      const date = new Date(dateString);
+      return format(date, 'MMM dd, yyyy HH:mm:ss');
+    } catch (error) {
       return dateString;
     }
   };
 
   // Format JSON for display
   const formatJsonDisplay = (data: any) => {
-    if (!data) return "null";
+    if (!data) return 'null';
     
     try {
       return JSON.stringify(data, null, 2);
-    } catch (e) {
+    } catch (error) {
       return String(data);
     }
   };
-
-  // Get unique table names for filter
-  const uniqueTables = ['all', ...new Set(auditLogs.map(log => log.tableName))];
 
   return (
     <PortalLayout
       portalName="Admin Portal"
       navLinks={[
-        { name: "Dashboard", path: "/admin/dashboard" },
-        { name: "Users", path: "/admin/users" },
-        { name: "Centers", path: "/admin/centers" },
-        { name: "Notifications", path: "/admin/notifications" },
-        { name: "Audit", path: "/admin/audit-logs" },
-        { name: "Education", path: "/admin/education" },
-        { name: "Reports", path: "/admin/reports" },
+        { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+        { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
+        { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
+        { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
+        { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
       userName="Michael Adams"
       userRole="System Administrator"
       userImage="https://randomuser.me/api/portraits/men/42.jpg"
     >
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Audit Logs</h1>
-          <div className="flex space-x-2">
-            <div className="relative">
+        <h1 className="text-3xl font-bold tracking-tight">System Audit Logs</h1>
+        
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+          <div className="flex flex-1 gap-4 items-center">
+            <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 type="search"
                 placeholder="Search logs..."
-                className="pl-8 w-[200px]"
+                className="pl-8"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
-            <Select value={tableFilter} onValueChange={setTableFilter}>
-              <SelectTrigger className="w-[150px]">
-                <Filter className="mr-2 h-4 w-4" />
-                <span>Table: {tableFilter}</span>
-              </SelectTrigger>
-              <SelectContent>
-                {uniqueTables.map((table) => (
-                  <SelectItem key={table} value={table}>
-                    {table === 'all' ? 'All Tables' : table}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={actionFilter} onValueChange={setActionFilter}>
-              <SelectTrigger className="w-[150px]">
-                <Filter className="mr-2 h-4 w-4" />
-                <span>Action: {actionFilter}</span>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Actions</SelectItem>
-                <SelectItem value="create">Create</SelectItem>
-                <SelectItem value="update">Update</SelectItem>
-                <SelectItem value="delete">Delete</SelectItem>
-              </SelectContent>
-            </Select>
+            
+            <div className="flex gap-2">
+              <Select value={tableFilter} onValueChange={setTableFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <Filter className="mr-2 h-4 w-4" />
+                  <span>Table</span>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Tables</SelectItem>
+                  <SelectItem value="users">Users</SelectItem>
+                  <SelectItem value="centers">Centers</SelectItem>
+                  <SelectItem value="appointment_slots">Appointments</SelectItem>
+                  <SelectItem value="education_materials">Education</SelectItem>
+                  <SelectItem value="center_users">Center Users</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Select value={actionFilter} onValueChange={setActionFilter}>
+                <SelectTrigger className="w-[150px]">
+                  <Filter className="mr-2 h-4 w-4" />
+                  <span>Action</span>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Actions</SelectItem>
+                  <SelectItem value="create">Create</SelectItem>
+                  <SelectItem value="update">Update</SelectItem>
+                  <SelectItem value="delete">Delete</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              <Calendar className="mr-2 h-4 w-4" />
+              Date Range
+            </Button>
+            <Button variant="outline" size="sm">
+              Export
+            </Button>
           </div>
         </div>
-
+        
         <Card>
           <CardHeader>
-            <CardTitle>System Activity Logs</CardTitle>
+            <CardTitle>Audit Log Records</CardTitle>
+            <CardDescription>
+              Showing {filteredLogs.length} of {auditLogs.length} records
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
@@ -256,33 +279,34 @@ const AdminAuditLogs = () => {
                   <TableHead>Table</TableHead>
                   <TableHead>Record ID</TableHead>
                   <TableHead>Changed By</TableHead>
+                  <TableHead>Date & Time</TableHead>
                   <TableHead>IP Address</TableHead>
-                  <TableHead>Timestamp</TableHead>
                   <TableHead className="text-right">Details</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredLogs.map((log) => (
+                {filteredLogs.map(log => (
                   <TableRow key={log.id}>
                     <TableCell>
-                      <div className="flex items-center">
-                        <div className={`p-1 mr-2 rounded-full ${getActionDetails(log.action).color} text-white`}>
+                      <div className="flex items-center gap-2">
+                        <div className={`p-1 rounded-full ${getActionDetails(log.action).color} text-white`}>
                           {getActionDetails(log.action).icon}
                         </div>
                         <span className="capitalize">{log.action}</span>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">{log.tableName}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">
+                        {log.tableName.replace('_', ' ')}
+                      </Badge>
+                    </TableCell>
                     <TableCell>{log.recordId}</TableCell>
                     <TableCell>{log.changedByName}</TableCell>
+                    <TableCell>{formatDate(log.createdAt)}</TableCell>
                     <TableCell>
-                      <code className="text-xs bg-muted px-1 py-0.5 rounded">{log.ipAddress}</code>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {formatDate(log.createdAt)}
-                      </div>
+                      <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                        {log.ipAddress}
+                      </code>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button 
@@ -378,4 +402,4 @@ const AdminAuditLogs = () => {
   );
 };
 
-export default AdminAuditLogs;
+export default AdminAudit;

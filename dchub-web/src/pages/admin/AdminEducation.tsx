@@ -40,7 +40,7 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Book, Edit, FileText, Plus, Trash, LayoutDashboard, Building2, Users, BookOpen, FileBarChart2 } from "lucide-react";
+import { Book, Edit, FileText, Plus, Trash, LayoutDashboard, Building2, Users, BookOpen, FileBarChart2, Bell, ClipboardList } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import PortalLayout from "@/components/layouts/PortalLayout";
 import { EducationMaterial, CkdStage } from '@/types/adminTypes';
@@ -221,8 +221,10 @@ const AdminEducation = () => {
       portalName="Admin Portal"
       navLinks={[
         { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
-        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
         { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
+        { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
         { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}

@@ -2,24 +2,30 @@ const { pool } = require('../config/db');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 
+// Helper function to capitalize first letter
+const capitalizeFirstLetter = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
+
 // Get all users
 exports.getAllUsers = async (req, res) => {
   try {
     const [users] = await pool.query(
-      `SELECT u.*, r.name as roleName
+      `SELECT u.*, r.name as role_name
        FROM users u
-       JOIN roles r ON u.roleId = r.id
-       ORDER BY u.name ASC`
+       JOIN roles r ON u.role_id = r.id
+       ORDER BY u.first_name ASC`
     );
     
     const formattedUsers = users.map(user => ({
       id: user.id,
-      name: user.name,
+      name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
       email: user.email,
-      mobileNo: user.mobileNo,
-      roleId: user.roleId,
-      roleName: user.roleName,
-      status: user.status
+      mobileNo: user.mobile_no,
+      roleId: user.role_id,
+      roleName: capitalizeFirstLetter(user.role_name),
+      status: user.is_active ? 'Active' : 'Inactive',
+      lastLogin: user.last_login_at
     }));
     
     res.status(200).json(formattedUsers);
@@ -36,9 +42,9 @@ exports.getUserById = async (req, res) => {
     
     // Get user
     const [user] = await pool.query(
-      `SELECT u.*, r.name as roleName
+      `SELECT u.*, r.name as role_name
        FROM users u
-       JOIN roles r ON u.roleId = r.id
+       JOIN roles r ON u.role_id = r.id
        WHERE u.id = ?`,
       [userId]
     );
@@ -51,46 +57,44 @@ exports.getUserById = async (req, res) => {
     let doctor = null;
     
     // If user is a patient, get patient details
-    if (user[0].roleId === 3) { // Assuming roleId 3 is for patients
+    if (user[0].role_id === 3) { // Assuming roleId 3 is for patients
       const [patientResult] = await pool.query(
-        `SELECT * FROM patients WHERE userId = ?`,
+        `SELECT * FROM patients WHERE user_id = ?`,
         [userId]
       );
       
       if (patientResult && patientResult.length > 0) {
         patient = {
           id: patientResult[0].id,
-          userId: patientResult[0].userId,
+          userId: patientResult[0].user_id,
           gender: patientResult[0].gender,
-          dob: patientResult[0].dateOfBirth,
-          address: patientResult[0].street + (patientResult[0].city ? ', ' + patientResult[0].city : '') + 
-                  (patientResult[0].state ? ', ' + patientResult[0].state : '') + 
-                  (patientResult[0].zipCode ? ' ' + patientResult[0].zipCode : ''),
-          bloodGroup: patientResult[0].bloodType,
-          emergencyContactNo: patientResult[0].emergencyContactPhone,
-          emergencyContact: patientResult[0].emergencyContactName,
-          insuranceProvider: patientResult[0].insuranceProvider,
+          dob: patientResult[0].dob,
+          address: patientResult[0].address,
+          bloodGroup: patientResult[0].blood_group,
+          emergencyContactNo: patientResult[0].emergency_contact_no,
+          emergencyContact: patientResult[0].emergency_contact_name,
+          insuranceProvider: patientResult[0].insurance_provider,
           allergies: patientResult[0].allergies,
-          chronicConditions: patientResult[0].comorbidities
+          chronicConditions: patientResult[0].chronic_conditions
         };
       }
     }
     
     // If user is a doctor, get doctor details
-    if (user[0].roleId === 4) { // Assuming roleId 4 is for doctors
+    if (user[0].role_id === 4) { // Assuming roleId 4 is for doctors
       const [doctorResult] = await pool.query(
-        `SELECT * FROM doctors WHERE userId = ?`,
+        `SELECT * FROM doctors WHERE user_id = ?`,
         [userId]
       );
       
       if (doctorResult && doctorResult.length > 0) {
         doctor = {
           id: doctorResult[0].id,
-          userId: doctorResult[0].userId,
+          userId: doctorResult[0].user_id,
           gender: doctorResult[0].gender,
           specialization: doctorResult[0].specialization,
           address: doctorResult[0].address,
-          emergencyContactNo: doctorResult[0].emergencyContactNo
+          emergencyContactNo: doctorResult[0].emergency_contact_no
         };
       }
     }
@@ -98,12 +102,13 @@ exports.getUserById = async (req, res) => {
     const response = {
       user: {
         id: user[0].id,
-        name: user[0].name,
+        name: `${user[0].first_name || ''} ${user[0].last_name || ''}`.trim(),
         email: user[0].email,
-        mobileNo: user[0].mobileNo,
-        roleId: user[0].roleId,
-        roleName: user[0].roleName,
-        status: user[0].status
+        mobileNo: user[0].mobile_no,
+        roleId: user[0].role_id,
+        roleName: capitalizeFirstLetter(user[0].role_name),
+        status: user[0].is_active ? 'Active' : 'Inactive',
+        lastLogin: user[0].last_login_at
       }
     };
     
@@ -130,12 +135,18 @@ exports.createUser = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
     
+    // Extract data from request body
     const {
       name, email, mobileNo, password, roleId, status,
       gender, dob, address, bloodGroup, emergencyContactNo, emergencyContact,
       insuranceProvider, allergies, chronicConditions,
       specialization, designation
     } = req.body;
+    
+    // Split name into first and last name
+    const nameParts = name.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
     
     // Check if email already exists
     const [existingUser] = await pool.query(
@@ -151,16 +162,19 @@ exports.createUser = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
     
+    // Convert status to boolean for database
+    const isActive = status === 'active';
+    
     // Start a transaction
     const connection = await pool.getConnection();
     await connection.beginTransaction();
     
     try {
-      // Insert user
+      // Insert user - remove created_at and updated_at columns if they don't exist
       const [userResult] = await connection.query(
-        `INSERT INTO users (name, email, mobileNo, password, roleId, status, createdAt, updatedAt)
-         VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-        [name, email, mobileNo, hashedPassword, roleId, status]
+        `INSERT INTO users (first_name, last_name, email, mobile_no, password, role_id, is_active)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [firstName, lastName, email, mobileNo, hashedPassword, roleId, isActive]
       );
       
       const userId = userResult.insertId;
@@ -178,15 +192,14 @@ exports.createUser = async (req, res) => {
           zipCode = stateZip[1] || '';
         }
         
+        // Remove created_at and updated_at if they don't exist
         await connection.query(
           `INSERT INTO patients (
-            userId, gender, dateOfBirth, street, city, state, zipCode,
-            bloodType, emergencyContactPhone, emergencyContactName,
-            insuranceProvider, allergies, comorbidities, createdAt, updatedAt
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+            user_id, gender, dob, address, blood_group, emergency_contact_no, emergency_contact_name,
+            insurance_provider, allergies, chronic_conditions
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            userId, gender, dob, street, city, state, zipCode,
-            bloodGroup, emergencyContactNo, emergencyContact,
+            userId, gender, dob, address, bloodGroup, emergencyContactNo, emergencyContact,
             insuranceProvider, allergies, chronicConditions
           ]
         );
@@ -194,10 +207,11 @@ exports.createUser = async (req, res) => {
       
       // If user is a doctor, insert doctor details
       if (roleId === 4) { // Assuming roleId 4 is for doctors
+        // Remove created_at and updated_at if they don't exist
         await connection.query(
           `INSERT INTO doctors (
-            userId, gender, specialization, address, emergencyContactNo, createdAt, updatedAt
-          ) VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
+            user_id, gender, specialization, address, emergency_contact_no
+          ) VALUES (?, ?, ?, ?, ?)`,
           [userId, gender, specialization, address, emergencyContactNo]
         );
       }
@@ -207,9 +221,9 @@ exports.createUser = async (req, res) => {
       
       // Get the created user with role name
       const [newUser] = await pool.query(
-        `SELECT u.*, r.name as roleName
+        `SELECT u.*, r.name as role_name
          FROM users u
-         JOIN roles r ON u.roleId = r.id
+         JOIN roles r ON u.role_id = r.id
          WHERE u.id = ?`,
         [userId]
       );
@@ -218,37 +232,36 @@ exports.createUser = async (req, res) => {
       const response = {
         user: {
           id: newUser[0].id,
-          name: newUser[0].name,
+          name: `${newUser[0].first_name || ''} ${newUser[0].last_name || ''}`.trim(),
           email: newUser[0].email,
-          mobileNo: newUser[0].mobileNo,
-          roleId: newUser[0].roleId,
-          roleName: newUser[0].roleName,
-          status: newUser[0].status
+          mobileNo: newUser[0].mobile_no,
+          roleId: newUser[0].role_id,
+          roleName: capitalizeFirstLetter(newUser[0].role_name),
+          status: newUser[0].is_active ? 'Active' : 'Inactive',
+          lastLogin: newUser[0].last_login_at
         }
       };
       
       // If user is a patient, get patient details
       if (roleId === 3) {
         const [patientResult] = await pool.query(
-          `SELECT * FROM patients WHERE userId = ?`,
+          `SELECT * FROM patients WHERE user_id = ?`,
           [userId]
         );
         
         if (patientResult && patientResult.length > 0) {
           response.patient = {
             id: patientResult[0].id,
-            userId: patientResult[0].userId,
+            userId: patientResult[0].user_id,
             gender: patientResult[0].gender,
-            dob: patientResult[0].dateOfBirth,
-            address: patientResult[0].street + (patientResult[0].city ? ', ' + patientResult[0].city : '') + 
-                    (patientResult[0].state ? ', ' + patientResult[0].state : '') + 
-                    (patientResult[0].zipCode ? ' ' + patientResult[0].zipCode : ''),
-            bloodGroup: patientResult[0].bloodType,
-            emergencyContactNo: patientResult[0].emergencyContactPhone,
-            emergencyContact: patientResult[0].emergencyContactName,
-            insuranceProvider: patientResult[0].insuranceProvider,
+            dob: patientResult[0].dob,
+            address: patientResult[0].address,
+            bloodGroup: patientResult[0].blood_group,
+            emergencyContactNo: patientResult[0].emergency_contact_no,
+            emergencyContact: patientResult[0].emergency_contact_name,
+            insuranceProvider: patientResult[0].insurance_provider,
             allergies: patientResult[0].allergies,
-            chronicConditions: patientResult[0].comorbidities
+            chronicConditions: patientResult[0].chronic_conditions
           };
         }
       }
@@ -256,18 +269,18 @@ exports.createUser = async (req, res) => {
       // If user is a doctor, get doctor details
       if (roleId === 4) {
         const [doctorResult] = await pool.query(
-          `SELECT * FROM doctors WHERE userId = ?`,
+          `SELECT * FROM doctors WHERE user_id = ?`,
           [userId]
         );
         
         if (doctorResult && doctorResult.length > 0) {
           response.doctor = {
             id: doctorResult[0].id,
-            userId: doctorResult[0].userId,
+            userId: doctorResult[0].user_id,
             gender: doctorResult[0].gender,
             specialization: doctorResult[0].specialization,
             address: doctorResult[0].address,
-            emergencyContactNo: doctorResult[0].emergencyContactNo
+            emergencyContactNo: doctorResult[0].emergency_contact_no
           };
         }
       }
@@ -297,7 +310,7 @@ exports.updateUser = async (req, res) => {
     
     const userId = req.params.id;
     const {
-      name, email, mobileNo, password, roleId, status,
+      firstName, lastName, email, mobileNo, password, roleId, status,
       gender, dob, address, bloodGroup, emergencyContactNo, emergencyContact,
       insuranceProvider, allergies, chronicConditions,
       specialization, designation
@@ -333,11 +346,11 @@ exports.updateUser = async (req, res) => {
       // Update user
       let updateUserQuery = `
         UPDATE users
-        SET name = ?, email = ?, mobileNo = ?, roleId = ?, status = ?, updatedAt = NOW()
+        SET first_name = ?, last_name = ?, email = ?, mobile_no = ?, role_id = ?, is_active = ?, updated_at = NOW()
       `;
       
       let updateUserParams = [
-        name, email, mobileNo, roleId, status
+        firstName, lastName, email, mobileNo, roleId, status
       ];
       
       // If password is provided, hash it and include in update
@@ -368,7 +381,7 @@ exports.updateUser = async (req, res) => {
         
         // Check if patient record exists
         const [existingPatient] = await connection.query(
-          `SELECT * FROM patients WHERE userId = ?`,
+          `SELECT * FROM patients WHERE user_id = ?`,
           [userId]
         );
         
@@ -376,13 +389,11 @@ exports.updateUser = async (req, res) => {
           // Update existing patient
           await connection.query(
             `UPDATE patients
-             SET gender = ?, dateOfBirth = ?, street = ?, city = ?, state = ?, zipCode = ?,
-                 bloodType = ?, emergencyContactPhone = ?, emergencyContactName = ?,
-                 insuranceProvider = ?, allergies = ?, comorbidities = ?, updatedAt = NOW()
-             WHERE userId = ?`,
+             SET gender = ?, dob = ?, address = ?, blood_group = ?, emergency_contact_no = ?, emergency_contact_name = ?,
+                 insurance_provider = ?, allergies = ?, chronic_conditions = ?, updated_at = NOW()
+             WHERE user_id = ?`,
             [
-              gender, dob, street, city, state, zipCode,
-              bloodGroup, emergencyContactNo, emergencyContact,
+              gender, dob, address, bloodGroup, emergencyContactNo, emergencyContact,
               insuranceProvider, allergies, chronicConditions, userId
             ]
           );
@@ -390,13 +401,11 @@ exports.updateUser = async (req, res) => {
           // Insert new patient
           await connection.query(
             `INSERT INTO patients (
-              userId, gender, dateOfBirth, street, city, state, zipCode,
-              bloodType, emergencyContactPhone, emergencyContactName,
-              insuranceProvider, allergies, comorbidities, createdAt, updatedAt
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+              user_id, gender, dob, address, blood_group, emergency_contact_no, emergency_contact_name,
+              insurance_provider, allergies, chronic_conditions, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
             [
-              userId, gender, dob, street, city, state, zipCode,
-              bloodGroup, emergencyContactNo, emergencyContact,
+              userId, gender, dob, address, bloodGroup, emergencyContactNo, emergencyContact,
               insuranceProvider, allergies, chronicConditions
             ]
           );
@@ -407,7 +416,7 @@ exports.updateUser = async (req, res) => {
       if (roleId === 4) { // Assuming roleId 4 is for doctors
         // Check if doctor record exists
         const [existingDoctor] = await connection.query(
-          `SELECT * FROM doctors WHERE userId = ?`,
+          `SELECT * FROM doctors WHERE user_id = ?`,
           [userId]
         );
         
@@ -415,15 +424,15 @@ exports.updateUser = async (req, res) => {
           // Update existing doctor
           await connection.query(
             `UPDATE doctors
-             SET gender = ?, specialization = ?, address = ?, emergencyContactNo = ?, updatedAt = NOW()
-             WHERE userId = ?`,
+             SET gender = ?, specialization = ?, address = ?, emergency_contact_no = ?, updated_at = NOW()
+             WHERE user_id = ?`,
             [gender, specialization, address, emergencyContactNo, userId]
           );
         } else {
           // Insert new doctor
           await connection.query(
             `INSERT INTO doctors (
-              userId, gender, specialization, address, emergencyContactNo, createdAt, updatedAt
+              user_id, gender, specialization, address, emergency_contact_no, created_at, updated_at
             ) VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
             [userId, gender, specialization, address, emergencyContactNo]
           );
@@ -435,9 +444,9 @@ exports.updateUser = async (req, res) => {
       
       // Get the updated user with role name
       const [updatedUser] = await pool.query(
-        `SELECT u.*, r.name as roleName
+        `SELECT u.*, r.name as role_name
          FROM users u
-         JOIN roles r ON u.roleId = r.id
+         JOIN roles r ON u.role_id = r.id
          WHERE u.id = ?`,
         [userId]
       );
@@ -446,37 +455,36 @@ exports.updateUser = async (req, res) => {
       const response = {
         user: {
           id: updatedUser[0].id,
-          name: updatedUser[0].name,
+          name: `${updatedUser[0].first_name || ''} ${updatedUser[0].last_name || ''}`.trim(),
           email: updatedUser[0].email,
-          mobileNo: updatedUser[0].mobileNo,
-          roleId: updatedUser[0].roleId,
-          roleName: updatedUser[0].roleName,
-          status: updatedUser[0].status
+          mobileNo: updatedUser[0].mobile_no,
+          roleId: updatedUser[0].role_id,
+          roleName: capitalizeFirstLetter(updatedUser[0].role_name),
+          status: updatedUser[0].is_active ? 'Active' : 'Inactive',
+          lastLogin: updatedUser[0].last_login_at
         }
       };
       
       // If user is a patient, get patient details
       if (roleId === 3) {
         const [patientResult] = await pool.query(
-          `SELECT * FROM patients WHERE userId = ?`,
+          `SELECT * FROM patients WHERE user_id = ?`,
           [userId]
         );
         
         if (patientResult && patientResult.length > 0) {
           response.patient = {
             id: patientResult[0].id,
-            userId: patientResult[0].userId,
+            userId: patientResult[0].user_id,
             gender: patientResult[0].gender,
-            dob: patientResult[0].dateOfBirth,
-            address: patientResult[0].street + (patientResult[0].city ? ', ' + patientResult[0].city : '') + 
-                    (patientResult[0].state ? ', ' + patientResult[0].state : '') + 
-                    (patientResult[0].zipCode ? ' ' + patientResult[0].zipCode : ''),
-            bloodGroup: patientResult[0].bloodType,
-            emergencyContactNo: patientResult[0].emergencyContactPhone,
-            emergencyContact: patientResult[0].emergencyContactName,
-            insuranceProvider: patientResult[0].insuranceProvider,
+            dob: patientResult[0].dob,
+            address: patientResult[0].address,
+            bloodGroup: patientResult[0].blood_group,
+            emergencyContactNo: patientResult[0].emergency_contact_no,
+            emergencyContact: patientResult[0].emergency_contact_name,
+            insuranceProvider: patientResult[0].insurance_provider,
             allergies: patientResult[0].allergies,
-            chronicConditions: patientResult[0].comorbidities
+            chronicConditions: patientResult[0].chronic_conditions
           };
         }
       }
@@ -484,18 +492,18 @@ exports.updateUser = async (req, res) => {
       // If user is a doctor, get doctor details
       if (roleId === 4) {
         const [doctorResult] = await pool.query(
-          `SELECT * FROM doctors WHERE userId = ?`,
+          `SELECT * FROM doctors WHERE user_id = ?`,
           [userId]
         );
         
         if (doctorResult && doctorResult.length > 0) {
           response.doctor = {
             id: doctorResult[0].id,
-            userId: doctorResult[0].userId,
+            userId: doctorResult[0].user_id,
             gender: doctorResult[0].gender,
             specialization: doctorResult[0].specialization,
             address: doctorResult[0].address,
-            emergencyContactNo: doctorResult[0].emergencyContactNo
+            emergencyContactNo: doctorResult[0].emergency_contact_no
           };
         }
       }
@@ -536,16 +544,16 @@ exports.deleteUser = async (req, res) => {
     
     try {
       // Check if user has related records
-      if (user[0].roleId === 3) { // Patient
+      if (user[0].role_id === 3) { // Patient
         // Check if patient has appointments
         const [patient] = await connection.query(
-          `SELECT id FROM patients WHERE userId = ?`,
+          `SELECT id FROM patients WHERE user_id = ?`,
           [userId]
         );
         
         if (patient && patient.length > 0) {
           const [appointments] = await connection.query(
-            `SELECT COUNT(*) as count FROM appointments WHERE patientId = ?`,
+            `SELECT COUNT(*) as count FROM appointments WHERE patient_id = ?`,
             [patient[0].id]
           );
           
@@ -557,20 +565,20 @@ exports.deleteUser = async (req, res) => {
           
           // Delete patient record
           await connection.query(
-            `DELETE FROM patients WHERE userId = ?`,
+            `DELETE FROM patients WHERE user_id = ?`,
             [userId]
           );
           
           // Delete CKD records
           await connection.query(
-            `DELETE FROM ckd_records WHERE userId = ?`,
+            `DELETE FROM ckd_records WHERE user_id = ?`,
             [userId]
           );
         }
-      } else if (user[0].roleId === 4) { // Doctor
+      } else if (user[0].role_id === 4) { // Doctor
         // Delete doctor record
         await connection.query(
-          `DELETE FROM doctors WHERE userId = ?`,
+          `DELETE FROM doctors WHERE user_id = ?`,
           [userId]
         );
       }
@@ -606,9 +614,48 @@ exports.getAllRoles = async (req, res) => {
       `SELECT * FROM roles ORDER BY id ASC`
     );
     
-    res.status(200).json(roles);
+    // Map to camelCase for frontend with capitalized role names
+    const formattedRoles = roles.map(role => ({
+      id: role.id,
+      name: capitalizeFirstLetter(role.name)
+    }));
+    
+    res.status(200).json(formattedRoles);
   } catch (error) {
     console.error('Error fetching roles:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Get users by roles (admin or staff)
+exports.getUsersByRoles = async (req, res) => {
+  try {
+    // Get role IDs for admin and staff
+    const roleNames = req.query.roles ? req.query.roles.split(',') : ['admin', 'staff'];
+    
+    // Get users with specified roles
+    const [users] = await pool.query(
+      `SELECT u.id, u.first_name, u.last_name, u.email, u.mobile_no, u.is_active, r.name as role_name
+       FROM users u
+       JOIN roles r ON u.role_id = r.id
+       WHERE r.name IN (?) AND u.is_active = TRUE
+       ORDER BY u.first_name ASC`,
+      [roleNames]
+    );
+    
+    // Map to camelCase for frontend with capitalized role names and status
+    const formattedUsers = users.map(user => ({
+      id: user.id,
+      name: `${user.first_name || ''} ${user.last_name || ''}`.trim(),
+      email: user.email,
+      mobileNo: user.mobile_no,
+      roleName: capitalizeFirstLetter(user.role_name),
+      status: user.is_active ? 'Active' : 'Inactive'
+    }));
+    
+    res.status(200).json(formattedUsers);
+  } catch (error) {
+    console.error('Error fetching users by roles:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

@@ -47,6 +47,8 @@ const CenterHoursForm: React.FC<CenterHoursFormProps> = ({ form }) => {
 
   // Common hours to select from
   const commonHours = [
+    "6:00 AM - 10:00 PM",
+    "6:00 AM - 8:00 PM",
     "6:00 AM - 6:00 PM",
     "6:00 AM - 4:00 PM",    
     "Closed",

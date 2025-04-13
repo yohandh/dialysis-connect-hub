@@ -21,8 +21,9 @@ import PortalLayout from "@/components/layouts/PortalLayout";
 import { fetchCenterById } from '@/api/centerApi';
 import { formatOperatingHours } from '@/utils/centerUtils';
 import AppointmentSlotManagement from '@/components/admin/appointments/AppointmentSlotManagement';
-import BedManagement from '@/components/admin/equipment/BedManagement';
+import BedManagement from '@/components/admin/equipments/BedManagement';
 import SessionManagement from '@/components/admin/sessions/SessionManagement';
+import ScheduleSessionManagement from '@/components/admin/schedules/ScheduleSessionManagement';
 
 interface Center {
   id: number;
@@ -112,8 +113,8 @@ const AdminCenterDetails = () => {
         portalName="Admin Portal"
         navLinks={[
           { name: "Dashboard", path: "/admin/dashboard" },
-          { name: "Centers", path: "/admin/centers" },
           { name: "Users", path: "/admin/users" },
+          { name: "Centers", path: "/admin/centers" },          
           { name: "Reports", path: "/admin/reports" },
         ]}
         userName="Michael Adams"
@@ -133,8 +134,8 @@ const AdminCenterDetails = () => {
         portalName="Admin Portal"
         navLinks={[
           { name: "Dashboard", path: "/admin/dashboard" },
-          { name: "Centers", path: "/admin/centers" },
           { name: "Users", path: "/admin/users" },
+          { name: "Centers", path: "/admin/centers" },          
           { name: "Reports", path: "/admin/reports" },
         ]}
         userName="Michael Adams"
@@ -159,8 +160,8 @@ const AdminCenterDetails = () => {
       portalName="Admin Portal"
       navLinks={[
         { name: "Dashboard", path: "/admin/dashboard" },
-        { name: "Centers", path: "/admin/centers" },
         { name: "Users", path: "/admin/users" },
+        { name: "Centers", path: "/admin/centers" },        
         { name: "Reports", path: "/admin/reports" },
       ]}
       userName="Michael Adams"
@@ -179,11 +180,12 @@ const AdminCenterDetails = () => {
         </div>
 
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="appointments">Appointments</TabsTrigger>
+            <TabsTrigger value="equipments">Equipments</TabsTrigger>
             <TabsTrigger value="sessions">Sessions</TabsTrigger>
-            <TabsTrigger value="equipment">Equipment</TabsTrigger>
+            <TabsTrigger value="schedules">Schedule Sessions</TabsTrigger>
+            <TabsTrigger value="appointments">Appointments</TabsTrigger>
             <TabsTrigger value="staff">Staff</TabsTrigger>
           </TabsList>
           
@@ -261,11 +263,19 @@ const AdminCenterDetails = () => {
                 </Card>
               </div>
             </TabsContent>
-            
-            <TabsContent value="appointments">
-              <AppointmentSlotManagement centerId={center.id.toString()} />
+
+            <TabsContent value="equipments">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Equipments</CardTitle>
+                  <CardDescription>Manage dialysis beds, machines and other equipments.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <BedManagement centerId={center.id.toString()} />
+                </CardContent>
+              </Card>
             </TabsContent>
-            
+
             <TabsContent value="sessions">
               <Card>
                 <CardHeader>
@@ -278,16 +288,20 @@ const AdminCenterDetails = () => {
               </Card>
             </TabsContent>
             
-            <TabsContent value="equipment">
+            <TabsContent value="schedules">
               <Card>
                 <CardHeader>
-                  <CardTitle>Equipments</CardTitle>
-                  <CardDescription>Manage dialysis beds, machines and other equipment.</CardDescription>
+                  <CardTitle>Schedule Sessions</CardTitle>
+                  <CardDescription>Schedule dialysis sessions for specific dates.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <BedManagement centerId={center.id.toString()} />
+                  <ScheduleSessionManagement centerId={center.id.toString()} />
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            <TabsContent value="appointments">
+              <AppointmentSlotManagement centerId={center.id.toString()} />
             </TabsContent>
             
             <TabsContent value="staff">

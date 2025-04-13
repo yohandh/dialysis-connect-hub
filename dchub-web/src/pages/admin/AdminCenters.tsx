@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, LayoutDashboard, Building2, Users, FileBarChart2, BookOpen } from "lucide-react";
+import { Plus, LayoutDashboard, Building2, Users, FileBarChart2, BookOpen, Bell, ClipboardList } from "lucide-react";
 import PortalLayout from "@/components/layouts/PortalLayout";
 import CenterTable from "@/components/admin/centers/CenterTable";
 import CenterFormDialog from "@/components/admin/centers/CenterFormDialog";
@@ -283,8 +283,10 @@ const AdminCenters = () => {
       portalName="Admin Portal"
       navLinks={[
         { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
-        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
         { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
+        { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
         { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}

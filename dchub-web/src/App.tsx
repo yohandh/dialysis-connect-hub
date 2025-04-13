@@ -39,6 +39,7 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminEducation from "./pages/admin/AdminEducation";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
+import AdminAudit from "./pages/admin/AdminAudit";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminAccountSettings from "./pages/admin/AdminAccountSettings";
 
@@ -103,6 +104,7 @@ function App() {
           <Route path="/admin/notifications" element={<AdminNotifications />} />
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/education" element={<AdminEducation />} />
+          <Route path="/admin/audit" element={<AdminAudit />} />
           <Route path="/admin/audit-logs" element={<AdminAuditLogs />} />
           <Route path="/admin/account-settings" element={<AdminAccountSettings />} />
           

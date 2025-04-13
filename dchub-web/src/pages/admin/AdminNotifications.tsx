@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Table,
@@ -25,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { 
-  BellRing, 
+  Bell, 
   Calendar, 
   Filter, 
   Mail, 
@@ -33,7 +32,12 @@ import {
   Phone, 
   Search, 
   User, 
-  Users 
+  Users,
+  Building2,
+  BookOpen,
+  FileBarChart2,
+  LayoutDashboard,
+  ClipboardList
 } from "lucide-react";
 import { format } from "date-fns";
 import PortalLayout from "@/components/layouts/PortalLayout";
@@ -157,7 +161,7 @@ const AdminNotifications = () => {
       case 'app':
         return <MessageSquare className="h-4 w-4" />;
       default:
-        return <BellRing className="h-4 w-4" />;
+        return <Bell className="h-4 w-4" />;
     }
   };
 
@@ -216,13 +220,13 @@ const AdminNotifications = () => {
     <PortalLayout
       portalName="Admin Portal"
       navLinks={[
-        { name: "Dashboard", path: "/admin/dashboard" },
-        { name: "Centers", path: "/admin/centers" },
-        { name: "Users", path: "/admin/users" },
-        { name: "Education", path: "/admin/education" },
-        { name: "Notifications", path: "/admin/notifications" },
-        { name: "Audit Logs", path: "/admin/audit-logs" },
-        { name: "Reports", path: "/admin/reports" },
+        { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+        { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },        
+        { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
+        { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
+        { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
+        { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
       userName="Michael Adams"
       userRole="System Administrator"
@@ -249,7 +253,7 @@ const AdminNotifications = () => {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Notifications</CardTitle>
-              <BellRing className="h-4 w-4 text-muted-foreground" />
+              <Bell className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{summaryCounts.total}</div>

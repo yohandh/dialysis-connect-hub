@@ -14,6 +14,10 @@ const userRoutes = require('./routes/user.routes');
 const ckdRoutes = require('./routes/ckd.routes');
 const bedRoutes = require('./routes/bed.routes');
 const sessionRoutes = require('./routes/session.routes');
+const scheduleSessionRoutes = require('./routes/schedule-session.routes');
+
+// Import controllers for direct route registration
+const userController = require('./controllers/user.controller');
 
 // Initialize Express app
 const app = express();
@@ -45,6 +49,10 @@ testConnection()
     process.exit(1);
   });
 
+// Direct route registration for problematic endpoints
+// This needs to be registered BEFORE the /api/users route to avoid conflicts
+app.get('/api/roles', userController.getAllRoles);
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
@@ -54,6 +62,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/ckd-records', ckdRoutes);
 app.use('/api/beds', bedRoutes);
 app.use('/api', sessionRoutes);
+app.use('/api', scheduleSessionRoutes);
 
 // Test endpoint
 app.get('/api/test', (req, res) => {
@@ -78,7 +87,9 @@ app.get('/api', (req, res) => {
       users: '/api/users',
       ckdRecords: '/api/ckd-records',
       beds: '/api/beds',
-      sessions: '/api/centers/:centerId/sessions'
+      sessions: '/api/centers/:centerId/sessions',
+      scheduleSessions: '/api/centers/:centerId/schedule-sessions',
+      roles: '/api/roles'
     }
   });
 });
