@@ -7,7 +7,7 @@ const HowItWorksSection = () => {
     {
       step: 1,
       title: "Register & Access",
-      description: "Patients and staff register and gain secure access to personalized portals",
+      description: "Registration to gain secure access to personalized portals",
       icon: "🔐"
     },
     {
@@ -18,8 +18,8 @@ const HowItWorksSection = () => {
     },
     {
       step: 3,
-      title: "Monitor & Learn",
-      description: "Access CKD education and track kidney health progress",
+      title: "Learn & Improve",
+      description: "Access personalized CKD education and improve kidney health",
       icon: "📊"
     }
   ];
@@ -30,7 +30,7 @@ const HowItWorksSection = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-dark-slate mb-4">How It Works</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Our platform simplifies dialysis management for everyone involved in the care process
+            DialyzeEase simplifies dialysis management for everyone involved in the care process
           </p>
         </div>
         

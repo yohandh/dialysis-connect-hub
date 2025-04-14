@@ -17,7 +17,11 @@ const config = {
   port: process.env.DB_PORT || 3306,
   user: process.env.DB_ROOT_USER || 'root',
   password: process.env.DB_ROOT_PASSWORD || '',
-  multipleStatements: true
+  multipleStatements: true,
+  authPlugins: {
+    // Use default authentication for auth_gssapi_client
+    'auth_gssapi_client': () => () => Buffer.from('', 'utf8')
+  }
 };
 
 // Database user and credentials
@@ -39,7 +43,7 @@ async function initializeDatabase() {
     // Create user if not exists
     console.log(`Creating user ${DB_USER}...`);
     await connection.execute(`
-      CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED VIA mysql_native_password USING PASSWORD('${DB_PASSWORD}');
+      CREATE USER IF NOT EXISTS '${DB_USER}'@'%' IDENTIFIED BY '${DB_PASSWORD}';
     `);
 
     // Grant privileges to user

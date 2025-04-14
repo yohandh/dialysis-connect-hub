@@ -7,9 +7,9 @@ const AboutSection = () => {
     <section id="about" className="py-8 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-dark-slate mb-4">About Dialysis Connect Hub</h2>
+          <h2 className="text-3xl font-bold text-dark-slate mb-4">About DialyseEase</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Our mission is to improve the lives of CKD patients through technology
+          Empowering dialysis patients and healthcare providers through simplified appointment management, personalized education
           </p>
         </div>
         
@@ -18,10 +18,7 @@ const AboutSection = () => {
             <CardContent className="pt-6">
               <h2 className="text-2xl font-semibold mb-4">Our Mission</h2>
               <p className="text-gray-700 leading-relaxed mb-4">
-                Dialysis Connect Hub is dedicated to improving the lives of individuals with Chronic Kidney Disease (CKD) through a comprehensive, integrated platform that streamlines dialysis management and provides educational resources. Our mission is to enhance patient outcomes, empower healthcare providers, and optimize administrative processes related to kidney care.
-              </p>
-              <p className="text-gray-700 leading-relaxed">
-                We believe that accessible, well-organized healthcare information and services can significantly improve the quality of life for CKD patients and make the healthcare system more efficient for all stakeholders involved.
+                To transform the dialysis care experience by providing a comprehensive digital platform that empowers both patients and healthcare providers through streamlined appointment management, personalized education, and improved access to care. Our mission is to reduce the administrative burden on medical facilities while enhancing patient autonomy, knowledge, and quality of life by addressing the key challenges in dialysis management.
               </p>
             </CardContent>
           </Card>
@@ -76,8 +73,8 @@ const AboutSection = () => {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div className="bg-light-gray-bg p-4 rounded-lg">
-                  <h3 className="font-semibold text-lg mb-2">Medical Treatment</h3>
-                  <p className="text-gray-600 text-sm">Streamlined dialysis appointments, treatment records, and medical history tracking</p>
+                  <h3 className="font-semibold text-lg mb-2">Online Appointments</h3>
+                  <p className="text-gray-600 text-sm">Schedule and manage dialysis appointments from anywhere</p>
                 </div>
                 <div className="bg-light-gray-bg p-4 rounded-lg">
                   <h3 className="font-semibold text-lg mb-2">Education</h3>

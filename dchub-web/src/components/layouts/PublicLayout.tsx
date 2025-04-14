@@ -77,7 +77,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <span className="text-xl font-bold text-gray-900">Dialysis Connect Hub</span>
+                <span className="text-xl font-bold text-gray-900">DialyzeEase</span>
               </Link>
             </div>
             
@@ -119,14 +119,14 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between">
             <div className="mb-6 md:mb-0">
-              <h3 className="text-xl font-bold mb-4">Dialysis Connect Hub</h3>
+              <h3 className="text-xl font-bold mb-4">DialyzeEase</h3>
               <p className="max-w-md text-gray-300">
                 Providing comprehensive dialysis management and CKD education to improve
                 patient outcomes and quality of life.
               </p>
             </div>
             
-            <div className="grid grid-cols gap-8">
+            <div className="grid grid-cols-2 gap-8">
               <div>
                 <h4 className="font-semibold mb-3 text-white">Quick Links</h4>
                 <ul className="space-y-2">
@@ -135,12 +135,21 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                   <li><Link to="/ckd-awareness#top" className="text-gray-300 hover:text-white">CKD Awareness</Link></li>
                   <li><Link to="/#faq" className="text-gray-300 hover:text-white">FAQ</Link></li>
                 </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold mb-3 text-white">Contact Us</h4>
+                <address className="not-italic text-gray-300 space-y-2">
+                  <p>DialyzeEase Headquarters</p>
+                  <p>123, Jayantha Weerasekara Mawatha<br />Colombo, Western Province, 01000</p>
+                  <p>+94-11-242-2335</p>
+                  <p><a href="mailto:dialyzeease@gmail.com" className="hover:text-white">dialyzeease@gmail.com</a></p>
+                </address>
               </div>              
             </div>
           </div>
           
           <div className="border-t border-gray-700 mt-8 pt-6 text-sm text-gray-400">
-            <p>&copy; {new Date().getFullYear()} Dialysis Connect Hub. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} DialyzeEase. All rights reserved.</p>
           </div>
         </div>
       </footer>

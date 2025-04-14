@@ -20,7 +20,7 @@ const HeroSection = () => {
             </h1>
             <p className="text-xl text-gray-700 mb-8">
               A comprehensive platform connecting patients, healthcare providers, and administrators 
-              to streamline dialysis management and improve kidney health outcomes.
+              to streamline dialysis management and improve quality of life of dialysis patients.
             </p>
             <div className="flex flex-wrap gap-4">
               <Button

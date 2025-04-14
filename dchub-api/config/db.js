@@ -13,7 +13,12 @@ const dbConfig = {
   database: process.env.DB_NAME || 'dc_hub',
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
+  // Add authentication plugin handling
+  authPlugins: {
+    // Use default authentication
+    'auth_gssapi_client': () => () => Buffer.from('', 'utf8')
+  }
 };
 
 // Create a connection pool
