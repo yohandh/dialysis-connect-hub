@@ -17,6 +17,9 @@ router.get('/roles/all', authMiddleware, userController.getAllRoles);
 // GET users by roles (admin or staff)
 router.get('/by-roles', userController.getUsersByRoles);
 
+// GET users by a specific role
+router.get('/by-role/:role', userController.getUsersByRole);
+
 // Get user by ID - moved after specific routes
 router.get('/:id', authMiddleware, userController.getUserById);
 
@@ -44,5 +47,11 @@ router.put('/:id', [
 
 // Delete user
 router.delete('/:id', authMiddleware, userController.deleteUser);
+
+// Deactivate user
+router.put('/:id/deactivate', authMiddleware, userController.deactivateUser);
+
+// Activate user
+router.put('/:id/activate', authMiddleware, userController.activateUser);
 
 module.exports = router;

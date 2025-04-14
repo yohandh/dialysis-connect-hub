@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, addDays, startOfWeek, endOfWeek, parseISO } from 'date-fns';
-import { Calendar, Clock, Plus, Pencil, Trash2, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, Plus, Pencil, Trash2, RefreshCw, Search } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -19,7 +19,7 @@ import { z } from "zod";
 import { ScheduledSession, ScheduledSessionFormValues, GenerateSessionsFormValues, statusOptions } from '@/types/scheduleSessionTypes';
 import { fetchScheduledSessionsByCenter, createScheduledSession, updateScheduledSession, deleteScheduledSession, generateScheduledSessions } from '@/api/scheduleSessionApi';
 import { fetchSessionsByCenter } from '@/api/sessionApi';
-import { Session } from '@/types/sessionTypes';
+import { Session, timeOptions, formatTimeString } from '@/types/sessionTypes';
 
 // Form schemas
 const scheduleSessionFormSchema = z.object({
@@ -308,11 +308,8 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
   };
   
   const formatTime = (timeStr: string) => {
-    const [hours, minutes] = timeStr.split(':');
-    const hourNum = parseInt(hours, 10);
-    const ampm = hourNum >= 12 ? 'PM' : 'AM';
-    const hour12 = hourNum % 12 || 12;
-    return `${hour12}:${minutes} ${ampm}`;
+    const option = timeOptions.find(opt => opt.value === timeStr);
+    return option ? option.label : formatTimeString(timeStr);
   };
   
   const getStatusBadge = (status: string) => {
@@ -530,9 +527,48 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Start Time</FormLabel>
-                      <FormControl>
-                        <Input type="time" step="1" {...field} />
-                      </FormControl>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select time" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <div className="flex items-center px-3 pb-2">
+                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                            <input
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              placeholder="Search times..."
+                              id="schedule-time-search"
+                              onChange={(e) => {
+                                const searchTerm = e.target.value.toLowerCase();
+                                const items = document.querySelectorAll('[data-schedule-time-item]');
+                                
+                                items.forEach(item => {
+                                  const text = item.textContent?.toLowerCase() || '';
+                                  if (text.includes(searchTerm)) {
+                                    item.classList.remove('hidden');
+                                  } else {
+                                    item.classList.add('hidden');
+                                  }
+                                });
+                              }}
+                            />
+                          </div>
+                          {timeOptions.map(option => (
+                            <SelectItem 
+                              key={option.value} 
+                              value={option.value}
+                              data-schedule-time-item
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -544,9 +580,48 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>End Time</FormLabel>
-                      <FormControl>
-                        <Input type="time" step="1" {...field} />
-                      </FormControl>
+                      <Select 
+                        onValueChange={field.onChange} 
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select time" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <div className="flex items-center px-3 pb-2">
+                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                            <input
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              placeholder="Search times..."
+                              id="schedule-end-time-search"
+                              onChange={(e) => {
+                                const searchTerm = e.target.value.toLowerCase();
+                                const items = document.querySelectorAll('[data-schedule-end-time-item]');
+                                
+                                items.forEach(item => {
+                                  const text = item.textContent?.toLowerCase() || '';
+                                  if (text.includes(searchTerm)) {
+                                    item.classList.remove('hidden');
+                                  } else {
+                                    item.classList.add('hidden');
+                                  }
+                                });
+                              }}
+                            />
+                          </div>
+                          {timeOptions.map(option => (
+                            <SelectItem 
+                              key={option.value} 
+                              value={option.value}
+                              data-schedule-end-time-item
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -555,26 +630,24 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
               
               <FormField
                 control={scheduleSessionForm.control}
-                name="available_beds"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Available Beds</FormLabel>
-                    <FormControl>
-                      <Input type="number" min="1" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={scheduleSessionForm.control}
                 name="session_id"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Session Template (Optional)</FormLabel>
                     <Select 
-                      onValueChange={(value) => field.onChange(value === "null" ? null : parseInt(value))} 
+                      onValueChange={(value) => {
+                        const sessionId = value === "null" ? null : parseInt(value);
+                        field.onChange(sessionId);
+                        
+                        // If a session template is selected, update the available beds
+                        if (sessionId) {
+                          const selectedSession = recurringSessions.find(s => s.id === sessionId);
+                          if (selectedSession) {
+                            // Set the available beds to the session capacity
+                            scheduleSessionForm.setValue("available_beds", selectedSession.default_capacity);
+                          }
+                        }
+                      }} 
                       value={field.value?.toString() || "null"}
                     >
                       <FormControl>
@@ -594,6 +667,39 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                     <FormMessage />
                   </FormItem>
                 )}
+              />
+              
+              <FormField
+                control={scheduleSessionForm.control}
+                name="available_beds"
+                render={({ field }) => {
+                  // Get max beds from selected session template
+                  const sessionId = scheduleSessionForm.watch("session_id");
+                  const selectedSession = sessionId 
+                    ? recurringSessions.find(s => s.id === sessionId) 
+                    : null;
+                  const maxBeds = selectedSession?.default_capacity || 100;
+                  
+                  return (
+                    <FormItem>
+                      <FormLabel>Available Beds</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
+                          min="1" 
+                          max={maxBeds}
+                          {...field} 
+                        />
+                      </FormControl>
+                      {selectedSession && (
+                        <div className="text-sm text-muted-foreground">
+                          Maximum capacity: {maxBeds}
+                        </div>
+                      )}
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
               
               <FormField

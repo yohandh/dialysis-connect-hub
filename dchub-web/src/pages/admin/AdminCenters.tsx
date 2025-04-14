@@ -260,6 +260,7 @@ const AdminCenters = () => {
       contactNo: data.contactNo,
       email: data.email,
       totalCapacity: data.totalCapacity,
+      manageById: data.manageById,
       isActive: true,
       centerHours: centerHoursData
     };

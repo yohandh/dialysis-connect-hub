@@ -60,7 +60,7 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/centers', centerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/ckd-records', ckdRoutes);
-app.use('/api/beds', bedRoutes);
+app.use('/api', bedRoutes);
 app.use('/api', sessionRoutes);
 app.use('/api', scheduleSessionRoutes);
 
@@ -86,7 +86,7 @@ app.get('/api', (req, res) => {
       centers: '/api/centers',
       users: '/api/users',
       ckdRecords: '/api/ckd-records',
-      beds: '/api/beds',
+      beds: '/api/centers/:centerId/beds',
       sessions: '/api/centers/:centerId/sessions',
       scheduleSessions: '/api/centers/:centerId/schedule-sessions',
       roles: '/api/roles'

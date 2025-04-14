@@ -18,18 +18,11 @@ export type User = {
   createdAt?: string;
 };
 
-export type Patient = {
+export type Staff = {
   id: number;
   userId: number;
   gender: 'male' | 'female' | 'other';
-  dob: string;
-  address: string;
-  bloodGroup: string;
-  emergencyContactNo: string;
-  emergencyContact: string;
-  insuranceProvider: string;
-  allergies: string;
-  chronicConditions: string;
+  designation: string;
   // User joined data
   name?: string;
   email?: string;
@@ -43,6 +36,24 @@ export type Doctor = {
   address: string;
   emergencyContactNo: string;
   gender: 'male' | 'female' | 'other';
+  // User joined data
+  name?: string;
+  email?: string;
+  mobileNo?: string;
+};
+
+export type Patient = {
+  id: number;
+  userId: number;
+  gender: 'male' | 'female' | 'other';
+  dob: string;
+  address: string;
+  bloodGroup: string;
+  emergencyContactNo: string;
+  emergencyContact: string;
+  insuranceProvider: string;
+  allergies: string;
+  chronicConditions: string;
   // User joined data
   name?: string;
   email?: string;

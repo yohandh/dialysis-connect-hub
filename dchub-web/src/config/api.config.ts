@@ -27,6 +27,13 @@ export const setUseMockApi = (value: boolean): void => {
 
 // Function to get the appropriate auth token based on API mode
 export const getAuthToken = (): string => {
+  // Try to get the token from localStorage first
+  const authToken = localStorage.getItem('authToken');
+  if (authToken) {
+    return authToken;
+  }
+  
+  // Fall back to mock tokens if no auth token is found
   return USE_MOCK_API ? MOCK_AUTH_TOKEN : LIVE_AUTH_TOKEN;
 };
 

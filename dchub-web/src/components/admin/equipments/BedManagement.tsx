@@ -39,9 +39,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Bed, BedFormValues } from '@/types/bedTypes';
 import { fetchBedsByCenter, createBed, updateBed, deleteBed } from '@/api/bedApi';
-import { Plus, Pencil, Trash2, Bed as BedIcon } from 'lucide-react';
+import { Plus, Pencil, Trash2, Bed as BedIcon, Database } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import GenerateBedsDialog from './GenerateBedsDialog';
 
 // Form schema for bed
 const bedFormSchema = z.object({
@@ -57,6 +58,7 @@ const BedManagement: React.FC<BedManagementProps> = ({ centerId }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
   const [editingBed, setEditingBed] = useState<Bed | null>(null);
 
   // Fetch beds
@@ -91,6 +93,31 @@ const BedManagement: React.FC<BedManagementProps> = ({ centerId }) => {
       toast({
         title: "Error",
         description: `Failed to create bed: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Bulk create beds mutation
+  const bulkCreateMutation = useMutation({
+    mutationFn: async (beds: { code: string }[]) => {
+      const promises = beds.map(bed => 
+        createBed({ center_id: parseInt(centerId), code: bed.code })
+      );
+      return Promise.all(promises);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['beds', centerId] });
+      toast({
+        title: "Success",
+        description: "Beds generated successfully",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error in bulkCreateMutation:', error);
+      toast({
+        title: "Error",
+        description: `Failed to generate beds: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -148,6 +175,16 @@ const BedManagement: React.FC<BedManagementProps> = ({ centerId }) => {
     setIsDialogOpen(true);
   };
 
+  // Handle dialog open for generating beds
+  const handleGenerateBeds = () => {
+    setIsGenerateDialogOpen(true);
+  };
+
+  // Handle bed generation
+  const handleBedGeneration = (beds: { code: string }[]) => {
+    bulkCreateMutation.mutate(beds);
+  };
+
   // Handle dialog open for editing
   const handleEditBed = (bed: Bed) => {
     form.reset({
@@ -202,14 +239,18 @@ const BedManagement: React.FC<BedManagementProps> = ({ centerId }) => {
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Dialysis Beds</CardTitle>
-          <CardDescription>
-            Manage dialysis beds for this center
-          </CardDescription>
+          <CardDescription>Manage dialysis beds for this center.</CardDescription>
         </div>
-        <Button onClick={handleNewBed}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Bed
-        </Button>
+        <div className="flex space-x-2">
+          <Button variant="outline" onClick={handleGenerateBeds}>
+            <BedIcon className="mr-2 h-4 w-4" />
+            Generate Beds
+          </Button>
+          <Button onClick={handleNewBed}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Bed
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -264,10 +305,16 @@ const BedManagement: React.FC<BedManagementProps> = ({ centerId }) => {
             <p className="text-sm text-muted-foreground mb-4">
               Add beds to manage dialysis machines.
             </p>
-            <Button onClick={handleNewBed}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Your First Bed
-            </Button>
+            <div className="flex space-x-2">              
+              <Button variant="outline" onClick={handleGenerateBeds}>
+                <BedIcon className="mr-2 h-4 w-4" />            
+                Generate Beds
+              </Button>
+              <Button onClick={handleNewBed}>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Your First Bed
+              </Button>
+            </div>
           </div>
         )}
       </CardContent>
@@ -343,6 +390,13 @@ const BedManagement: React.FC<BedManagementProps> = ({ centerId }) => {
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* Generate Beds Dialog */}
+      <GenerateBedsDialog 
+        isOpen={isGenerateDialogOpen}
+        onClose={() => setIsGenerateDialogOpen(false)}
+        onGenerate={handleBedGeneration}
+      />
     </Card>
   );
 };

@@ -33,7 +33,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, UserPlus, Settings, User, Users, Search, Filter, LayoutDashboard, Building2, BookOpen, FileBarChart2, Bell, ClipboardList, UserCog } from "lucide-react";
+import {
+  ChevronDown,
+  UserPlus,
+  Settings,
+  User,
+  Users,
+  Search,
+  Filter,
+  LayoutDashboard,
+  Building2,
+  BookOpen,
+  FileBarChart2,
+  Bell,
+  ClipboardList,
+  UserCog,
+} from "lucide-react";
 import PortalLayout from "@/components/layouts/PortalLayout";
 import { useUserManagement } from '@/hooks/useUserManagement';
 import UserFormDialog from '@/components/admin/UserFormDialog';
@@ -87,39 +102,37 @@ const AdminUsers = () => {
   // Use our custom hook for user management
   const userManagement = useUserManagement();
   
-  // Filter users by role name
-  const filterUsersByRoleName = (roleName: string | null) => {
-    if (!roleName) return users;
-    return users.filter(user => 
-      user.roleName && user.roleName.toLowerCase() === roleName.toLowerCase()
-    );
-  };
-  
-  // Get users by role
-  const adminUsers = filterUsersByRoleName("Admin");
-  const staffUsers = filterUsersByRoleName("Staff");
-  const patientUsers = filterUsersByRoleName("Patient");
-  const doctorUsers = filterUsersByRoleName("Doctor");
-  
-  const getFilteredUsers = (): UserType[] => {
-    let filteredUsers: UserType[] = [];
+  // Filter users based on active tab and search query
+  const getFilteredUsers = () => {
+    if (!userManagement.users) return [];
     
-    // Filter by role first
+    // First filter by role based on active tab
+    let filteredUsers = userManagement.users;
+    
+    // Map role names to lowercase for consistent comparison
     switch (activeTab) {
-      case 'admins':
-        filteredUsers = adminUsers;
-        break;
-      case 'staff':
-        filteredUsers = staffUsers;
-        break;
       case 'patients':
-        filteredUsers = patientUsers;
+        filteredUsers = userManagement.users.filter(user => 
+          user.roleName && user.roleName.toLowerCase() === 'patient'
+        );
         break;
       case 'doctors':
-        filteredUsers = doctorUsers;
+        filteredUsers = userManagement.users.filter(user => 
+          user.roleName && user.roleName.toLowerCase() === 'doctor'
+        );
+        break;
+      case 'staff':
+        filteredUsers = userManagement.users.filter(user => 
+          user.roleName && user.roleName.toLowerCase() === 'staff'
+        );
+        break;
+      case 'admins':
+        filteredUsers = userManagement.users.filter(user => 
+          user.roleName && user.roleName.toLowerCase() === 'admin'
+        );
         break;
       default:
-        filteredUsers = users;
+        filteredUsers = userManagement.users;
     }
     
     // Then filter by search query if provided
@@ -128,13 +141,13 @@ const AdminUsers = () => {
       filteredUsers = filteredUsers.filter(user => 
         user.name.toLowerCase().includes(query) || 
         user.email.toLowerCase().includes(query) || 
-        user.mobileNo.toLowerCase().includes(query)
+        (user.mobileNo && user.mobileNo.toLowerCase().includes(query))
       );
     }
     
     return filteredUsers;
   };
-
+  
   // Get initials for avatar
   const getInitials = (name: string) => {
     return name
@@ -144,13 +157,25 @@ const AdminUsers = () => {
       .toUpperCase();
   };
   
+  // Helper function to format status with proper capitalization
+  const formatStatus = (status: string) => {
+    if (!status) return '';
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  };
+
+  // Helper function to format role with proper capitalization
+  const formatRole = (role: string) => {
+    if (!role) return '';
+    return role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+  };
+
   // Get role badge variant based on role name
   const getRoleBadgeVariant = (roleName: string): "default" | "secondary" | "outline" | "destructive" => {
     switch (roleName.toLowerCase()) {
       case 'admin': return "destructive"; // Admin - Red
       case 'staff': return "secondary";   // Staff - Purple
-      case 'patient': return "outline";   // Patient - Green (using className for color)
-      case 'doctor': return "default";    // Doctor - Blue (using className for color)
+      case 'doctor': return "default";    // Doctor - Blue
+      case 'patient': return "outline";   // Patient - Green
       default: return "outline";
     }
   };
@@ -158,10 +183,10 @@ const AdminUsers = () => {
   // Log the user counts for debugging
   console.log('User counts:', {
     total: users.length,
-    admin: adminUsers.length,
-    staff: staffUsers.length,
-    patient: patientUsers.length,
-    doctor: doctorUsers.length
+    admin: users.filter(user => user.roleName && user.roleName.toLowerCase() === 'admin').length,
+    staff: users.filter(user => user.roleName && user.roleName.toLowerCase() === 'staff').length,
+    patient: users.filter(user => user.roleName && user.roleName.toLowerCase() === 'patient').length,
+    doctor: users.filter(user => user.roleName && user.roleName.toLowerCase() === 'doctor').length
   });
 
   if (error) {
@@ -239,7 +264,7 @@ const AdminUsers = () => {
               <User className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{patientUsers.length}</div>
+              <div className="text-2xl font-bold">{users.filter(user => user.roleName && user.roleName.toLowerCase() === 'patient').length}</div>
               <p className="text-xs text-muted-foreground">
                 Registered patients
               </p>
@@ -253,7 +278,7 @@ const AdminUsers = () => {
               <User className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{doctorUsers.length}</div>
+              <div className="text-2xl font-bold">{users.filter(user => user.roleName && user.roleName.toLowerCase() === 'doctor').length}</div>
               <p className="text-xs text-muted-foreground">
                 Medical professionals
               </p>
@@ -267,7 +292,7 @@ const AdminUsers = () => {
               <UserCog className="h-4 w-4 text-purple-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{staffUsers.length}</div>
+              <div className="text-2xl font-bold">{users.filter(user => user.roleName && user.roleName.toLowerCase() === 'staff').length}</div>
               <p className="text-xs text-muted-foreground">
                 Support staff
               </p>
@@ -281,7 +306,7 @@ const AdminUsers = () => {
               <Settings className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{adminUsers.length}</div>
+              <div className="text-2xl font-bold">{users.filter(user => user.roleName && user.roleName.toLowerCase() === 'admin').length}</div>
               <p className="text-xs text-muted-foreground">
                 System administrators
               </p>
@@ -340,31 +365,42 @@ const AdminUsers = () => {
                       {getFilteredUsers().map((user) => (
                         <TableRow key={user.id}>
                           <TableCell className="font-medium">
-                            <div className="flex items-center space-x-3">
-                              <Avatar>
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8">
                                 <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                               </Avatar>
                               <div>
-                                <p className="font-medium">{user.name}</p>
+                                <p className="text-sm font-medium leading-none">{user.name}</p>
                                 <p className="text-xs text-muted-foreground">ID: {user.id}</p>
                               </div>
                             </div>
                           </TableCell>
                           {activeTab === "all" && (
                             <TableCell>
-                              <Badge variant={getRoleBadgeVariant(user.roleName || '')}>
-                                {user.roleName}
+                              <Badge
+                                variant="outline"
+                                className={
+                                  user.roleName === "Admin" ? "bg-red-100 text-red-600 border-red-200" :
+                                  user.roleName === "Staff" ? "bg-purple-100 text-purple-600 border-purple-200" :
+                                  user.roleName === "Doctor" ? "bg-blue-100 text-blue-600 border-blue-200" :
+                                  user.roleName === "Patient" ? "bg-green-100 text-green-600 border-green-200" : ''
+                                }
+                              >
+                                {formatRole(user.roleName)}
                               </Badge>
                             </TableCell>
                           )}
                           <TableCell>{user.email}</TableCell>
                           <TableCell>{user.mobileNo}</TableCell>
                           <TableCell>
-                            <Badge 
-                              variant={user.status === 'Active' ? 'default' : 'outline'}
-                              className={user.status === 'Active' ? 'bg-green-500 hover:bg-green-600' : ''}
+                            <Badge
+                              variant="outline"
+                              className={
+                                user.status === "Active" ? "bg-green-100 text-green-600 border-green-200" :
+                                user.status === "Inactive" ? "bg-gray-100 text-gray-600 border-gray-200" : ''
+                              }
                             >
-                              {user.status}
+                              {formatStatus(user.status)}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-right">
@@ -394,7 +430,7 @@ const AdminUsers = () => {
                                   </DropdownMenuItem>
                                 )}
                                 <DropdownMenuItem 
-                                  onClick={() => userManagement.handleUserAction('deactivate', user)}
+                                  onClick={() => userManagement.handleUserAction('delete', user)}
                                   className="text-red-500"
                                 >
                                   Delete User
@@ -417,7 +453,7 @@ const AdminUsers = () => {
       <UserFormDialog
         isOpen={userManagement.isAddUserDialogOpen}
         onClose={userManagement.closeAddUserDialog}
-        onSave={userManagement.createUser}
+        onSave={userManagement.createUserMutation}
         mode="create"
         isSubmitting={userManagement.isCreatingUser}
       />
@@ -426,8 +462,8 @@ const AdminUsers = () => {
       <UserFormDialog
         isOpen={userManagement.isEditUserDialogOpen}
         onClose={userManagement.closeEditUserDialog}
-        onSave={userManagement.updateUser}
-        defaultValues={userManagement.selectedUserData?.user || {}}
+        onSave={userManagement.updateUserMutation}
+        userId={userManagement.selectedUserId !== null ? userManagement.selectedUserId : undefined}
         mode="edit"
         isSubmitting={userManagement.isUpdatingUser}
       />

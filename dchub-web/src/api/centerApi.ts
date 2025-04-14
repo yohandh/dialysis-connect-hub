@@ -103,6 +103,7 @@ export const createCenter = async (centerData: any): Promise<DialysisCenter> => 
         contact_no: centerFields.contactNo,
         email: centerFields.email,
         total_capacity: centerFields.totalCapacity,
+        manage_by_id: centerFields.manageById,
         is_active: true,
         center_hours: centerHours.map((hour: any) => ({
           weekday: hour.day,
@@ -159,6 +160,7 @@ export const updateCenter = async (centerData: any): Promise<DialysisCenter> => 
         contact_no: centerFields.contactNo,
         email: centerFields.email,
         total_capacity: centerFields.totalCapacity,
+        manage_by_id: centerFields.manageById,
         is_active: centerFields.isActive,
         center_hours: centerHours.map((hour: any) => ({
           weekday: hour.day,

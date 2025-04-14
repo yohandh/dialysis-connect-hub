@@ -173,7 +173,7 @@ exports.createAppointmentSlot = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
     
-    const { centerId, date, startTime, endTime, type } = req.body;
+    const { centerId, date, startTime, endTime, type, staffId, doctorId, patientId, bedId } = req.body;
     
     // Check if center exists
     const [center] = await pool.query(
@@ -185,33 +185,60 @@ exports.createAppointmentSlot = async (req, res) => {
       return res.status(404).json({ message: 'Center not found' });
     }
     
-    // Create appointment slot
-    const [result] = await pool.query(
-      `INSERT INTO appointments (centerId, date, startTime, endTime, type, status, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, 'available', NOW(), NOW())`,
-      [centerId, date, startTime, endTime, type]
+    // Create a scheduled session first
+    const [scheduleSessionResult] = await pool.query(
+      `INSERT INTO schedule_sessions (center_id, session_date, start_time, end_time, available_beds, notes)
+       VALUES (?, ?, ?, ?, 1, ?)`,
+      [centerId, date, startTime, endTime, `${type} appointment slot`]
     );
     
-    // Get the created appointment
+    const scheduleSessionId = scheduleSessionResult.insertId;
+    
+    // Create the appointment entry
+    const [appointmentResult] = await pool.query(
+      `INSERT INTO appointments (schedule_session_id, bed_id, patient_id, staff_id, doctor_id, notes, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'scheduled', NOW())`,
+      [
+        scheduleSessionId, 
+        bedId === 'none' ? null : bedId, 
+        patientId === 'none' ? null : patientId, 
+        staffId === 'none' ? null : staffId, 
+        doctorId === 'none' ? null : doctorId, 
+        `${type} appointment`
+      ]
+    );
+    
+    // Get the created appointment with center info
     const [newAppointment] = await pool.query(
-      `SELECT a.*, c.name as centerName
+      `SELECT a.*, ss.session_date as date, ss.start_time as startTime, ss.end_time as endTime, 
+              c.name as centerName, c.id as centerId
        FROM appointments a
-       JOIN centers c ON a.centerId = c.id
+       JOIN schedule_sessions ss ON a.schedule_session_id = ss.id
+       JOIN centers c ON ss.center_id = c.id
        WHERE a.id = ?`,
-      [result.insertId]
+      [appointmentResult.insertId]
     );
     
+    if (!newAppointment || newAppointment.length === 0) {
+      return res.status(500).json({ message: 'Failed to retrieve created appointment' });
+    }
+    
+    // Return a properly formatted response
     res.status(201).json({
       id: newAppointment[0].id,
-      patientId: newAppointment[0].patientId,
+      scheduleSessionId: newAppointment[0].schedule_session_id,
+      patientId: newAppointment[0].patient_id,
+      staffId: newAppointment[0].staff_id,
+      doctorId: newAppointment[0].doctor_id,
+      bedId: newAppointment[0].bed_id,
       centerId: newAppointment[0].centerId,
       centerName: newAppointment[0].centerName,
       date: newAppointment[0].date,
       startTime: newAppointment[0].startTime,
       endTime: newAppointment[0].endTime,
       status: newAppointment[0].status,
-      type: newAppointment[0].type,
-      notes: newAppointment[0].notes
+      notes: newAppointment[0].notes,
+      type: type // Include the appointment type in the response
     });
   } catch (error) {
     console.error('Error creating appointment slot:', error);
@@ -450,6 +477,65 @@ exports.cancelAppointment = async (req, res) => {
     });
   } catch (error) {
     console.error('Error canceling appointment:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Get appointment details with related information
+exports.getAppointmentDetails = async (req, res) => {
+  try {
+    const appointmentId = req.params.id;
+    
+    // Get appointment with related information
+    const [appointment] = await pool.query(
+      `SELECT a.*, 
+              ss.session_date as date, ss.start_time as startTime, ss.end_time as endTime,
+              c.id as centerId, c.name as centerName,
+              b.code as bedCode,
+              CONCAT(p.first_name, ' ', p.last_name) as patientName,
+              CONCAT(s.first_name, ' ', s.last_name) as staffName,
+              CONCAT(d.first_name, ' ', d.last_name) as doctorName
+       FROM appointments a
+       JOIN schedule_sessions ss ON a.schedule_session_id = ss.id
+       JOIN centers c ON ss.center_id = c.id
+       LEFT JOIN beds b ON a.bed_id = b.id
+       LEFT JOIN users p ON a.patient_id = p.id
+       LEFT JOIN users s ON a.staff_id = s.id
+       LEFT JOIN users d ON a.doctor_id = d.id
+       WHERE a.id = ?`,
+      [appointmentId]
+    );
+    
+    if (!appointment || appointment.length === 0) {
+      return res.status(404).json({ message: 'Appointment not found' });
+    }
+    
+    // Format the response
+    const appointmentDetails = {
+      id: appointment[0].id,
+      scheduleSessionId: appointment[0].schedule_session_id,
+      centerId: appointment[0].centerId,
+      centerName: appointment[0].centerName,
+      date: appointment[0].date,
+      startTime: appointment[0].startTime,
+      endTime: appointment[0].endTime,
+      patientId: appointment[0].patient_id,
+      patientName: appointment[0].patientName,
+      staffId: appointment[0].staff_id,
+      staffName: appointment[0].staffName,
+      doctorId: appointment[0].doctor_id,
+      doctorName: appointment[0].doctorName,
+      bedId: appointment[0].bed_id,
+      bedCode: appointment[0].bedCode,
+      status: appointment[0].status,
+      notes: appointment[0].notes,
+      createdAt: appointment[0].created_at,
+      updatedAt: appointment[0].updated_at
+    };
+    
+    res.status(200).json(appointmentDetails);
+  } catch (error) {
+    console.error('Error fetching appointment details:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

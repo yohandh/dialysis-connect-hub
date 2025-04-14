@@ -96,6 +96,7 @@ exports.createCenter = async (req, res) => {
       contact_no, 
       email,
       total_capacity,
+      manage_by_id,
       center_hours = []
     } = dbFormatData;
     
@@ -103,14 +104,15 @@ exports.createCenter = async (req, res) => {
     const [result] = await pool.query(
       `INSERT INTO centers (
         name, address, contact_no, email,
-        total_capacity, is_active
-      ) VALUES (?, ?, ?, ?, ?, 1)`,
+        total_capacity, is_active, manage_by_id
+      ) VALUES (?, ?, ?, ?, ?, 1, ?)`,
       [
         name, 
         address, 
         contact_no, 
         email,
-        total_capacity
+        total_capacity,
+        manage_by_id || null
       ]
     );
     
@@ -200,6 +202,11 @@ exports.updateCenter = async (req, res) => {
     if (dbFormatData.total_capacity !== undefined) {
       updateFields.push('total_capacity = ?');
       updateValues.push(dbFormatData.total_capacity);
+    }
+    
+    if (dbFormatData.manage_by_id !== undefined) {
+      updateFields.push('manage_by_id = ?');
+      updateValues.push(dbFormatData.manage_by_id === 0 ? null : dbFormatData.manage_by_id);
     }
     
     if (dbFormatData.is_active !== undefined) {

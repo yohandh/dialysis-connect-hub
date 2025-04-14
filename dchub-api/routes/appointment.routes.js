@@ -11,6 +11,9 @@ router.get('/', authMiddleware, appointmentController.getAllAppointments);
 // Get appointment by ID
 router.get('/:id', authMiddleware, appointmentController.getAppointmentById);
 
+// Get appointment details with related information
+router.get('/:id/details', authMiddleware, appointmentController.getAppointmentDetails);
+
 // Get appointments by center
 router.get('/center/:centerId', authMiddleware, appointmentController.getAppointmentsByCenter);
 
@@ -27,7 +30,11 @@ router.post('/', [
   body('date').notEmpty().withMessage('Date is required'),
   body('startTime').notEmpty().withMessage('Start time is required'),
   body('endTime').notEmpty().withMessage('End time is required'),
-  body('type').isIn(['dialysis', 'consultation', 'checkup']).withMessage('Invalid appointment type')
+  body('type').isIn(['dialysis', 'consultation', 'checkup']).withMessage('Invalid appointment type'),
+  body('staffId').optional(),
+  body('doctorId').optional(),
+  body('patientId').optional(),
+  body('bedId').optional()
 ], appointmentController.createAppointmentSlot);
 
 // Update appointment slot

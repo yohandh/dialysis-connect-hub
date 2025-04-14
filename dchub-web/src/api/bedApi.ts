@@ -2,8 +2,14 @@ import axios from '../lib/axios';
 
 // Fetch all beds for a center
 export const fetchBedsByCenter = async (centerId: string) => {
-  const response = await axios.get(`/api/centers/${centerId}/beds`);
-  return response.data;
+  try {
+    const response = await axios.get(`/api/centers/${centerId}/beds`);
+    return response.data;
+  } catch (error: any) {
+    console.error(`Error fetching beds for center ${centerId}:`, error.response?.data || error.message);
+    // Return an empty array instead of throwing to prevent form loading issues
+    return [];
+  }
 };
 
 // Create a new bed

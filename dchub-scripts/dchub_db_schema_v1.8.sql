@@ -14,8 +14,34 @@ CREATE TABLE users (
   password VARCHAR(255),
   mobile_no VARCHAR(16),
   is_active BOOLEAN DEFAULT TRUE,
+  is_deleted BOOLEAN DEFAULT FALSE,
   last_login_at DATETIME DEFAULT NULL,
   FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+);
+
+-- STAFF TABLE
+CREATE TABLE staff (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT UNIQUE,
+  gender ENUM('male', 'female', 'other'),
+  designation VARCHAR(128),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  INDEX idx_staff_user_id (user_id)
+);
+
+-- DOCTORS TABLE
+CREATE TABLE doctors (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT UNIQUE,
+  emergency_contact_no VARCHAR(16),
+  specialization VARCHAR(128),
+  medical_license_no VARCHAR(128),
+  address TEXT,
+  dob DATE,
+  gender ENUM('male', 'female', 'other'),
+  blood_group VARCHAR(16),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  INDEX idx_doctors_user_id (user_id)
 );
 
 -- PATIENTS TABLE
@@ -38,21 +64,6 @@ CREATE TABLE patients (
   INDEX idx_patients_user_id (user_id)
 );
 
--- DOCTORS TABLE
-CREATE TABLE doctors (
-  id INT PRIMARY KEY AUTO_INCREMENT,
-  user_id INT UNIQUE,
-  emergency_contact_no VARCHAR(16),
-  specialization VARCHAR(128),
-  medical_license_no VARCHAR(128),
-  address TEXT,
-  dob DATE,
-  gender ENUM('male', 'female', 'other'),
-  blood_group VARCHAR(16),
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  INDEX idx_doctors_user_id (user_id)
-);
-
 -- CENTERS TABLE
 CREATE TABLE centers (
   id INT PRIMARY KEY AUTO_INCREMENT,
@@ -62,6 +73,7 @@ CREATE TABLE centers (
   email VARCHAR(128),
   total_capacity INT,
   is_active BOOLEAN DEFAULT TRUE,
+  is_deleted BOOLEAN DEFAULT FALSE,
   manage_by_id INT,  -- Assigned user who manages the center
   FOREIGN KEY (manage_by_id) REFERENCES users(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
   INDEX idx_centers_name (name),

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,6 +26,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectSeparator,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,13 +51,20 @@ import {
   User, 
   Repeat, 
   Pencil, 
-  Trash2 
+  Trash2,
+  AlertCircle,
+  Search
 } from 'lucide-react';
 import { 
   Session, 
   SessionFormValues, 
   weekdayOptions, 
-  timeOptions 
+  weekdayGroupOptions,
+  timeOptions,
+  isWeekdayGroup,
+  getDaysFromWeekdayGroup,
+  formatTimeString,
+  parseTimeString
 } from '@/types/sessionTypes';
 import { 
   fetchSessionsByCenter, 
@@ -61,6 +72,8 @@ import {
   updateSession, 
   deleteSession 
 } from '@/api/sessionApi';
+import { fetchCenterById } from '@/api/centerApi';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 // Form schema for session
 const sessionFormSchema = z.object({
@@ -82,11 +95,20 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<Session | null>(null);
+  const [selectedWeekday, setSelectedWeekday] = useState<string>("mon");
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [overlapWarning, setOverlapWarning] = useState<string | null>(null);
 
   // Fetch sessions
-  const { data: sessions = [], isLoading } = useQuery({
+  const { data: sessions = [], isLoading: isLoadingSessions } = useQuery({
     queryKey: ['sessions', centerId],
     queryFn: () => fetchSessionsByCenter(centerId),
+  });
+
+  // Fetch center details to get operating hours
+  const { data: centerData, isLoading: isLoadingCenter } = useQuery({
+    queryKey: ['center', centerId],
+    queryFn: () => fetchCenterById(centerId),
   });
 
   // Initialize form
@@ -103,20 +125,130 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
     },
   });
 
+  // Watch form values for validation
+  const watchedWeekday = form.watch("weekday");
+  const watchedStartTime = form.watch("start_time");
+  const watchedEndTime = form.watch("end_time");
+  const watchedRecurrencePattern = form.watch("recurrence_pattern");
+
+  // Update selected weekday when form value changes
+  useEffect(() => {
+    setSelectedWeekday(watchedWeekday);
+  }, [watchedWeekday]);
+
+  // Validate session times against center hours and check for overlaps
+  useEffect(() => {
+    if (!centerData || !watchedWeekday || !watchedStartTime || !watchedEndTime) return;
+
+    const errors: string[] = [];
+    
+    // Get the days to validate based on weekday selection
+    const daysToValidate = isWeekdayGroup(watchedWeekday) 
+      ? getDaysFromWeekdayGroup(watchedWeekday)
+      : [watchedWeekday];
+    
+    // Validate against center hours
+    if (centerData.centerHours && Array.isArray(centerData.centerHours)) {
+      for (const day of daysToValidate) {
+        const centerHour = centerData.centerHours.find(h => h.weekday === day);
+        
+        if (centerHour) {
+          const { openTime, closeTime } = centerHour;
+          
+          if (openTime && closeTime) {
+            if (watchedStartTime < openTime || watchedEndTime > closeTime) {
+              errors.push(`Session time for ${formatWeekday(day)} is outside center hours (${formatTime(openTime)} - ${formatTime(closeTime)})`);
+            }
+          }
+        }
+      }
+    }
+    
+    // Validate capacity against center total capacity
+    const watchedCapacity = form.watch("default_capacity");
+    if (centerData.totalCapacity && watchedCapacity > centerData.totalCapacity) {
+      errors.push(`Capacity (${watchedCapacity}) exceeds center total capacity (${centerData.totalCapacity})`);
+    }
+    
+    setValidationErrors(errors);
+    
+    // Check for overlaps with existing sessions
+    if (sessions.length > 0) {
+      const overlappingSessions = sessions.filter(session => {
+        // Skip the current session being edited
+        if (editingSession && session.id === editingSession.id) return false;
+        
+        // For group weekdays, check if any day in the group overlaps
+        if (isWeekdayGroup(watchedWeekday)) {
+          const groupDays = getDaysFromWeekdayGroup(watchedWeekday);
+          if (!groupDays.includes(session.weekday)) return false;
+        } else if (session.weekday !== watchedWeekday) {
+          return false;
+        }
+        
+        // Check time overlap
+        return (
+          (watchedStartTime >= session.start_time && watchedStartTime < session.end_time) ||
+          (watchedEndTime > session.start_time && watchedEndTime <= session.end_time) ||
+          (watchedStartTime <= session.start_time && watchedEndTime >= session.end_time)
+        );
+      });
+      
+      if (overlappingSessions.length > 0) {
+        setOverlapWarning(`This session overlaps with ${overlappingSessions.length} existing session(s)`);
+      } else {
+        setOverlapWarning(null);
+      }
+    }
+  }, [centerData, watchedWeekday, watchedStartTime, watchedEndTime, form, sessions, editingSession]);
+
+  // Update recurrence pattern based on weekday selection
+  useEffect(() => {
+    const selectedWeekday = form.watch("weekday");
+    
+    if (isWeekdayGroup(selectedWeekday)) {
+      // For weekday groups, automatically set recurrence pattern to daily
+      form.setValue("recurrence_pattern", "daily");
+    } else {
+      // For individual days, set to weekly
+      form.setValue("recurrence_pattern", "weekly");
+    }
+  }, [form.watch("weekday"), form]);
+
   // Create session mutation
   const createMutation = useMutation({
-    mutationFn: (data: SessionFormValues) => createSession({
-      center_id: parseInt(centerId),
-      ...data
-    }),
+    mutationFn: async (data: SessionFormValues) => {
+      // If weekday is a group, create multiple sessions
+      if (isWeekdayGroup(data.weekday)) {
+        const days = getDaysFromWeekdayGroup(data.weekday);
+        const promises = days.map(day => 
+          createSession({
+            center_id: parseInt(centerId),
+            ...data,
+            weekday: day,
+            // Only allow daily recurrence for group weekdays
+            recurrence_pattern: "daily"
+          })
+        );
+        return Promise.all(promises);
+      } else {
+        // Create a single session
+        return createSession({
+          center_id: parseInt(centerId),
+          ...data
+        });
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sessions', centerId] });
       toast({
         title: "Success",
-        description: "Session created successfully",
+        description: "Session(s) created successfully",
       });
       setIsDialogOpen(false);
       form.reset();
+      setValidationErrors([]);
+      setOverlapWarning(null);
     },
     onError: (error: any) => {
       console.error('Error in createMutation:', error);
@@ -141,6 +273,8 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
       setIsDialogOpen(false);
       setEditingSession(null);
       form.reset();
+      setValidationErrors([]);
+      setOverlapWarning(null);
     },
     onError: (error: any) => {
       console.error('Error in updateMutation:', error);
@@ -184,6 +318,8 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
       status: "active"
     });
     setEditingSession(null);
+    setValidationErrors([]);
+    setOverlapWarning(null);
     setIsDialogOpen(true);
   };
 
@@ -199,26 +335,33 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
       status: session.status
     });
     setEditingSession(session);
+    setValidationErrors([]);
+    setOverlapWarning(null);
     setIsDialogOpen(true);
   };
 
   // Handle session deletion
   const handleDeleteSession = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this session?")) {
+    if (window.confirm('Are you sure you want to delete this session?')) {
       deleteMutation.mutate(id);
     }
   };
 
   // Form submission handler
   const onSubmit = (data: SessionFormValues) => {
-    if (editingSession) {
-      // Update existing session
-      updateMutation.mutate({
-        id: editingSession.id,
-        data
+    // If there are validation errors, show a toast and prevent submission
+    if (validationErrors.length > 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please fix the validation errors before submitting",
+        variant: "destructive",
       });
+      return;
+    }
+    
+    if (editingSession) {
+      updateMutation.mutate({ id: editingSession.id, data });
     } else {
-      // Create new session
       createMutation.mutate(data);
     }
   };
@@ -232,7 +375,67 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
   // Format time for display
   const formatTime = (time: string) => {
     const option = timeOptions.find(opt => opt.value === time);
-    return option ? option.label : time;
+    return option ? option.label : formatTimeString(time);
+  };
+
+  // Get center operating hours for a specific day
+  const getCenterHoursForDay = (day: string) => {
+    if (!centerData || !centerData.centerHours || !Array.isArray(centerData.centerHours)) {
+      return null;
+    }
+    
+    const centerHour = centerData.centerHours.find(h => h.weekday === day);
+    if (!centerHour || !centerHour.openTime || !centerHour.closeTime) {
+      return null;
+    }
+    
+    return `${formatTime(centerHour.openTime)} - ${formatTime(centerHour.closeTime)}`;
+  };
+
+  // Get center operating hours for a group of days or a single day
+  const getCenterHoursDisplay = (weekday: string) => {
+    if (isWeekdayGroup(weekday)) {
+      const days = getDaysFromWeekdayGroup(weekday);
+      const hoursMap: Record<string, string> = {};
+      
+      // Collect hours for each day in the group
+      days.forEach(day => {
+        const hours = getCenterHoursForDay(day);
+        if (hours) {
+          hoursMap[day] = hours;
+        }
+      });
+      
+      // If we have hours for any days, display them
+      if (Object.keys(hoursMap).length > 0) {
+        return (
+          <div className="text-sm text-blue-600 mt-1">
+            <div className="font-medium">Center Hours:</div>
+            {Object.entries(hoursMap).map(([day, hours]) => (
+              <div key={day} className="flex justify-between">
+                <span>{formatWeekday(day)}:</span>
+                <span>{hours}</span>
+              </div>
+            ))}
+          </div>
+        );
+      }
+    } else {
+      const hours = getCenterHoursForDay(weekday);
+      if (hours) {
+        return (
+          <div className="text-sm text-blue-600 mt-1">
+            <div className="font-medium">Center Hours:</div>
+            <div className="flex justify-between">
+              <span>{formatWeekday(weekday)}:</span>
+              <span>{hours}</span>
+            </div>
+          </div>
+        );
+      }
+    }
+    
+    return null;
   };
 
   // Get status badge
@@ -247,14 +450,14 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
     }
   };
 
+  const isLoading = isLoadingSessions || isLoadingCenter;
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Recurring Sessions</CardTitle>
-          <CardDescription>
-            Define weekly recurring dialysis sessions
-          </CardDescription>
+          <CardDescription>Define and manage recurring dialysis sessions.</CardDescription>
         </div>
         <Button onClick={handleNewSession}>
           <Plus className="mr-2 h-4 w-4" />
@@ -271,52 +474,47 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                 <TableHead>Day</TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Capacity</TableHead>
-                <TableHead>Doctor</TableHead>
                 <TableHead>Recurrence</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sessions.map((session: Session) => (
+              {sessions.map((session) => (
                 <TableRow key={session.id}>
-                  <TableCell>
+                  <TableCell className="font-medium">
                     <div className="flex items-center">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      <span className="font-medium">{formatWeekday(session.weekday)}</span>
+                      <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                      {formatWeekday(session.weekday)}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center">
-                      <Clock className="mr-2 h-4 w-4" />
+                      <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
                       {formatTime(session.start_time)} - {formatTime(session.end_time)}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center">
-                      <Users className="mr-2 h-4 w-4" />
+                      <Users className="h-4 w-4 mr-2 text-muted-foreground" />
                       {session.default_capacity}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center">
-                      <User className="mr-2 h-4 w-4" />
-                      {session.doctor_name || 'Not assigned'}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Repeat className="mr-2 h-4 w-4" />
+                      <Repeat className="h-4 w-4 mr-2 text-muted-foreground" />
                       {session.recurrence_pattern === 'daily' ? 'Daily' : 'Weekly'}
                     </div>
                   </TableCell>
-                  <TableCell>{getStatusBadge(session.status)}</TableCell>
+                  <TableCell>
+                    {getStatusBadge(session.status)}
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button 
                       variant="ghost" 
                       size="sm" 
                       onClick={() => handleEditSession(session)}
-                      className="h-8 w-8 p-0 mr-1"
+                      className="h-8 w-8 p-0"
                     >
                       <Pencil className="h-4 w-4" />
                       <span className="sr-only">Edit</span>
@@ -338,9 +536,9 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
         ) : (
           <div className="flex flex-col items-center justify-center p-8 text-center border rounded-md border-dashed">
             <Calendar className="h-10 w-10 text-muted-foreground mb-2" />
-            <h3 className="text-lg font-medium">No recurring sessions</h3>
+            <h3 className="text-lg font-medium">No sessions available</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Define recurring sessions to schedule dialysis treatments.
+              Define recurring dialysis sessions for this center.
             </p>
             <Button onClick={handleNewSession}>
               <Plus className="mr-2 h-4 w-4" />
@@ -357,13 +555,39 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
             <DialogTitle>{editingSession ? "Edit Session" : "Add New Session"}</DialogTitle>
             <DialogDescription>
               {editingSession 
-                ? "Update the recurring session information below." 
+                ? "Update the session information below." 
                 : "Define a new recurring dialysis session."}
             </DialogDescription>
           </DialogHeader>
           
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Validation Errors */}
+              {validationErrors.length > 0 && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Validation Errors</AlertTitle>
+                  <AlertDescription>
+                    <ul className="list-disc pl-5 mt-2">
+                      {validationErrors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              {/* Overlap Warning */}
+              {overlapWarning && (
+                <Alert variant="warning" className="bg-yellow-50 border-yellow-200">
+                  <AlertCircle className="h-4 w-4 text-yellow-600" />
+                  <AlertTitle className="text-yellow-800">Session Overlap Warning</AlertTitle>
+                  <AlertDescription className="text-yellow-700">
+                    {overlapWarning}
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               <FormField
                 control={form.control}
                 name="weekday"
@@ -371,7 +595,13 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                   <FormItem>
                     <FormLabel>Day of Week</FormLabel>
                     <Select 
-                      onValueChange={field.onChange} 
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        // If selecting a group, set recurrence to daily
+                        if (isWeekdayGroup(value)) {
+                          form.setValue("recurrence_pattern", "daily");
+                        }
+                      }}
                       defaultValue={field.value}
                     >
                       <FormControl>
@@ -380,11 +610,23 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {weekdayOptions.map(option => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
+                        <SelectGroup>
+                          <SelectLabel>Groups</SelectLabel>
+                          {weekdayGroupOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                        <SelectSeparator />
+                        <SelectGroup>
+                          <SelectLabel>Individual Days</SelectLabel>
+                          {weekdayOptions.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -401,7 +643,7 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                       <FormLabel>Start Time</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -409,13 +651,42 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <div className="flex items-center px-3 pb-2">
+                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                            <input
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              placeholder="Search times..."
+                              id="time-search"
+                              onChange={(e) => {
+                                const searchBox = document.getElementById('time-search');
+                                const searchTerm = e.target.value.toLowerCase();
+                                const items = document.querySelectorAll('[data-time-item]');
+                                
+                                items.forEach(item => {
+                                  const text = item.textContent?.toLowerCase() || '';
+                                  if (text.includes(searchTerm)) {
+                                    item.classList.remove('hidden');
+                                  } else {
+                                    item.classList.add('hidden');
+                                  }
+                                });
+                              }}
+                            />
+                          </div>
                           {timeOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
+                            <SelectItem 
+                              key={option.value} 
+                              value={option.value}
+                              data-time-item
+                            >
                               {option.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormDescription>
+                        Enter time in 12-hour format
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -429,7 +700,7 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                       <FormLabel>End Time</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -437,18 +708,53 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <div className="flex items-center px-3 pb-2">
+                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                            <input
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                              placeholder="Search times..."
+                              id="end-time-search"
+                              onChange={(e) => {
+                                const searchTerm = e.target.value.toLowerCase();
+                                const items = document.querySelectorAll('[data-end-time-item]');
+                                
+                                items.forEach(item => {
+                                  const text = item.textContent?.toLowerCase() || '';
+                                  if (text.includes(searchTerm)) {
+                                    item.classList.remove('hidden');
+                                  } else {
+                                    item.classList.add('hidden');
+                                  }
+                                });
+                              }}
+                            />
+                          </div>
                           {timeOptions.map(option => (
-                            <SelectItem key={option.value} value={option.value}>
+                            <SelectItem 
+                              key={option.value} 
+                              value={option.value}
+                              data-end-time-item
+                            >
                               {option.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormDescription>
+                        Enter time in 12-hour format
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+              
+              {/* Display center hours */}
+              {getCenterHoursDisplay(selectedWeekday) && (
+                <div className="-mt-2 mb-2">
+                  {getCenterHoursDisplay(selectedWeekday)}
+                </div>
+              )}
               
               <FormField
                 control={form.control}
@@ -457,8 +763,18 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                   <FormItem>
                     <FormLabel>Capacity (Number of Patients)</FormLabel>
                     <FormControl>
-                      <Input type="number" min="1" {...field} />
+                      <Input 
+                        type="number" 
+                        min="1" 
+                        max={centerData?.totalCapacity || undefined} 
+                        {...field} 
+                      />
                     </FormControl>
+                    {centerData?.totalCapacity && (
+                      <FormDescription>
+                        Maximum capacity: {centerData.totalCapacity}
+                      </FormDescription>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -472,7 +788,8 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                     <FormLabel>Recurrence Pattern</FormLabel>
                     <Select 
                       onValueChange={field.onChange} 
-                      defaultValue={field.value}
+                      value={field.value}
+                      disabled={true} // Always disable selection
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -480,10 +797,22 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="daily">Daily</SelectItem>
+                        {isWeekdayGroup(selectedWeekday) ? (
+                          <SelectItem value="daily">Daily</SelectItem>
+                        ) : (
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
+                    {isWeekdayGroup(selectedWeekday) ? (
+                      <FormDescription>
+                        Daily recurrence is automatically selected for day groups
+                      </FormDescription>
+                    ) : (
+                      <FormDescription>
+                        Weekly recurrence is automatically selected for individual days
+                      </FormDescription>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -498,7 +827,7 @@ const SessionManagement: React.FC<SessionManagementProps> = ({ centerId }) => {
                       <FormLabel>Status</FormLabel>
                       <Select 
                         onValueChange={field.onChange} 
-                        defaultValue={field.value}
+                        value={field.value || "active"}
                       >
                         <FormControl>
                           <SelectTrigger>

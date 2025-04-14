@@ -16,7 +16,20 @@ import {
 } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, MapPin, Phone, Mail, Users, Clock } from "lucide-react";
+import { 
+  ArrowLeft, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Users, 
+  Clock,
+  LayoutDashboard,
+  Building2,
+  Bell,
+  ClipboardList,
+  BookOpen,
+  FileBarChart2
+} from "lucide-react";
 import PortalLayout from "@/components/layouts/PortalLayout";
 import { fetchCenterById } from '@/api/centerApi';
 import { formatOperatingHours } from '@/utils/centerUtils';
@@ -112,10 +125,13 @@ const AdminCenterDetails = () => {
       <PortalLayout
         portalName="Admin Portal"
         navLinks={[
-          { name: "Dashboard", path: "/admin/dashboard" },
-          { name: "Users", path: "/admin/users" },
-          { name: "Centers", path: "/admin/centers" },          
-          { name: "Reports", path: "/admin/reports" },
+          { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+          { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+          { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+          { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
+          { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
+          { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
+          { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
         ]}
         userName="Michael Adams"
         userRole="System Administrator"
@@ -133,10 +149,13 @@ const AdminCenterDetails = () => {
       <PortalLayout
         portalName="Admin Portal"
         navLinks={[
-          { name: "Dashboard", path: "/admin/dashboard" },
-          { name: "Users", path: "/admin/users" },
-          { name: "Centers", path: "/admin/centers" },          
-          { name: "Reports", path: "/admin/reports" },
+          { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+          { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+          { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+          { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
+          { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
+          { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
+          { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
         ]}
         userName="Michael Adams"
         userRole="System Administrator"
@@ -159,10 +178,13 @@ const AdminCenterDetails = () => {
     <PortalLayout
       portalName="Admin Portal"
       navLinks={[
-        { name: "Dashboard", path: "/admin/dashboard" },
-        { name: "Users", path: "/admin/users" },
-        { name: "Centers", path: "/admin/centers" },        
-        { name: "Reports", path: "/admin/reports" },
+        { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+        { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
+        { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
+        { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
+        { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
       userName="Michael Adams"
       userRole="System Administrator"
