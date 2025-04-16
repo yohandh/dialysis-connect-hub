@@ -23,6 +23,9 @@ const dayAfterTomorrow = new Date(new Date().setDate(new Date().getDate() + 2)).
 // Next week date in YYYY-MM-DD format
 const nextWeek = new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split('T')[0];
 
+// Specific date for the demo (April 16th, 2025)
+const specificDate = "2025-04-16";
+
 export const appointments: Appointment[] = [
   {
     id: "apt-001",
@@ -233,6 +236,48 @@ export const appointments: Appointment[] = [
     endTime: "16:00",
     status: "scheduled",
     type: "consultation"
+  },
+  // Add appointments for April 16th, 2025 (Asiri Surgical - center-003)
+  {
+    id: "apt-021",
+    patientId: null,
+    centerId: "3",
+    date: specificDate,
+    startTime: "06:00",
+    endTime: "07:00",
+    status: "scheduled",
+    type: "dialysis",
+    notes: "8 beds available"
+  },
+  {
+    id: "apt-022",
+    patientId: null,
+    centerId: "3",
+    date: specificDate,
+    startTime: "07:00",
+    endTime: "08:00",
+    status: "scheduled",
+    type: "dialysis"
+  },
+  {
+    id: "apt-023",
+    patientId: null,
+    centerId: "3",
+    date: specificDate,
+    startTime: "08:00",
+    endTime: "09:00",
+    status: "scheduled",
+    type: "dialysis"
+  },
+  {
+    id: "apt-024",
+    patientId: null,
+    centerId: "3",
+    date: specificDate,
+    startTime: "09:00",
+    endTime: "10:00",
+    status: "scheduled",
+    type: "dialysis"
   }
 ];
 

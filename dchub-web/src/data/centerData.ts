@@ -4,7 +4,7 @@ import { DialysisCenter } from '../types/centerTypes';
 // Mock data that matches the MySQL database schema
 export const dialysisCenters: DialysisCenter[] = [
   {
-    id: 1,
+    id: "1",
     name: "The National Institute For Nephrology Dialysis & Transplantation",
     address: "Colombo",
     contactNo: "011-200-0000",
@@ -22,7 +22,7 @@ export const dialysisCenters: DialysisCenter[] = [
     }
   },
   {
-    id: 2,
+    id: "2",
     name: "Nawaloka",
     address: "Colombo",
     contactNo: "011-200-0001",
@@ -40,25 +40,25 @@ export const dialysisCenters: DialysisCenter[] = [
     }
   },
   {
-    id: 3,
+    id: "3",
     name: "Asiri Surgical",
     address: "Colombo",
-    contactNo: "011-200-0002",
-    email: "asirisurgical@dialysis.org",
+    contactNo: "94-11-452-4400",
+    email: "asiri.surgical@dchub.org",
     totalCapacity: 10,
     isActive: true,
     centerHours: {
-      monday: "8:30 AM - 5:30 PM",
-      tuesday: "8:30 AM - 5:30 PM",
-      wednesday: "8:30 AM - 5:30 PM",
-      thursday: "8:30 AM - 5:30 PM",
-      friday: "8:30 AM - 5:30 PM",
-      saturday: "9:00 AM - 1:00 PM",
-      sunday: "Closed"
+      monday: "6:00 AM - 10:00 PM",
+      tuesday: "6:00 AM - 6:00 PM",
+      wednesday: "6:00 AM - 10:00 PM",
+      thursday: "6:00 AM - 6:00 PM",
+      friday: "6:00 AM - 10:00 PM",
+      saturday: "6:00 AM - 4:00 PM",
+      sunday: "6:00 AM - 4:00 PM"
     }
   },
   {
-    id: 4,
+    id: "4",
     name: "Kings Hospital",
     address: "Colombo",
     contactNo: "011-200-0003",
@@ -76,7 +76,7 @@ export const dialysisCenters: DialysisCenter[] = [
     }
   },
   {
-    id: 5,
+    id: "5",
     name: "Lanka Hospital",
     address: "Colombo",
     contactNo: "011-200-0004",

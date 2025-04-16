@@ -12,12 +12,12 @@ interface CKDStageCardProps {
 
 const CKDStageCard: React.FC<CKDStageCardProps> = ({ patientCkdStage, ckdStageInfo }) => {
   return (
-    <Card className="shadow-sm hover:shadow transition-shadow duration-200">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">
+    <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b border-blue-100">
+        <CardTitle className="text-sm font-medium text-medical-blue">
           CKD Stage Overview
         </CardTitle>
-        <Activity className="h-4 w-4 text-muted-foreground" />
+        <Activity className="h-4 w-4 text-medical-blue" />
       </CardHeader>
       <CardContent>
         <div className="flex flex-col space-y-2">
@@ -38,11 +38,11 @@ const CKDStageCard: React.FC<CKDStageCardProps> = ({ patientCkdStage, ckdStageIn
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex justify-between p-2">
-        <Link to="/patient/ckd-stage" className="text-xs text-primary hover:underline">
+      <CardFooter className="flex justify-between p-2 bg-blue-50/50">
+        <Link to="/patient/ckd-stage" className="text-xs text-medical-blue hover:underline">
           Check your CKD Stage
         </Link>
-        <Link to="/patient/recommendations" className="text-xs text-primary hover:underline">
+        <Link to="/patient/recommendations" className="text-xs text-medical-blue hover:underline">
           View Recommendations
         </Link>
       </CardFooter>

@@ -144,10 +144,10 @@ const PatientDashboard = () => {
       {isLoading ? (
         <DashboardSkeleton />
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 bg-blue-50 p-6 rounded-lg">
           <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold tracking-tight">Patient Dashboard</h1>
-            <Button asChild variant="outline">
+            <h1 className="text-3xl font-bold tracking-tight text-medical-blue">Patient Dashboard</h1>
+            <Button asChild className="bg-medical-blue text-white hover:bg-medical-blue/90">
               <Link to="/patient/book">
                 Book New Appointment
               </Link>

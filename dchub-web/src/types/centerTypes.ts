@@ -2,15 +2,20 @@ import { z } from "zod";
 
 // Updated DialysisCenter interface to match the frontend naming convention
 export interface DialysisCenter {
-  id: number;
+  id: string;
   name: string;
   address: string;
   contactNo: string;
   email: string;
   totalCapacity: number;
   isActive: boolean;
-  manageById?: number;
+  manageById?: string;
   type?: string;
+  hours?: {
+    day: string;
+    openTime: string;
+    closeTime: string;
+  }[];
   centerHours?: {
     id?: number;
     weekday: string;

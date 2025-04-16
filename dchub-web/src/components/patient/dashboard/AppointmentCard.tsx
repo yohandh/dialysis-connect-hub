@@ -13,12 +13,12 @@ interface AppointmentCardProps {
 
 const AppointmentCard: React.FC<AppointmentCardProps> = ({ nextAppointment }) => {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">
+    <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b border-blue-100">
+        <CardTitle className="text-sm font-medium text-medical-blue">
           Next Appointment
         </CardTitle>
-        <Calendar className="h-4 w-4 text-muted-foreground" />
+        <Calendar className="h-4 w-4 text-medical-blue" />
       </CardHeader>
       <CardContent>
         {nextAppointment ? (
@@ -43,14 +43,14 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ nextAppointment }) =>
         ) : (
           <div className="text-center py-2">
             <p className="text-sm text-muted-foreground">No upcoming appointments</p>
-            <Button asChild variant="link" size="sm" className="mt-2">
+            <Button asChild size="sm" className="mt-2 bg-medical-blue text-white hover:bg-medical-blue/90">
               <Link to="/patient/book">Book Now</Link>
             </Button>
           </div>
         )}
       </CardContent>
-      <CardFooter className="p-2">
-        <Link to="/patient/calendar" className="text-xs text-center w-full text-primary hover:underline">
+      <CardFooter className="p-2 bg-blue-50/50">
+        <Link to="/patient/calendar" className="text-xs text-center w-full text-medical-blue hover:underline">
           View all appointments
         </Link>
       </CardFooter>

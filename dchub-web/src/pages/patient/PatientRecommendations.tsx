@@ -37,12 +37,12 @@ const PatientRecommendations = () => {
   
   return (
     <PatientPortalLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 bg-blue-50 p-6 rounded-lg">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">Health Recommendations</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-medical-blue">Health Recommendations</h1>
         </div>
         
-        <Alert className="bg-gray-900 text-white border-none">
+        <Alert className="bg-medical-blue text-white border-none">
           <Info className="h-4 w-4 text-white" />
           <AlertTitle className="text-white">Personalized Guidance</AlertTitle>
           <AlertDescription className="text-gray-200">
@@ -51,9 +51,9 @@ const PatientRecommendations = () => {
           </AlertDescription>
         </Alert>
         
-        <Card className="border-0 shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+        <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+          <CardHeader className="border-b border-blue-100">
+            <CardTitle className="flex items-center justify-between text-medical-blue">
               <span>Recommendations for CKD Stage:</span>
               <Select value={selectedStage} onValueChange={setSelectedStage}>
                 <SelectTrigger className="w-[180px]">
@@ -83,14 +83,14 @@ const PatientRecommendations = () => {
           {stageData && (
             <CardContent>
               <Tabs defaultValue="diet">
-                <TabsList className="grid grid-cols-3 mb-6 bg-gray-100">
-                  <TabsTrigger value="diet" className="data-[state=active]:bg-gray-800 data-[state=active]:text-white">
+                <TabsList className="grid grid-cols-3 mb-6 bg-medical-blue/10">
+                  <TabsTrigger value="diet" className="data-[state=active]:bg-medical-blue data-[state=active]:text-white">
                     <Utensils className="h-4 w-4 mr-2" /> Diet
                   </TabsTrigger>
-                  <TabsTrigger value="lifestyle" className="data-[state=active]:bg-gray-800 data-[state=active]:text-white">
+                  <TabsTrigger value="lifestyle" className="data-[state=active]:bg-medical-blue data-[state=active]:text-white">
                     <Activity className="h-4 w-4 mr-2" /> Lifestyle
                   </TabsTrigger>
-                  <TabsTrigger value="monitoring" className="data-[state=active]:bg-gray-800 data-[state=active]:text-white">
+                  <TabsTrigger value="monitoring" className="data-[state=active]:bg-medical-blue data-[state=active]:text-white">
                     <Heart className="h-4 w-4 mr-2" /> Monitoring
                   </TabsTrigger>
                 </TabsList>
@@ -105,7 +105,6 @@ const PatientRecommendations = () => {
                       {stageData.recommendations.diet.map((item, index) => (
                         <li key={index} className="flex items-start">
                           <Check className="h-4 w-4 text-teal-600 mt-0.5 mr-2 shrink-0" />
-                          <span className="text-teal-900">{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -113,12 +112,12 @@ const PatientRecommendations = () => {
                   
                   <Card>
                     <CardHeader>
-                      <CardTitle className="text-lg">Foods to Monitor</CardTitle>
+                      <CardTitle className="text-lg text-medical-blue">Foods to Monitor</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="font-medium mb-2">Sodium</h4>
+                        <div className="bg-medical-blue-50 p-4 rounded-lg">
+                          <h4 className="font-medium mb-2 text-medical-blue">Sodium</h4>
                           <p className="text-sm text-gray-600 mb-2">
                             {stageData.stage < 3 ? "Moderate intake" : "Limit intake"}
                           </p>
@@ -131,7 +130,7 @@ const PatientRecommendations = () => {
                           </ul>
                         </div>
                         
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-blue-50 p-4 rounded-lg">
                           <h4 className="font-medium mb-2">Potassium</h4>
                           <p className="text-sm text-gray-600 mb-2">
                             {stageData.stage < 4 ? "Monitor intake" : "Restrict intake"}
@@ -145,7 +144,7 @@ const PatientRecommendations = () => {
                           </ul>
                         </div>
                         
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-blue-50 p-4 rounded-lg">
                           <h4 className="font-medium mb-2">Phosphorus</h4>
                           <p className="text-sm text-gray-600 mb-2">
                             {stageData.stage < 3 ? "Normal intake" : "Limit intake"}
@@ -185,7 +184,7 @@ const PatientRecommendations = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-blue-50 p-4 rounded-lg">
                           <h4 className="font-medium mb-2">Recommended Activities</h4>
                           <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                             <li>Walking</li>
@@ -196,7 +195,7 @@ const PatientRecommendations = () => {
                           </ul>
                         </div>
                         
-                        <div className="bg-gray-50 p-4 rounded-lg">
+                        <div className="bg-blue-50 p-4 rounded-lg">
                           <h4 className="font-medium mb-2">Exercise Guidelines</h4>
                           <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                             <li>{stageData.stage < 4 ? "Aim for 30 minutes daily" : "Start with 10-15 minutes daily"}</li>
@@ -227,14 +226,14 @@ const PatientRecommendations = () => {
                     </ul>
                   </div>
                   
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Track These Metrics</CardTitle>
+                  <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+                    <CardHeader className="border-b border-blue-100">
+                      <CardTitle className="text-lg text-medical-blue">Track These Metrics</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="font-medium mb-2">Daily</h4>
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <h4 className="font-medium mb-2 text-medical-blue">Daily</h4>
                           <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                             <li>Blood pressure</li>
                             <li>Weight</li>
@@ -244,8 +243,8 @@ const PatientRecommendations = () => {
                           </ul>
                         </div>
                         
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="font-medium mb-2">Monthly</h4>
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <h4 className="font-medium mb-2 text-medical-blue">Monthly</h4>
                           <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                             <li>eGFR levels</li>
                             <li>Creatinine levels</li>
@@ -255,8 +254,8 @@ const PatientRecommendations = () => {
                           </ul>
                         </div>
                         
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h4 className="font-medium mb-2">When to Contact a Doctor</h4>
+                        <div className="bg-blue-50 p-4 rounded-lg">
+                          <h4 className="font-medium mb-2 text-medical-blue">When to Contact a Doctor</h4>
                           <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
                             <li>Sudden weight gain</li>
                             <li>Increased swelling</li>
@@ -274,32 +273,32 @@ const PatientRecommendations = () => {
           )}
         </Card>
         
-        <Card className="border-0 shadow-sm">
-          <CardHeader>
-            <CardTitle>Additional Resources</CardTitle>
+        <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+          <CardHeader className="border-b border-blue-100">
+            <CardTitle className="text-medical-blue">Additional Resources</CardTitle>
             <CardDescription>Helpful information for managing your kidney health</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-start p-4 border rounded-lg">
-                <div className="bg-primary/10 p-2 rounded mr-4">
-                  <Info className="h-6 w-6 text-primary" />
+              <div className="flex items-start p-4 border border-blue-100 rounded-lg hover:shadow-md transition-shadow">
+                <div className="bg-medical-blue/10 p-2 rounded mr-4">
+                  <Info className="h-6 w-6 text-medical-blue" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">CKD Diet Guide</h3>
+                  <h3 className="font-medium mb-1 text-medical-blue">CKD Diet Guide</h3>
                   <p className="text-sm text-gray-600 mb-2">Comprehensive guide to managing your diet with kidney disease.</p>
-                  <a href="#" className="text-sm text-primary hover:underline">Download PDF</a>
+                  <a href="#" className="text-sm text-medical-blue hover:underline">Download PDF</a>
                 </div>
               </div>
               
-              <div className="flex items-start p-4 border rounded-lg">
-                <div className="bg-primary/10 p-2 rounded mr-4">
-                  <Info className="h-6 w-6 text-primary" />
+              <div className="flex items-start p-4 border border-blue-100 rounded-lg hover:shadow-md transition-shadow">
+                <div className="bg-medical-blue/10 p-2 rounded mr-4">
+                  <Info className="h-6 w-6 text-medical-blue" />
                 </div>
                 <div>
-                  <h3 className="font-medium mb-1">Medication Tracker</h3>
+                  <h3 className="font-medium mb-1 text-medical-blue">Medication Tracker</h3>
                   <p className="text-sm text-gray-600 mb-2">Template to help you track your medications and schedule.</p>
-                  <a href="#" className="text-sm text-primary hover:underline">Download PDF</a>
+                  <a href="#" className="text-sm text-medical-blue hover:underline">Download PDF</a>
                 </div>
               </div>
             </div>

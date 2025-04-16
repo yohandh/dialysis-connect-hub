@@ -68,13 +68,13 @@ const PatientCalendar = () => {
   const renderHeader = () => {
     return (
       <div className="flex items-center justify-between mb-4">
-        <Button variant="outline" size="icon" onClick={prevMonth}>
+        <Button variant="outline" size="icon" onClick={prevMonth} className="border-medical-blue text-medical-blue hover:bg-medical-blue/10">
           <ChevronLeft className="h-4 w-4" />
         </Button>
-        <h2 className="font-semibold text-xl">
+        <h2 className="font-semibold text-xl text-medical-blue">
           {format(currentMonth, 'MMMM yyyy')}
         </h2>
-        <Button variant="outline" size="icon" onClick={nextMonth}>
+        <Button variant="outline" size="icon" onClick={nextMonth} className="border-medical-blue text-medical-blue hover:bg-medical-blue/10">
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
@@ -222,9 +222,9 @@ const PatientCalendar = () => {
     monthAppointments.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
     
     return (
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle>Appointments for {format(currentMonth, 'MMMM yyyy')}</CardTitle>
+      <Card className="mt-6 border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+        <CardHeader className="border-b border-blue-100">
+          <CardTitle className="text-medical-blue">Appointments for {format(currentMonth, 'MMMM yyyy')}</CardTitle>
           <CardDescription>List view of all scheduled appointments</CardDescription>
         </CardHeader>
         <CardContent>
@@ -247,7 +247,7 @@ const PatientCalendar = () => {
                     {appointment.status === 'booked' && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm">Cancel</Button>
+                          <Button variant="outline" size="sm" className="border-red-500 text-red-500 hover:bg-red-50">Cancel</Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
@@ -258,7 +258,7 @@ const PatientCalendar = () => {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>No, keep appointment</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleCancelAppointment(appointment.id)}>
+                            <AlertDialogAction onClick={() => handleCancelAppointment(appointment.id)} className="bg-medical-blue hover:bg-medical-blue/90">
                               Yes, cancel appointment
                             </AlertDialogAction>
                           </AlertDialogFooter>
@@ -271,8 +271,8 @@ const PatientCalendar = () => {
             )}
           </div>
         </CardContent>
-        <CardFooter>
-          <Button asChild className="w-full">
+        <CardFooter className="bg-blue-50/50">
+          <Button asChild className="w-full bg-medical-blue text-white hover:bg-medical-blue/90">
             <Link to="/patient/book">Book New Appointment</Link>
           </Button>
         </CardFooter>
@@ -282,19 +282,19 @@ const PatientCalendar = () => {
   
   return (
     <PatientPortalLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 bg-blue-50 p-6 rounded-lg">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">Appointment Calendar</h1>
-          <Button asChild>
+          <h1 className="text-3xl font-bold tracking-tight text-medical-blue">Appointment Calendar</h1>
+          <Button asChild className="bg-medical-blue text-white hover:bg-medical-blue/90">
             <Link to="/patient/book">
               Book Appointment
             </Link>
           </Button>
         </div>
         
-        <Card>
-          <CardHeader>
-            <CardTitle>Calendar View</CardTitle>
+        <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+          <CardHeader className="border-b border-blue-100">
+            <CardTitle className="text-medical-blue">Calendar View</CardTitle>
             <CardDescription>Your scheduled dialysis appointments</CardDescription>
           </CardHeader>
           <CardContent>

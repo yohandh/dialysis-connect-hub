@@ -32,17 +32,17 @@ const PatientLogin = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-lg border-t-4 border-medical-blue">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
-            <div className="bg-patient-green-light rounded-full p-3">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-patient-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="bg-medical-blue/10 rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-medical-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
           </div>
-          <CardTitle className="text-2xl text-center">Patient Login</CardTitle>
+          <CardTitle className="text-2xl text-center text-medical-blue">Patient Login</CardTitle>
           <CardDescription className="text-center">
             Enter your credentials to access the Patient Portal
           </CardDescription>
@@ -62,7 +62,7 @@ const PatientLogin = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <a href="#" className="text-sm text-patient-green hover:underline">
+                <a href="#" className="text-sm text-medical-blue hover:underline">
                   Forgot password?
                 </a>
               </div>
@@ -75,7 +75,7 @@ const PatientLogin = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full bg-patient-green hover:bg-patient-green/90">
+            <Button type="submit" className="w-full bg-medical-blue hover:bg-medical-blue/90 text-white">
               Login
             </Button>
           </CardFooter>
@@ -84,6 +84,10 @@ const PatientLogin = () => {
           <p className="mt-4 text-xs text-gray-500">
             Patient portal is secure and HIPAA compliant
           </p>
+          <div className="mt-4 flex justify-center">
+            <img src="/logo.png" alt="DialyzeEase Logo" className="h-6 mr-2" />
+            <span className="text-xs font-semibold text-gray-700">DialyzeEase</span>
+          </div>
         </div>
       </Card>
     </div>
