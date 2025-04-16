@@ -93,7 +93,7 @@ const ContactSection = () => {
                     <p className="text-gray-700">
                       349<br />
                       Jayantha Weerasekara Mawatha<br />
-                      Colombo, Western Province, 01000
+                      Colombo, Western Province 01000, Sri Lanka
                     </p>
                   </div>
                 </div>

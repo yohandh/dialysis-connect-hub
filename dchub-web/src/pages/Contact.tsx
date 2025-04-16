@@ -22,16 +22,16 @@ const Contact = () => {
                 <div className="flex items-start">
                   <MapPin className="h-5 w-5 text-medical-blue mr-2 mt-0.5" />
                   <div>
-                    <h3 className="font-medium">Main Office - Dialysis Connect Hub</h3>
-                    <p className="text-gray-600">123 Healthcare Avenue</p>
-                    <p className="text-gray-600">San Francisco, CA 94158</p>
+                    <h3 className="font-medium">DialyzeEase Headquarters</h3>
+                    <p className="text-gray-600">349 Jayantha Weerasekara</p>
+                    <p className="text-gray-600">Colombo, Western Province 01000, Sri Lanka</p>
                   </div>
                 </div>
                 
                 <div className="flex items-center">
                   <Phone className="h-5 w-5 text-medical-blue mr-2" />
                   <div>
-                    <p className="text-gray-600">(555) 123-4567</p>
+                    <p className="text-gray-600">94-11-242-2335</p>
                   </div>
                 </div>
                 
@@ -62,19 +62,19 @@ const Contact = () => {
               <CardContent className="space-y-4">
                 <div>
                   <h3 className="font-medium text-medical-blue">Emergency Support</h3>
-                  <p className="text-gray-600">Call our 24/7 hotline: (555) 999-8888</p>
+                  <p className="text-gray-600">Call our 24/7 hotline: 94-11-242-2335</p>
                 </div>
                 
                 <div>
                   <h3 className="font-medium text-medical-blue">Patient Services</h3>
                   <p className="text-gray-600">For appointment scheduling and general inquiries</p>
-                  <p className="text-gray-600">Email: patients@dialysisconnect.example</p>
+                  <p className="text-gray-600">Email: patients@dialyzeease.org</p>
                 </div>
                 
                 <div>
                   <h3 className="font-medium text-medical-blue">Provider Relations</h3>
                   <p className="text-gray-600">For healthcare professionals and facility partnerships</p>
-                  <p className="text-gray-600">Email: providers@dialysisconnect.example</p>
+                  <p className="text-gray-600">Email: providers@dialyzeease.org</p>
                 </div>
               </CardContent>
             </Card>

@@ -126,7 +126,7 @@ const AdminLogin = () => {
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="your.email@dialysisconnecthub.org" 
+                placeholder="your.name@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}

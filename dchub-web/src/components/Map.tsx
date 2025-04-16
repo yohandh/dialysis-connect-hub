@@ -18,7 +18,7 @@ const Map = () => {
         center={center}
         zoom={15}
       >
-        <Marker position={center} title="Dialysis Connect Hub" />
+        <Marker position={center} title="DialyzeEase" />
       </GoogleMap>
     </LoadScript>
   );

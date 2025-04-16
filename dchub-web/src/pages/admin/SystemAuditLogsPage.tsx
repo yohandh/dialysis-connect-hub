@@ -7,7 +7,7 @@ const SystemAuditLogsPage: React.FC = () => {
   return (
     <>
       <Helmet>
-        <title>System Audit Logs | DialysisConnectHub</title>
+        <title>System Audit Logs | DialyzeEase</title>
       </Helmet>
       <AdminLayout>
         <SystemAuditLogs />

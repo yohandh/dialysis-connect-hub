@@ -2,10 +2,25 @@
 import React, { useState } from 'react';
 import PublicLayout from '@/components/layouts/PublicLayout';
 import { dialysisCenters } from '@/data/centerData';
+import { DialysisCenter } from '@/types/centerTypes';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+// Type guard to check if centerHours is the weekday object format
+const isWeekdayHoursObject = (centerHours: DialysisCenter['centerHours']): centerHours is {
+  monday: string;
+  tuesday: string;
+  wednesday: string;
+  thursday: string;
+  friday: string;
+  saturday: string;
+  sunday: string;
+} => {
+  if (!centerHours) return false;
+  return 'monday' in centerHours;
+};
 
 const Centers = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,8 +28,7 @@ const Centers = () => {
   
   const filteredCenters = dialysisCenters.filter(center => 
     center.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    center.address.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    center.address.state.toLowerCase().includes(searchTerm.toLowerCase())
+    center.address.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
   return (
@@ -50,44 +64,37 @@ const Centers = () => {
                     <CardHeader className="bg-medical-blue/5 pb-2">
                       <CardTitle>{center.name}</CardTitle>
                       <CardDescription>
-                        {center.address.city}, {center.address.state} {center.address.zipCode}
+                        {center.address}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="pt-4">
                       <div className="space-y-2">
-                        <p><span className="font-medium">Address:</span> {center.address.street}</p>
-                        <p><span className="font-medium">Phone:</span> {center.phone}</p>
+                        <p><span className="font-medium">Address:</span> {center.address}</p>
+                        <p><span className="font-medium">Phone:</span> {center.contactNo}</p>
                         <p><span className="font-medium">Email:</span> {center.email}</p>
-                        <p><span className="font-medium">Capacity:</span> {center.currentPatients} / {center.capacity} patients</p>
+                        <p><span className="font-medium">Capacity:</span> {center.totalCapacity} patients</p>
                         
                         <div className="mt-4">
                           <h4 className="font-medium mb-1">Operating Hours:</h4>
                           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                             <div>Monday:</div>
-                            <div>{center.centerHours.monday}</div>
+                            <div>{isWeekdayHoursObject(center.centerHours) ? center.centerHours.monday : 'N/A'}</div>
                             <div>Tuesday:</div>
-                            <div>{center.centerHours.tuesday}</div>
+                            <div>{isWeekdayHoursObject(center.centerHours) ? center.centerHours.tuesday : 'N/A'}</div>
                             <div>Wednesday:</div>
-                            <div>{center.centerHours.wednesday}</div>
+                            <div>{isWeekdayHoursObject(center.centerHours) ? center.centerHours.wednesday : 'N/A'}</div>
                             <div>Thursday:</div>
-                            <div>{center.centerHours.thursday}</div>
+                            <div>{isWeekdayHoursObject(center.centerHours) ? center.centerHours.thursday : 'N/A'}</div>
                             <div>Friday:</div>
-                            <div>{center.centerHours.friday}</div>
+                            <div>{isWeekdayHoursObject(center.centerHours) ? center.centerHours.friday : 'N/A'}</div>
                             <div>Saturday:</div>
-                            <div>{center.centerHours.saturday}</div>
+                            <div>{isWeekdayHoursObject(center.centerHours) ? center.centerHours.saturday : 'N/A'}</div>
                             <div>Sunday:</div>
-                            <div>{center.centerHours.sunday}</div>
+                            <div>{isWeekdayHoursObject(center.centerHours) ? center.centerHours.sunday : 'N/A'}</div>
                           </div>
                         </div>
                         
-                        <div className="mt-4">
-                          <h4 className="font-medium mb-1">Nephrologists:</h4>
-                          <ul className="list-disc list-inside text-sm">
-                            {center.nephrologists.map((doctor, i) => (
-                              <li key={i}>{doctor}</li>
-                            ))}
-                          </ul>
-                        </div>
+
                       </div>
                     </CardContent>
                   </Card>
@@ -113,13 +120,13 @@ const Centers = () => {
                       {filteredCenters.map((center) => (
                         <TableRow key={center.id}>
                           <TableCell className="font-medium">{center.name}</TableCell>
-                          <TableCell>{center.address.city}, {center.address.state}</TableCell>
-                          <TableCell>{center.phone}</TableCell>
-                          <TableCell>{center.currentPatients}/{center.capacity}</TableCell>
-                          <TableCell className="text-xs">{center.centerHours.monday}</TableCell>
+                          <TableCell>{center.address}</TableCell>
+                          <TableCell>{center.contactNo}</TableCell>
+                          <TableCell>{center.totalCapacity}</TableCell>
+                          <TableCell className="text-xs">{isWeekdayHoursObject(center.centerHours) ? center.centerHours.monday : 'N/A'}</TableCell>
                           <TableCell className="text-xs">
-                            Sat: {center.centerHours.saturday}<br />
-                            Sun: {center.centerHours.sunday}
+                            Sat: {isWeekdayHoursObject(center.centerHours) ? center.centerHours.saturday : 'N/A'}<br />
+                            Sun: {isWeekdayHoursObject(center.centerHours) ? center.centerHours.sunday : 'N/A'}
                           </TableCell>
                         </TableRow>
                       ))}

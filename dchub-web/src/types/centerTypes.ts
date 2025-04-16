@@ -16,7 +16,15 @@ export interface DialysisCenter {
     weekday: string;
     openTime: string;
     closeTime: string;
-  }[];
+  }[] | {
+    monday: string;
+    tuesday: string;
+    wednesday: string;
+    thursday: string;
+    friday: string;
+    saturday: string;
+    sunday: string;
+  };
 }
 
 // Center form schema

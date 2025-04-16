@@ -8,33 +8,33 @@ const API_DELAY = 300;
 const mockUsers = [
   {
     id: 1,
-    email: "admin@dialysisconnecthub.org",
+    email: "admin@dialyzeease.org",
     password: "example.com", // In a real app, passwords would be hashed
-    name: "Michael Adams",
+    name: "DialyzeEase Admin",
     role_id: 1000, // Admin role
     is_active: true
   },
   {
     id: 2,
-    email: "staff@dialysisconnecthub.org",
+    email: "staff@dialyzeease.org",
     password: "example.com",
-    name: "Sarah Johnson",
+    name: "DialyzeEase Staff",
     role_id: 1001, // Staff role
     is_active: true
   },
   {
     id: 3,
-    email: "doctor@dialysisconnecthub.org",
+    email: "doctor@dialyzeease.org",
     password: "example.com",
-    name: "Dr. David Chen",
+    name: "DialyzeEase Doctor",
     role_id: 1002, // Doctor role
     is_active: true
   },
   {
     id: 4,
-    email: "patient@dialysisconnecthub.org",
+    email: "patient@dialyzeease.org",
     password: "example.com",
-    name: "Emma Williams",
+    name: "DialyzeEase Patient",
     role_id: 1003, // Patient role
     is_active: true
   }

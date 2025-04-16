@@ -35,7 +35,7 @@ const Map: React.FC<MapProps> = ({ className }) => {
     // Add San Francisco marker (example)
     const marker = new mapboxgl.Marker({ color: '#0077B6' })
       .setLngLat([6.93251953319493, 79.87133077116464]) // 349 Jayantha Weerasekara , Colombo
-      .setPopup(new mapboxgl.Popup().setHTML("<h3>Dialysis Connect Hub</h3><p>Main Office</p>"))
+      .setPopup(new mapboxgl.Popup().setHTML("<h3>DialyzeEase</h3><p>Main Office</p>"))
       .addTo(map.current);
     
     // Add navigation controls
