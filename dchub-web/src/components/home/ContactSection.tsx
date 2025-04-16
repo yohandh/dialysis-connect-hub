@@ -89,7 +89,7 @@ const ContactSection = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                   <div>
-                    <p className="font-medium">Dialysis Connect Hub Headquarters</p>
+                    <p className="font-medium">DialyzeEase Headquarters</p>
                     <p className="text-gray-700">
                       349<br />
                       Jayantha Weerasekara Mawatha<br />
