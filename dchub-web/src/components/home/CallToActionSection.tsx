@@ -15,7 +15,7 @@ const CallToActionSection = () => {
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
         <p className="text-xl max-w-2xl mx-auto mb-8">
-          Join Dialysis Connect Hub today to access comprehensive dialysis management
+          Join DialyzeEase today to access comprehensive dialysis management
           and kidney disease education tools.
         </p>
         <div className="flex flex-wrap justify-center gap-4">

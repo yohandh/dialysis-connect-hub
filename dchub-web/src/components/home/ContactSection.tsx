@@ -16,13 +16,12 @@ const ContactSection = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-dark-slate mb-4">Contact Us</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Have questions about Dialysis Connect Hub? We're here to help
+            Join Our Network: Register Your Dialysis Center
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto">
           <div>
-            <h2 className="text-2xl font-semibold mb-6">Send Us a Message</h2>
             <Card>
               <form onSubmit={(e) => {
                 e.preventDefault();

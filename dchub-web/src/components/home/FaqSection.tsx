@@ -10,29 +10,24 @@ const FaqSection = () => {
       category: "General",
       questions: [
         {
-          question: "What is Dialysis Connect Hub?",
-          answer: "Dialysis Connect Hub is a comprehensive platform designed to streamline dialysis appointment management and provide educational resources for CKD patients. It connects patients, healthcare providers, and administrators to improve kidney care outcomes."
+          question: "What is DialyzeEase?",
+          answer: "DialyzeEase is a comprehensive platform designed to streamline dialysis appointment management and provide educational resources for CKD patients. It connects patients, healthcare providers, and administrators to improve kidney care outcomes."
         },
         {
-          question: "Who can use Dialysis Connect Hub?",
+          question: "Who can use DialyzeEase?",
           answer: "The platform is designed for three main user groups: patients with CKD who require dialysis, healthcare staff managing dialysis centers, and administrators overseeing multiple centers and users."
         },
         {
           question: "Is my medical information secure on this platform?",
-          answer: "Yes, Dialysis Connect Hub implements robust security measures to protect all user data, especially sensitive medical information. We comply with healthcare data protection regulations and use encryption to safeguard your information."
-        }
-      ]
-    },
-    {
-      category: "For Patients",
-      questions: [
-        {
-          question: "How do I book a dialysis appointment?",
-          answer: "After logging into the Patient Portal, navigate to the 'Book Appointment' page. There, you can select available time slots from your assigned dialysis center. The booking process is straightforward and will guide you through each step."
+          answer: "Yes, DialyzeEase implements robust security measures to protect all user data, especially sensitive medical information. We comply with healthcare data protection regulations and use encryption to safeguard your information."
         },
         {
           question: "Can I check my CKD stage through the platform?",
           answer: "Yes, the Patient Portal includes a 'CKD Stage' tool where you can input your eGFR or creatinine levels to determine your CKD stage. The system will also provide relevant advice based on your stage."
+        },
+        {
+          question: "Are the lifestyle and dietary recommendations in DialyzeEase medically accurate?",
+          answer: "Yes, all recommendations are developed with nephrologists and renal dietitians based on current clinical guidelines. Our content is regularly reviewed by medical professionals. However, always consult your healthcare provider before making changes to your treatment plan or diet."
         }
       ]
     }
@@ -44,7 +39,7 @@ const FaqSection = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-dark-slate mb-4">Frequently Asked Questions</h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Common questions about Dialysis Connect Hub and CKD management
+            Common questions about DialyzeEase and CKD management
           </p>
         </div>
         
