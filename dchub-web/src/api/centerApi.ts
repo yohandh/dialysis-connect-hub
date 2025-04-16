@@ -61,6 +61,7 @@ export const getCenterDetails = async (centerId: string): Promise<DialysisCenter
       return center;
     } else {
       const response = await apiCall<DialysisCenter>(`/centers/${centerId}`);
+      console.log('API Response - Centers: ', response);
       return response;
     }
   } catch (error) {
@@ -184,8 +185,8 @@ export const updateCenter = async (centerData: any): Promise<DialysisCenter> => 
   }
 };
 
-// Delete center (soft delete - sets is_active to 0)
-export const deleteCenter = async (centerId: string): Promise<void> => {
+// Deactivate center (soft delete - sets is_active to 0)
+export const deactivateCenter = async (centerId: string): Promise<void> => {
   try {
     if (useMockApi()) {
       await new Promise(resolve => setTimeout(resolve, API_DELAY));
@@ -199,12 +200,62 @@ export const deleteCenter = async (centerId: string): Promise<void> => {
       // Instead of removing from array, mark as inactive
       dialysisCenters[centerIndex].isActive = false;
     } else {
+      await apiCall<void>(`/centers/${centerId}/deactivate`, {
+        method: 'PUT'
+      });
+    }
+  } catch (error) {
+    console.error("Failed to deactivate center:", error);
+    throw error;
+  }
+};
+
+// Activate center (sets is_active to 1)
+export const activateCenter = async (centerId: string): Promise<void> => {
+  try {
+    if (useMockApi()) {
+      await new Promise(resolve => setTimeout(resolve, API_DELAY));
+      
+      const centerIndex = dialysisCenters.findIndex(c => c.id.toString() === centerId);
+      
+      if (centerIndex === -1) {
+        throw new Error("Center not found");
+      }
+      
+      // Mark as active
+      dialysisCenters[centerIndex].isActive = true;
+    } else {
+      await apiCall<void>(`/centers/${centerId}/activate`, {
+        method: 'PUT'
+      });
+    }
+  } catch (error) {
+    console.error("Failed to activate center:", error);
+    throw error;
+  }
+};
+
+// Hard delete center (completely removes from database)
+export const deleteCenter = async (centerId: string): Promise<void> => {
+  try {
+    if (useMockApi()) {
+      await new Promise(resolve => setTimeout(resolve, API_DELAY));
+      
+      const centerIndex = dialysisCenters.findIndex(c => c.id.toString() === centerId);
+      
+      if (centerIndex === -1) {
+        throw new Error("Center not found");
+      }
+      
+      // Remove from array
+      dialysisCenters.splice(centerIndex, 1);
+    } else {
       await apiCall<void>(`/centers/${centerId}`, {
         method: 'DELETE'
       });
     }
   } catch (error) {
-    console.error("Failed to deactivate center:", error);
+    console.error("Failed to delete center:", error);
     throw error;
   }
 };

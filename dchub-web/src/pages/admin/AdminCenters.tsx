@@ -9,13 +9,14 @@ import { Plus, LayoutDashboard, Building2, Users, FileBarChart2, BookOpen, Bell,
 import PortalLayout from "@/components/layouts/PortalLayout";
 import CenterTable from "@/components/admin/centers/CenterTable";
 import CenterFormDialog from "@/components/admin/centers/CenterFormDialog";
-import { formatOperatingHours } from "@/utils/centerUtils";
 import { centerFormSchema, CenterFormValues } from "@/types/centerTypes";
 import { 
   fetchCenters, 
   createCenter, 
   updateCenter, 
-  deleteCenter 
+  deleteCenter,
+  activateCenter,
+  deactivateCenter
 } from "@/api/centerApi";
 import { DialysisCenter } from '@/types/centerTypes';
 
@@ -112,12 +113,82 @@ const AdminCenters = () => {
     },
   });
 
+  // Activate center mutation
+  const activateMutation = useMutation({
+    mutationFn: activateCenter,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['centers'] });
+      toast({
+        title: "Success",
+        description: "Center activated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to activate center: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Deactivate center mutation
+  const deactivateMutation = useMutation({
+    mutationFn: deactivateCenter,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['centers'] });
+      toast({
+        title: "Success",
+        description: "Center deactivated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to deactivate center: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Convert database time format (HH:MM:SS) to display format (HH:MM AM/PM)
+  function formatTime(timeStr: string) {
+    try {
+      // Check if the timeStr is in the expected format
+      if (!timeStr || typeof timeStr !== 'string') {
+        return 'Invalid time';
+      }
+
+      // Parse the time string (format: HH:MM:SS)
+      const timeParts = timeStr.split(':');
+      if (timeParts.length < 2) {
+        return timeStr; // Return original if not in expected format
+      }
+
+      // Extract hours and minutes
+      let hours = parseInt(timeParts[0], 10);
+      const minutes = timeParts[1];
+      
+      // Determine AM/PM
+      const period = hours >= 12 ? 'PM' : 'AM';
+      
+      // Convert to 12-hour format
+      hours = hours % 12;
+      hours = hours === 0 ? 12 : hours; // Convert 0 to 12 for 12 AM
+      
+      // Format as "h:MM AM/PM"
+      return `${hours}:${minutes} ${period}`;
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return timeStr;
+    }
+  }
+
   // Handle dialog open for editing
   const handleEditCenter = (centerId: number) => {
     const center = centers.find(c => c.id === centerId);
     if (center) {
       console.log('Center data from API:', center);
-      console.log('Center hours from API:', center.centerHours);
       
       // Create default operating hours
       const defaultHours = {
@@ -130,59 +201,52 @@ const AdminCenters = () => {
         sunday: 'Closed'
       };
 
-      // Map centerHours from API to form format if available
-      let formattedHours = { ...defaultHours };
-      
-      if (center.centerHours && center.centerHours.length > 0) {
-        // Create a mapping from short day names to full day names
-        const dayMap: Record<string, string> = {
-          'mon': 'monday',
-          'tue': 'tuesday',
-          'wed': 'wednesday',
-          'thu': 'thursday',
-          'fri': 'friday',
-          'sat': 'saturday',
-          'sun': 'sunday'
-        };
-        
-        // Update formattedHours with actual data from API
-        center.centerHours.forEach(hour => {
-          // Get the weekday value
-          const weekday = hour.weekday;
-          const day = dayMap[weekday];
-          
-          // Format the time from 24-hour format to 12-hour format with AM/PM
-          if (day && hour.openTime && hour.closeTime) {
-            // Convert database time format (HH:MM:SS) to display format (HH:MM AM/PM)
-            const formatTime = (timeStr: string) => {
-              const [hours, minutes] = timeStr.split(':');
-              const hourNum = parseInt(hours, 10);
-              const ampm = hourNum >= 12 ? 'PM' : 'AM';
-              const hour12 = hourNum % 12 || 12; // Convert 0 to 12 for 12 AM
-              return `${hour12}:${minutes} ${ampm}`;
-            };
-            
-            const openTimeFormatted = formatTime(hour.openTime);
-            const closeTimeFormatted = formatTime(hour.closeTime);
-            
-            formattedHours[day] = `${openTimeFormatted} - ${closeTimeFormatted}`;
-          } else if (day) {
-            formattedHours[day] = 'Closed';
-          }
-        });
+      // Check if centerHours exists before logging
+      if (center.centerHours) {
+        console.log('Center hours from API:', center.centerHours);
+      } else {
+        console.log('Center hours not available');
       }
       
-      console.log('Formatted hours for editing:', formattedHours);
+      // Map centerHours from API to form format if available
+      const centerHours = center.centerHours && Array.isArray(center.centerHours) && center.centerHours.length > 0
+        ? center.centerHours.reduce((acc, hour) => {
+            // Convert day abbreviation to full day name
+            const dayMap: Record<string, string> = {
+              'mon': 'monday',
+              'tue': 'tuesday',
+              'wed': 'wednesday',
+              'thu': 'thursday',
+              'fri': 'friday',
+              'sat': 'saturday',
+              'sun': 'sunday'
+            };
+            
+            const day = dayMap[hour.weekday] || hour.weekday;
+            
+            // Format hours as "HH:MM AM - HH:MM PM" if both open and close times exist
+            if (hour.openTime && hour.closeTime) {
+              acc[day] = `${formatTime(hour.openTime)} - ${formatTime(hour.closeTime)}`;
+            } else {
+              acc[day] = 'Closed';
+            }
+            
+            return acc;
+          }, { ...defaultHours })
+        : defaultHours;
       
+      // Reset form and set values
       form.reset({
         name: center.name,
         address: center.address || '',
         contactNo: center.contactNo || '',
         email: center.email || '',
-        totalCapacity: center.totalCapacity || 0,
-        centerHours: formattedHours,
-        type: 'Independent'
+        totalCapacity: center.totalCapacity || 10,
+        manageById: center.manageById,
+        centerHours,
+        type: center.type || 'Independent'
       });
+      
       setCurrentCenter(centerId);
       setIsDialogOpen(true);
     }
@@ -190,13 +254,12 @@ const AdminCenters = () => {
 
   // Handle dialog open for new center
   const handleNewCenter = () => {
-    // Reset form to default values
     form.reset({
       name: "",
       address: "",
       contactNo: "",
       email: "",
-      totalCapacity: 1,
+      totalCapacity: 10,
       centerHours: {
         monday: "",
         tuesday: "",
@@ -208,14 +271,30 @@ const AdminCenters = () => {
       },
       type: "Independent"
     });
+    
     setCurrentCenter(null);
     setIsDialogOpen(true);
   };
 
-  // Handle center deletion (soft delete)
+  // Handle center deletion (hard delete)
   const handleDeleteCenter = (centerId: number) => {
-    if (window.confirm("Are you sure you want to deactivate this center? This will make it unavailable for new appointments.")) {
+    if (window.confirm("Are you sure you want to permanently delete this center? This action cannot be undone.")) {
       deleteMutation.mutate(centerId.toString());
+    }
+  };
+
+  // Handle center activation/deactivation
+  const handleToggleActive = (centerId: number, isActive: boolean) => {
+    if (isActive) {
+      // Deactivate center
+      if (window.confirm("Are you sure you want to deactivate this center? This will make it unavailable for new appointments.")) {
+        deactivateMutation.mutate(centerId.toString());
+      }
+    } else {
+      // Activate center
+      if (window.confirm("Are you sure you want to activate this center? This will make it available for new appointments.")) {
+        activateMutation.mutate(centerId.toString());
+      }
     }
   };
 
@@ -316,6 +395,7 @@ const AdminCenters = () => {
                 centers={centers} 
                 onEditCenter={handleEditCenter}
                 onDeleteCenter={handleDeleteCenter}
+                onToggleActive={handleToggleActive}
               />
             ) : (
               <div>Error loading centers</div>

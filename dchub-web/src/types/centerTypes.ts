@@ -10,6 +10,7 @@ export interface DialysisCenter {
   totalCapacity: number;
   isActive: boolean;
   manageById?: number;
+  type?: string;
   centerHours?: {
     id?: number;
     weekday: string;

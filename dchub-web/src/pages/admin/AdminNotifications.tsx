@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   Table,
   TableBody,
@@ -37,81 +38,14 @@ import {
   BookOpen,
   FileBarChart2,
   LayoutDashboard,
-  ClipboardList
+  ClipboardList,
+  UserCog,
+  Stethoscope,
+  ChevronDown
 } from "lucide-react";
 import { format } from "date-fns";
 import PortalLayout from "@/components/layouts/PortalLayout";
-import { Notification } from '@/types/adminTypes';
-
-// Mock notification data
-const notifications: Notification[] = [
-  {
-    id: 1,
-    recipientId: 101,
-    recipientName: "John Smith",
-    recipientRole: "patient",
-    title: "Appointment Reminder",
-    message: "This is a reminder for your dialysis appointment tomorrow at 10:00 AM.",
-    type: "email",
-    status: "sent",
-    sentAt: "2023-09-01T09:15:22Z"
-  },
-  {
-    id: 2,
-    recipientId: 102,
-    recipientName: "Emily Johnson",
-    recipientRole: "patient",
-    title: "Lab Results Ready",
-    message: "Your recent lab results are now available. Please log in to view them.",
-    type: "app",
-    status: "read",
-    sentAt: "2023-09-02T10:45:30Z"
-  },
-  {
-    id: 3,
-    recipientId: 5,
-    recipientName: "Dr. Michael Chen",
-    recipientRole: "doctor",
-    title: "Urgent: Patient Status Change",
-    message: "Patient #108 has reported adverse symptoms. Please review their case immediately.",
-    type: "sms",
-    status: "sent",
-    sentAt: "2023-09-03T14:22:45Z"
-  },
-  {
-    id: 4,
-    recipientId: 12,
-    recipientName: "Sarah Williams",
-    recipientRole: "staff",
-    title: "Staff Meeting Reminder",
-    message: "This is a reminder for the staff meeting tomorrow at 9:00 AM in Room 301.",
-    type: "email",
-    status: "sent",
-    sentAt: "2023-09-04T16:10:05Z"
-  },
-  {
-    id: 5,
-    recipientId: 2,
-    recipientName: "Robert Davis",
-    recipientRole: "admin",
-    title: "System Update Complete",
-    message: "The scheduled system maintenance has been completed successfully.",
-    type: "app",
-    status: "sent",
-    sentAt: "2023-09-05T08:35:18Z"
-  },
-  {
-    id: 6,
-    recipientId: 103,
-    recipientName: "Maria Garcia",
-    recipientRole: "patient",
-    title: "Medication Update",
-    message: "Your medication regimen has been updated. Please review the changes.",
-    type: "sms",
-    status: "failed",
-    sentAt: "2023-09-06T11:20:33Z"
-  }
-];
+import { fetchNotifications, Notification } from '@/api/notificationApi';
 
 const AdminNotifications = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -119,10 +53,27 @@ const AdminNotifications = () => {
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
 
+  // Fetch notifications using React Query
+  const { data: notifications = [], isLoading, isError, error } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      try {
+        // Try to fetch from API
+        const data = await fetchNotifications();
+        console.log('Fetched notifications:', data);
+        return data;
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      }
+    },
+    retry: 1, // Only retry once to avoid too many failed API calls
+  });
+
   // Handling filters and search
   const filteredNotifications = notifications.filter(notification => {
     // Role filter
-    if (roleFilter !== 'all' && notification.recipientRole !== roleFilter) return false;
+    if (roleFilter !== 'all' && notification.recipient_role !== roleFilter) return false;
     
     // Type filter
     if (typeFilter !== 'all' && notification.type !== typeFilter) return false;
@@ -130,12 +81,13 @@ const AdminNotifications = () => {
     // Status filter
     if (statusFilter !== 'all' && notification.status !== statusFilter) return false;
     
-    // Search term
+    // Search term (case insensitive)
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       return (
         notification.title.toLowerCase().includes(searchLower) ||
-        notification.recipientName?.toLowerCase().includes(searchLower)
+        notification.message.toLowerCase().includes(searchLower) ||
+        notification.recipient_name.toLowerCase().includes(searchLower)
       );
     }
     
@@ -145,8 +97,14 @@ const AdminNotifications = () => {
   // Format date
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'MMM dd, yyyy HH:mm');
+      // Handle different date formats
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return dateString; // Return as is if invalid
+      }
+      return format(date, 'MMM dd, yyyy HH:mm');
     } catch (e) {
+      console.error('Error formatting date:', e);
       return dateString;
     }
   };
@@ -155,66 +113,117 @@ const AdminNotifications = () => {
   const getNotificationTypeIcon = (type: string) => {
     switch (type) {
       case 'email':
-        return <Mail className="h-4 w-4" />;
+        return <Mail className="h-4 w-4 text-blue-500" />;
       case 'sms':
-        return <Phone className="h-4 w-4" />;
+        return <Phone className="h-4 w-4 text-green-500" />;
       case 'app':
-        return <MessageSquare className="h-4 w-4" />;
+        return <MessageSquare className="h-4 w-4 text-purple-500" />;
       default:
         return <Bell className="h-4 w-4" />;
     }
   };
 
-  // Get badge variant by status
-  const getStatusBadgeVariant = (status: string): "default" | "secondary" | "outline" | "destructive" => {
-    switch (status) {
-      case 'sent':
-        return "default";
-      case 'read':
-        return "secondary";
-      case 'failed':
-        return "destructive";
-      default:
-        return "outline";
-    }
-  };
-
-  // Get badge variant by role
-  const getRoleBadgeVariant = (role: string): "default" | "secondary" | "outline" | "destructive" => {
+  // Get badge class for role (matching the users section)
+  const getRoleBadgeClass = (role: string) => {
     switch (role) {
       case 'admin':
-        return "destructive";
-      case 'doctor':
-        return "default";
+        return "bg-red-100 text-red-600 border-red-200";
       case 'staff':
-        return "secondary";
+        return "bg-purple-100 text-purple-600 border-purple-200";
+      case 'doctor':
+        return "bg-blue-100 text-blue-600 border-blue-200";
       case 'patient':
-        return "outline";
+        return "bg-green-100 text-green-600 border-green-200";
       default:
-        return "outline";
+        return "";
     }
   };
 
-  // Summary counts
-  const summaryCounts = {
-    total: notifications.length,
-    sent: notifications.filter(n => n.status === 'sent').length,
-    read: notifications.filter(n => n.status === 'read').length,
-    failed: notifications.filter(n => n.status === 'failed').length
+  // Get badge class for status (matching the users section)
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'sent':
+        return "bg-green-100 text-green-600 border-green-200";
+      case 'read':
+        return "bg-blue-100 text-blue-600 border-blue-200";
+      case 'failed':
+        return "bg-red-100 text-red-600 border-red-200";
+      case 'pending':
+        return "bg-gray-100 text-gray-600 border-gray-200";
+      default:
+        return "";
+    }
   };
 
-  // Get role icon
+  // Get badge variant by status with consistent colors
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'sent':
+        return "success"; // Green
+      case 'read':
+        return "info"; // Blue
+      case 'failed':
+        return "destructive"; // Red
+      case 'pending':
+        return "outline";
+      default:
+        return "default";
+    }
+  };
+
+  // Format status text with proper capitalization
+  const formatStatusText = (status: string) => {
+    switch (status) {
+      case 'sent':
+        return "Sent";
+      case 'read':
+        return "Read";
+      case 'failed':
+        return "Failed";
+      case 'pending':
+        return "Pending";
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+  };
+
+  // Get badge variant by role with consistent colors
+  const getRoleBadgeVariant = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return "destructive"; // Red
+      case 'staff':
+        return "purple"; // Purple
+      case 'doctor':
+        return "info"; // Blue
+      case 'patient':
+        return "success"; // Green
+      default:
+        return "default";
+    }
+  };
+
+  // Get role icon with consistent colors
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'admin':
-        return <Users className="h-4 w-4" />;
-      case 'doctor':
+        return <UserCog className="h-4 w-4 text-red-500" />;
       case 'staff':
+        return <Users className="h-4 w-4 text-purple-500" />;
+      case 'doctor':
+        return <Stethoscope className="h-4 w-4 text-blue-500" />;
       case 'patient':
+        return <User className="h-4 w-4 text-green-500" />;
       default:
         return <User className="h-4 w-4" />;
     }
   };
+
+  // Count notifications by status
+  const totalNotifications = notifications.length;
+  const sentNotifications = notifications.filter(n => n.status === 'sent').length;
+  const readNotifications = notifications.filter(n => n.status === 'read').length;
+  const failedNotifications = notifications.filter(n => n.status === 'failed').length;
 
   return (
     <PortalLayout
@@ -222,7 +231,7 @@ const AdminNotifications = () => {
       navLinks={[
         { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
         { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
-        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },        
+        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
         { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
         { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
@@ -233,81 +242,77 @@ const AdminNotifications = () => {
       userImage="https://randomuser.me/api/portraits/men/42.jpg"
     >
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Notification Logs</h1>
-          <div className="flex space-x-2">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search notifications..."
-                className="pl-8 w-[250px]"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+        <h1 className="text-3xl font-bold tracking-tight">Notification Logs</h1>
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Notifications</p>
+                  <h2 className="text-3xl font-bold">{totalNotifications}</h2>
+                  <p className="text-xs text-muted-foreground mt-1">All system notifications</p>
+                </div>
+                <Bell className="h-8 w-8 text-muted-foreground" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Sent</p>
+                  <h2 className="text-3xl font-bold">{sentNotifications}</h2>
+                  <p className="text-xs text-muted-foreground mt-1">Successfully delivered</p>
+                </div>
+                <Mail className="h-8 w-8 text-green-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Read</p>
+                  <h2 className="text-3xl font-bold">{readNotifications}</h2>
+                  <p className="text-xs text-muted-foreground mt-1">Opened by recipients</p>
+                </div>
+                <MessageSquare className="h-8 w-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Failed</p>
+                  <h2 className="text-3xl font-bold">{failedNotifications}</h2>
+                  <p className="text-xs text-muted-foreground mt-1">Delivery failures</p>
+                </div>
+                <Phone className="h-8 w-8 text-red-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div className="flex items-center space-x-2 mb-4">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search notifications..."
+              className="pl-8 w-full"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Notifications</CardTitle>
-              <Bell className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summaryCounts.total}</div>
-              <p className="text-xs text-muted-foreground">
-                All system notifications
-              </p>
-            </CardContent>
-          </Card>
           
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Sent</CardTitle>
-              <Mail className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summaryCounts.sent}</div>
-              <p className="text-xs text-muted-foreground">
-                Successfully delivered
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Read</CardTitle>
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summaryCounts.read}</div>
-              <p className="text-xs text-muted-foreground">
-                Opened by recipients
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Failed</CardTitle>
-              <Phone className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summaryCounts.failed}</div>
-              <p className="text-xs text-muted-foreground">
-                Delivery failures
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="flex space-x-4 mb-4">
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-[150px]">
-              <Filter className="mr-2 h-4 w-4" />
+            <SelectTrigger className="w-[120px]">
               <span>Role</span>
+              <ChevronDown className="ml-2 h-4 w-4" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Roles</SelectItem>
@@ -317,11 +322,11 @@ const AdminNotifications = () => {
               <SelectItem value="patient">Patient</SelectItem>
             </SelectContent>
           </Select>
-
+          
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[150px]">
-              <Filter className="mr-2 h-4 w-4" />
+            <SelectTrigger className="w-[120px]">
               <span>Type</span>
+              <ChevronDown className="ml-2 h-4 w-4" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
@@ -332,15 +337,16 @@ const AdminNotifications = () => {
           </Select>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]">
-              <Filter className="mr-2 h-4 w-4" />
+            <SelectTrigger className="w-[120px]">
               <span>Status</span>
+              <ChevronDown className="ml-2 h-4 w-4" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="sent">Sent</SelectItem>
               <SelectItem value="read">Read</SelectItem>
               <SelectItem value="failed">Failed</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -350,64 +356,77 @@ const AdminNotifications = () => {
             <CardTitle>Notification History</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Recipient</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Sent At</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredNotifications.map((notification) => (
-                  <TableRow key={notification.id}>
-                    <TableCell className="font-medium">{notification.title}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span>{notification.recipientName}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getRoleBadgeVariant(notification.recipientRole)}>
-                        <div className="flex items-center space-x-1">
-                          {getRoleIcon(notification.recipientRole)}
-                          <span className="capitalize">{notification.recipientRole}</span>
-                        </div>
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1">
-                        {getNotificationTypeIcon(notification.type)}
-                        <span className="capitalize">{notification.type}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadgeVariant(notification.status)}>
-                        {notification.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center">
-                        <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                        {formatDate(notification.sentAt)}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                
-                {filteredNotifications.length === 0 && (
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                Loading notifications...
+              </div>
+            ) : isError ? (
+              <div className="flex justify-center items-center h-64">
+                Error loading notifications: {error.message}
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      No notifications found matching your criteria.
-                    </TableCell>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Recipient</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Sent At</TableHead>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {filteredNotifications.map((notification) => (
+                    <TableRow key={notification.id}>
+                      <TableCell className="font-medium">{notification.title}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <User className="h-4 w-4 text-muted-foreground" />
+                          <span>{notification.recipient_name}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant="outline"
+                          className={`rounded-full px-2 py-1 ${getRoleBadgeClass(notification.recipient_role)}`}
+                        >
+                          <span className="capitalize">{notification.recipient_role}</span>
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1">
+                          {getNotificationTypeIcon(notification.type)}
+                          <span className="capitalize">{notification.type}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant="outline"
+                          className={`rounded-full px-2 py-1 ${getStatusBadgeClass(notification.status)}`}
+                        >
+                          {formatStatusText(notification.status)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center">
+                          <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                          {formatDate(notification.sent_at)}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  
+                  {filteredNotifications.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                        No notifications found matching your criteria.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
 

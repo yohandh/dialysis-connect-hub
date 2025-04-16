@@ -43,6 +43,7 @@ import AdminAudit from "./pages/admin/AdminAudit";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminAccountSettings from "./pages/admin/AdminAccountSettings";
 
+
 // Resources Pages
 import UserGuide from "./pages/resources/UserGuide";
 import Faq from "./pages/resources/Faq";
@@ -106,6 +107,7 @@ function App() {
           <Route path="/admin/education" element={<AdminEducation />} />
           <Route path="/admin/audit" element={<AdminAudit />} />
           <Route path="/admin/audit-logs" element={<AdminAuditLogs />} />
+
           <Route path="/admin/account-settings" element={<AdminAccountSettings />} />
           
           {/* Resource Routes */}

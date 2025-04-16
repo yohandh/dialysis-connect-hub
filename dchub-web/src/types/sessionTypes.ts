@@ -13,32 +13,34 @@ export interface Session {
   doctor_name?: string; // For display purposes
 }
 
-export interface SessionFormValues {
+// Session form values
+export type SessionFormValues = {
   doctor_id: number | null;
   weekday: string;
   start_time: string;
   end_time: string;
   default_capacity: number;
-  recurrence_pattern: string;
+  recurrence_pattern?: string;
   status?: string;
-}
+  center_id?: number;
+};
 
 // Individual weekday options
 export const weekdayOptions = [
-  { value: 'mon', label: 'Monday' },
-  { value: 'tue', label: 'Tuesday' },
-  { value: 'wed', label: 'Wednesday' },
-  { value: 'thu', label: 'Thursday' },
-  { value: 'fri', label: 'Friday' },
-  { value: 'sat', label: 'Saturday' },
-  { value: 'sun', label: 'Sunday' }
+  { value: 'mon', label: 'Monday', description: 'Weekly (every Monday)' },
+  { value: 'tue', label: 'Tuesday', description: 'Weekly (every Tuesday)' },
+  { value: 'wed', label: 'Wednesday', description: 'Weekly (every Wednesday)' },
+  { value: 'thu', label: 'Thursday', description: 'Weekly (every Thursday)' },
+  { value: 'fri', label: 'Friday', description: 'Weekly (every Friday)' },
+  { value: 'sat', label: 'Saturday', description: 'Weekly (every Saturday)' },
+  { value: 'sun', label: 'Sunday', description: 'Weekly (every Sunday)' }
 ];
 
 // Group weekday options
 export const weekdayGroupOptions = [
-  { value: 'weekdays', label: 'Weekdays (Mon-Fri)', days: ['mon', 'tue', 'wed', 'thu', 'fri'] },
-  { value: 'weekends', label: 'Weekends (Sat-Sun)', days: ['sat', 'sun'] },
-  { value: 'alldays', label: 'All Days (Mon-Sun)', days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] }
+  { value: 'weekdays', label: 'Weekdays (Mon-Fri)', description: 'Daily (Mon to Fri)', days: ['mon', 'tue', 'wed', 'thu', 'fri'] },
+  { value: 'weekends', label: 'Weekends (Sat-Sun)', description: 'Daily (Sat and Sun)', days: ['sat', 'sun'] },
+  { value: 'alldays', label: 'All Days (Mon-Sun)', description: 'Daily (All 7 days)', days: ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] }
 ];
 
 // Check if a weekday option is a group

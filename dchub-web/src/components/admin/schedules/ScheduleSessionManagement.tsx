@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format, addDays, startOfWeek, endOfWeek, parseISO } from 'date-fns';
-import { Calendar, Clock, Plus, Pencil, Trash2, RefreshCw, Search } from 'lucide-react';
+import { Calendar, Clock, Plus, Pencil, Trash2, RefreshCw, Search, Users, ChevronDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -20,22 +20,43 @@ import { ScheduledSession, ScheduledSessionFormValues, GenerateSessionsFormValue
 import { fetchScheduledSessionsByCenter, createScheduledSession, updateScheduledSession, deleteScheduledSession, generateScheduledSessions } from '@/api/scheduleSessionApi';
 import { fetchSessionsByCenter } from '@/api/sessionApi';
 import { Session, timeOptions, formatTimeString } from '@/types/sessionTypes';
+import { fetchCenterById } from '@/api/centerApi';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Form schemas
 const scheduleSessionFormSchema = z.object({
   session_id: z.number().nullable(),
   session_date: z.string().min(1, "Date is required"),
-  start_time: z.string().min(1, "Start time is required"),
-  end_time: z.string().min(1, "End time is required"),
   available_beds: z.coerce.number().min(1, "Available beds must be at least 1"),
   notes: z.string().optional(),
   status: z.string().optional()
 });
 
 const generateSessionsFormSchema = z.object({
-  start_date: z.string().min(1, "Start date is required"),
-  end_date: z.string().min(1, "End date is required"),
+  start_date: z.string()
+    .min(1, "Start date is required")
+    .refine((date) => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const selectedDate = new Date(date);
+      return selectedDate >= today;
+    }, "Start date must be today or in the future"),
+  end_date: z.string()
+    .min(1, "End date is required"),
   session_ids: z.array(z.number()).min(1, "Select at least one session template")
+}).refine((data) => {
+  const startDate = new Date(data.start_date);
+  const endDate = new Date(data.end_date);
+  return endDate >= startDate;
+}, {
+  message: "End date must be equal to or after start date",
+  path: ["end_date"]
 });
 
 interface ScheduleSessionManagementProps {
@@ -45,49 +66,53 @@ interface ScheduleSessionManagementProps {
 const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ centerId }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // State for dialogs
   const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<ScheduledSession | null>(null);
-  
+
   // State for date range
   const today = new Date();
   const [dateRange, setDateRange] = useState({
     from: new Date(today.getFullYear(), today.getMonth(), 1), // First day of current month
     to: new Date(today.getFullYear(), today.getMonth() + 1, 0) // Last day of current month
   });
-  
+
   // Format dates for API
   const formattedStartDate = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : '';
   const formattedEndDate = dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : '';
-  
+
   // Fetch scheduled sessions
   const { data: scheduledSessions = [], isLoading } = useQuery({
     queryKey: ['scheduledSessions', centerId, formattedStartDate, formattedEndDate],
     queryFn: () => fetchScheduledSessionsByCenter(centerId, formattedStartDate, formattedEndDate),
   });
-  
+
   // Fetch recurring sessions for the generate dialog
   const { data: recurringSessions = [] } = useQuery({
     queryKey: ['sessions', centerId],
     queryFn: () => fetchSessionsByCenter(centerId),
   });
-  
+
+  // Fetch center details to get active beds count
+  const { data: centerData } = useQuery({
+    queryKey: ['center', centerId],
+    queryFn: () => fetchCenterById(centerId),
+  });
+
   // Initialize forms
   const scheduleSessionForm = useForm<ScheduledSessionFormValues>({
     resolver: zodResolver(scheduleSessionFormSchema),
     defaultValues: {
       session_id: null,
       session_date: format(today, 'yyyy-MM-dd'),
-      start_time: '08:00:00',
-      end_time: '10:00:00',
       available_beds: 1,
       notes: '',
       status: 'scheduled'
     },
   });
-  
+
   const generateSessionsForm = useForm<GenerateSessionsFormValues>({
     resolver: zodResolver(generateSessionsFormSchema),
     defaultValues: {
@@ -96,7 +121,7 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
       session_ids: []
     },
   });
-  
+
   // Mutations
   const createMutation = useMutation({
     mutationFn: (data: ScheduledSessionFormValues) => createScheduledSession({
@@ -121,9 +146,9 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
       });
     },
   });
-  
+
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: ScheduledSessionFormValues }) => 
+    mutationFn: ({ id, data }: { id: number; data: ScheduledSessionFormValues }) =>
       updateScheduledSession(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scheduledSessions', centerId] });
@@ -144,7 +169,7 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
       });
     },
   });
-  
+
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteScheduledSession(id),
     onSuccess: () => {
@@ -163,7 +188,7 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
       });
     },
   });
-  
+
   const generateMutation = useMutation({
     mutationFn: (data: GenerateSessionsFormValues) => generateScheduledSessions({
       center_id: parseInt(centerId),
@@ -187,50 +212,45 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
       });
     },
   });
-  
+
   // Handlers
   const handleNewSession = () => {
-    setEditingSession(null);
-    const today = new Date();
     scheduleSessionForm.reset({
       session_id: null,
-      session_date: format(today, 'yyyy-MM-dd'),
-      start_time: '08:00:00',
-      end_time: '10:00:00',
+      session_date: format(new Date(), 'yyyy-MM-dd'),
       available_beds: 1,
       notes: '',
       status: 'scheduled'
     });
+    setEditingSession(null);
     setIsAddEditDialogOpen(true);
   };
-  
+
   const handleEditSession = (session: ScheduledSession) => {
     console.log('Editing session:', session);
     setEditingSession(session);
-    
+
     // Format the date correctly for the date input (YYYY-MM-DD)
     const formattedDate = format(new Date(session.session_date), 'yyyy-MM-dd');
     console.log('Formatted date for form:', formattedDate);
-    
+
     scheduleSessionForm.reset({
       session_id: session.session_id,
       session_date: formattedDate,
-      start_time: session.start_time,
-      end_time: session.end_time,
       available_beds: session.available_beds,
       notes: session.notes || '',
       status: session.status
     });
-    
+
     setIsAddEditDialogOpen(true);
   };
-  
+
   const handleDeleteSession = (id: number) => {
     if (window.confirm("Are you sure you want to delete this scheduled session?")) {
       deleteMutation.mutate(id);
     }
   };
-  
+
   const handleOpenGenerateDialog = () => {
     generateSessionsForm.reset({
       start_date: format(addDays(today, 1), 'yyyy-MM-dd'),
@@ -239,94 +259,178 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
     });
     setIsGenerateDialogOpen(true);
   };
-  
+
   // Form submission handlers
   const onSubmitScheduleSession = (data: ScheduledSessionFormValues) => {
-    console.log('Submitting scheduled session form with data:', data);
-    
-    // Ensure time format is correct (HH:MM:SS)
-    const formatTimeValue = (time: string) => {
-      if (!time.includes(':')) return time;
-      
-      // If time is in HH:MM format, add seconds
-      if (time.split(':').length === 2) {
-        return `${time}:00`;
-      }
-      return time;
-    };
-    
     // Ensure date format is YYYY-MM-DD
     const formatDateValue = (date: string) => {
-      // Check if date is already in correct format
-      if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        return date;
-      }
-      
-      // Try to parse and format the date
+      if (!date) return date;
+
+      // Check if date is already in YYYY-MM-DD format
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (dateRegex.test(date)) return date;
+
+      // Otherwise, try to parse and format
       try {
-        const parsedDate = new Date(date);
+        const parsedDate = parseISO(date);
         return format(parsedDate, 'yyyy-MM-dd');
-      } catch (e) {
-        console.error('Error formatting date:', e);
+      } catch (error) {
+        // If parsing fails, return as is (validation will catch this)
         return date;
       }
     };
-    
-    const formattedData = {
+
+    // Validate date is today or future
+    const selectedDate = new Date(data.session_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today) {
+      toast({
+        title: "Invalid date",
+        description: "Session date must be today or in the future",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Get session template details if selected
+    const sessionId = data.session_id;
+    let formattedData: any = {
       ...data,
-      session_date: formatDateValue(data.session_date),
-      start_time: formatTimeValue(data.start_time),
-      end_time: formatTimeValue(data.end_time)
+      center_id: parseInt(centerId),
+      session_date: formatDateValue(data.session_date)
     };
-    
+
+    // If a session template is selected, use its times
+    if (sessionId) {
+      const selectedTemplate = recurringSessions.find(s => s.id === sessionId);
+      if (selectedTemplate) {
+        formattedData.start_time = selectedTemplate.start_time;
+        formattedData.end_time = selectedTemplate.end_time;
+      }
+    }
+
     if (editingSession) {
-      console.log('Updating existing session:', editingSession.id);
-      console.log('Formatted data for update:', formattedData);
       updateMutation.mutate({
         id: editingSession.id,
         data: formattedData
       });
     } else {
-      console.log('Creating new session with center_id:', centerId);
-      const newSessionData = {
-        center_id: parseInt(centerId),
-        ...formattedData
-      };
-      console.log('Full data being sent to API:', newSessionData);
-      createMutation.mutate(newSessionData);
+      createMutation.mutate(formattedData);
     }
   };
-  
+
   const onSubmitGenerateSessions = (data: GenerateSessionsFormValues) => {
     generateMutation.mutate(data);
   };
-  
+
   // Helper functions
   const formatDate = (dateStr: string) => {
     const date = parseISO(dateStr);
     return format(date, 'MMM d, yyyy');
   };
-  
+
   const formatTime = (timeStr: string) => {
     const option = timeOptions.find(opt => opt.value === timeStr);
     return option ? option.label : formatTimeString(timeStr);
   };
-  
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'scheduled':
-        return <Badge variant="outline" className="bg-blue-100 text-blue-800 hover:bg-blue-100">Scheduled</Badge>;
+        return (
+          <Badge variant="outline" className="bg-blue-100 text-blue-600 border-blue-200">
+            Scheduled
+          </Badge>
+        );
       case 'in-progress':
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">In Progress</Badge>;
+        return (
+          <Badge variant="outline" className="bg-yellow-100 text-yellow-600 border-yellow-200">
+            In Progress
+          </Badge>
+        );
       case 'completed':
-        return <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Completed</Badge>;
+        return (
+          <Badge variant="outline" className="bg-green-100 text-green-600 border-green-200">
+            Completed
+          </Badge>
+        );
       case 'cancelled':
-        return <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Cancelled</Badge>;
+        return (
+          <Badge variant="outline" className="bg-red-100 text-red-600 border-red-200">
+            Cancelled
+          </Badge>
+        );
       default:
-        return null;
+        return (
+          <Badge variant="outline" className="bg-gray-100 text-gray-600 border-gray-200">
+            {status}
+          </Badge>
+        );
     }
   };
-  
+
+  // Calculate active beds count (this will be the number of beds that are active)
+  const getActiveBedCount = (center: any) => {
+    if (!center) return 0;
+    // For now, we'll use a percentage of total capacity as active beds
+    // In a real implementation, you would get this from the beds table
+    return Math.floor(center.totalCapacity * 0.8); // Assuming 80% of beds are active
+  };
+
+  // Function to get the weekdays included in a date range
+  const getWeekdaysInDateRange = (startDate: string, endDate: string): string[] => {
+    if (!startDate || !endDate) return [];
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const weekdays = new Set<string>();
+
+    // Map day numbers to weekday codes
+    const dayToWeekday = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
+    // Iterate through each day in the range
+    const currentDate = new Date(start);
+    while (currentDate <= end) {
+      const dayOfWeek = currentDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      weekdays.add(dayToWeekday[dayOfWeek]);
+
+      // Move to next day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return Array.from(weekdays);
+  };
+
+  // Filter sessions based on selected date range
+  const getFilteredSessions = (sessions: Session[], startDate: string, endDate: string): Session[] => {
+    if (!startDate || !endDate || !sessions.length) return sessions;
+
+    const weekdaysInRange = getWeekdaysInDateRange(startDate, endDate);
+
+    return sessions.filter(session =>
+      weekdaysInRange.includes(session.weekday.toLowerCase())
+    );
+  };
+
+  // Watch for date changes to filter sessions
+  const startDate = generateSessionsForm.watch("start_date");
+  const endDate = generateSessionsForm.watch("end_date");
+
+  // Filter sessions based on selected date range
+  const filteredSessions = getFilteredSessions(recurringSessions, startDate, endDate);
+
+  // Watch for date changes to filter sessions for the add dialog
+  const selectedDate = scheduleSessionForm.watch("session_date");
+
+  // Filter sessions based on selected date for the add dialog
+  const filteredSessionTemplates = getFilteredSessions(
+    recurringSessions,
+    selectedDate,
+    selectedDate
+  );
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -350,21 +454,21 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
       <CardContent>
         <div className="mb-6">
           <div className="flex items-center space-x-2">
-            <Input 
-              type="date" 
+            <Input
+              type="date"
               value={formattedStartDate}
               onChange={(e) => setDateRange(prev => ({ ...prev, from: new Date(e.target.value) }))}
               className="w-40"
             />
             <span className="self-center">to</span>
-            <Input 
-              type="date" 
+            <Input
+              type="date"
               value={formattedEndDate}
               onChange={(e) => setDateRange(prev => ({ ...prev, to: new Date(e.target.value) }))}
               className="w-40"
             />
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 const today = new Date();
                 setDateRange({
@@ -376,14 +480,14 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
             >
               Current Month
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 const today = new Date();
                 const prevMonth = today.getMonth() - 1;
                 const year = prevMonth < 0 ? today.getFullYear() - 1 : today.getFullYear();
                 const month = prevMonth < 0 ? 11 : prevMonth;
-                
+
                 setDateRange({
                   from: new Date(year, month, 1),
                   to: new Date(year, month + 1, 0)
@@ -393,14 +497,14 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
             >
               Previous Month
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 const today = new Date();
                 const nextMonth = today.getMonth() + 1;
                 const year = nextMonth > 11 ? today.getFullYear() + 1 : today.getFullYear();
                 const month = nextMonth > 11 ? 0 : nextMonth;
-                
+
                 setDateRange({
                   from: new Date(year, month, 1),
                   to: new Date(year, month + 1, 0)
@@ -412,7 +516,7 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
             </Button>
           </div>
         </div>
-        
+
         {isLoading ? (
           <div className="flex justify-center p-4">Loading scheduled sessions...</div>
         ) : scheduledSessions.length > 0 ? (
@@ -422,19 +526,18 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                 <TableHead>Date</TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Available Beds</TableHead>
-                <TableHead>Template</TableHead>
                 <TableHead>Notes</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {scheduledSessions.map((session: ScheduledSession) => (
+              {scheduledSessions.map((session) => (
                 <TableRow key={session.id}>
                   <TableCell>
                     <div className="flex items-center">
                       <Calendar className="mr-2 h-4 w-4" />
-                      <span className="font-medium">{formatDate(session.session_date)}</span>
+                      {formatDate(session.session_date)}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -443,29 +546,108 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                       {formatTime(session.start_time)} - {formatTime(session.end_time)}
                     </div>
                   </TableCell>
-                  <TableCell>{session.available_beds}</TableCell>
-                  <TableCell>{session.session_name || 'Custom'}</TableCell>
-                  <TableCell className="max-w-xs truncate">{session.notes || '-'}</TableCell>
-                  <TableCell>{getStatusBadge(session.status)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <Users className="h-4 w-4 mr-2" />
+                      {session.available_beds}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {session.notes ? (
+                      <div className="max-w-xs truncate" title={session.notes}>
+                        {session.notes}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {getStatusBadge(session.status)}
+                  </TableCell>
                   <TableCell className="text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleEditSession(session)}
-                      className="h-8 w-8 p-0 mr-1"
-                    >
-                      <Pencil className="h-4 w-4" />
-                      <span className="sr-only">Edit</span>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => handleDeleteSession(session.id)}
-                      className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
+                    <div className="flex justify-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm" className="flex items-center gap-1">
+                            Actions <ChevronDown className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => handleEditSession(session)}
+                            className="cursor-pointer"
+                          >
+                            Edit Session
+                          </DropdownMenuItem>
+
+                          <DropdownMenuSeparator />
+
+                          {session.status === 'scheduled' && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                updateMutation.mutate({
+                                  id: session.id,
+                                  data: {
+                                    status: 'in-progress'
+                                  }
+                                });
+                              }}
+                              className="cursor-pointer text-yellow-600"
+                            >
+                              Mark In Progress
+                            </DropdownMenuItem>
+                          )}
+
+                          {session.status === 'scheduled' && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                updateMutation.mutate({
+                                  id: session.id,
+                                  data: {
+                                    status: 'cancelled'
+                                  }
+                                });
+                              }}
+                              className="cursor-pointer text-red-600"
+                            >
+                              Cancel Session
+                            </DropdownMenuItem>
+                          )}
+
+                          {session.status === 'cancelled' && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                updateMutation.mutate({
+                                  id: session.id,
+                                  data: {
+                                    status: 'scheduled'
+                                  }
+                                });
+                              }}
+                              className="cursor-pointer text-blue-600"
+                            >
+                              Schedule Session
+                            </DropdownMenuItem>
+                          )}
+
+                          {session.status === 'in-progress' && (
+                            <DropdownMenuItem
+                              onClick={() => {
+                                updateMutation.mutate({
+                                  id: session.id,
+                                  data: {
+                                    status: 'completed'
+                                  }
+                                });
+                              }}
+                              className="cursor-pointer text-green-600"
+                            >
+                              Complete Session
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -498,12 +680,12 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
           <DialogHeader>
             <DialogTitle>{editingSession ? "Edit Scheduled Session" : "Add New Scheduled Session"}</DialogTitle>
             <DialogDescription>
-              {editingSession 
-                ? "Update the scheduled session information below." 
+              {editingSession
+                ? "Update the scheduled session information below."
                 : "Schedule a new dialysis session for a specific date."}
             </DialogDescription>
           </DialogHeader>
-          
+
           <Form {...scheduleSessionForm}>
             <form onSubmit={scheduleSessionForm.handleSubmit(onSubmitScheduleSession)} className="space-y-4">
               <FormField
@@ -513,201 +695,96 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                   <FormItem>
                     <FormLabel>Date</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input
+                        type="date"
+                        {...field}
+                        min={format(new Date(), 'yyyy-MM-dd')} // Set min to today
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={scheduleSessionForm.control}
-                  name="start_time"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Start Time</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select time" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <div className="flex items-center px-3 pb-2">
-                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                            <input
-                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                              placeholder="Search times..."
-                              id="schedule-time-search"
-                              onChange={(e) => {
-                                const searchTerm = e.target.value.toLowerCase();
-                                const items = document.querySelectorAll('[data-schedule-time-item]');
-                                
-                                items.forEach(item => {
-                                  const text = item.textContent?.toLowerCase() || '';
-                                  if (text.includes(searchTerm)) {
-                                    item.classList.remove('hidden');
-                                  } else {
-                                    item.classList.add('hidden');
-                                  }
-                                });
-                              }}
-                            />
-                          </div>
-                          {timeOptions.map(option => (
-                            <SelectItem 
-                              key={option.value} 
-                              value={option.value}
-                              data-schedule-time-item
-                            >
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={scheduleSessionForm.control}
-                  name="end_time"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>End Time</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select time" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <div className="flex items-center px-3 pb-2">
-                            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                            <input
-                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                              placeholder="Search times..."
-                              id="schedule-end-time-search"
-                              onChange={(e) => {
-                                const searchTerm = e.target.value.toLowerCase();
-                                const items = document.querySelectorAll('[data-schedule-end-time-item]');
-                                
-                                items.forEach(item => {
-                                  const text = item.textContent?.toLowerCase() || '';
-                                  if (text.includes(searchTerm)) {
-                                    item.classList.remove('hidden');
-                                  } else {
-                                    item.classList.add('hidden');
-                                  }
-                                });
-                              }}
-                            />
-                          </div>
-                          {timeOptions.map(option => (
-                            <SelectItem 
-                              key={option.value} 
-                              value={option.value}
-                              data-schedule-end-time-item
-                            >
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              
+
               <FormField
                 control={scheduleSessionForm.control}
                 name="session_id"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Session Template (Optional)</FormLabel>
-                    <Select 
+                  <FormItem className="mt-4">
+                    <FormLabel>Session Template</FormLabel>
+                    <Select
                       onValueChange={(value) => {
-                        const sessionId = value === "null" ? null : parseInt(value);
+                        const sessionId = value === "none" ? null : parseInt(value);
                         field.onChange(sessionId);
-                        
-                        // If a session template is selected, update the available beds
+
+                        // If a session is selected, update the form with its values
                         if (sessionId) {
                           const selectedSession = recurringSessions.find(s => s.id === sessionId);
                           if (selectedSession) {
-                            // Set the available beds to the session capacity
                             scheduleSessionForm.setValue("available_beds", selectedSession.default_capacity);
                           }
                         }
-                      }} 
-                      value={field.value?.toString() || "null"}
+                      }}
+                      value={field.value === null ? "none" : field.value.toString()}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a template or leave empty for custom" />
+                          <SelectValue placeholder="Select a session template" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="null">Custom Session</SelectItem>
-                        {recurringSessions.map((session: Session) => (
-                          <SelectItem key={session.id} value={session.id.toString()}>
-                            {session.weekday.toUpperCase()} {formatTime(session.start_time)} - {formatTime(session.end_time)}
+                        <SelectItem value="none">Custom Session</SelectItem>
+                        {filteredSessionTemplates.length > 0 ? (
+                          filteredSessionTemplates.map((session) => (
+                            <SelectItem key={session.id} value={session.id.toString()}>
+                              {session.weekday.toUpperCase()} {formatTime(session.start_time)} - {formatTime(session.end_time)}
+                              {session.doctor_name && ` (Dr. ${session.doctor_name})`}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="no-sessions" disabled>
+                            No templates for this day
                           </SelectItem>
-                        ))}
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={scheduleSessionForm.control}
                 name="available_beds"
                 render={({ field }) => {
-                  // Get max beds from selected session template
-                  const sessionId = scheduleSessionForm.watch("session_id");
-                  const selectedSession = sessionId 
-                    ? recurringSessions.find(s => s.id === sessionId) 
-                    : null;
-                  const maxBeds = selectedSession?.default_capacity || 100;
-                  
+                  const activeBedCount = getActiveBedCount(centerData);
+
                   return (
                     <FormItem>
                       <FormLabel>Available Beds</FormLabel>
                       <FormControl>
-                        <Input 
-                          type="number" 
-                          min="1" 
-                          max={maxBeds}
-                          {...field} 
+                        <Input
+                          type="number"
+                          min="1"
+                          max={activeBedCount || centerData?.totalCapacity || undefined}
+                          {...field}
                         />
                       </FormControl>
-                      {selectedSession && (
-                        <div className="text-sm text-muted-foreground">
-                          Maximum capacity: {maxBeds}
-                        </div>
-                      )}
+                      <FormDescription>
+                        Maximum available beds: {activeBedCount || centerData?.totalCapacity || 0}
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   );
                 }}
               />
-              
+
               <FormField
                 control={scheduleSessionForm.control}
                 name="notes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes (Optional)</FormLabel>
+                    <FormLabel>Notes</FormLabel>
                     <FormControl>
                       <Textarea {...field} />
                     </FormControl>
@@ -715,7 +792,7 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                   </FormItem>
                 )}
               />
-              
+
               {editingSession && (
                 <FormField
                   control={scheduleSessionForm.control}
@@ -723,8 +800,8 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
+                      <Select
+                        onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
@@ -747,9 +824,9 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
               )}
 
               <DialogFooter>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setIsAddEditDialogOpen(false)}
                 >
                   Cancel
@@ -772,7 +849,7 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
               Automatically create scheduled sessions from recurring templates for a date range.
             </DialogDescription>
           </DialogHeader>
-          
+
           <Form {...generateSessionsForm}>
             <form onSubmit={generateSessionsForm.handleSubmit(onSubmitGenerateSessions)} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -783,13 +860,17 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                     <FormItem>
                       <FormLabel>Start Date</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <Input
+                          type="date"
+                          {...field}
+                          min={format(new Date(), 'yyyy-MM-dd')} // Set min to today
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                
+
                 <FormField
                   control={generateSessionsForm.control}
                   name="end_date"
@@ -797,14 +878,18 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                     <FormItem>
                       <FormLabel>End Date</FormLabel>
                       <FormControl>
-                        <Input type="date" {...field} />
+                        <Input
+                          type="date"
+                          {...field}
+                          min={generateSessionsForm.watch("start_date") || format(new Date(), 'yyyy-MM-dd')} // Set min to start date or today
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
-              
+
               <FormField
                 control={generateSessionsForm.control}
                 name="session_ids"
@@ -816,9 +901,9 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                         Choose which recurring sessions to generate in the selected date range
                       </p>
                     </div>
-                    {recurringSessions.length > 0 ? (
+                    {filteredSessions.length > 0 ? (
                       <div className="space-y-2">
-                        {recurringSessions.map((session) => (
+                        {filteredSessions.map((session) => (
                           <FormField
                             key={session.id}
                             control={generateSessionsForm.control}
@@ -836,10 +921,10 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                                         return checked
                                           ? field.onChange([...field.value, session.id])
                                           : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== session.id
-                                              )
+                                            field.value?.filter(
+                                              (value) => value !== session.id
                                             )
+                                          )
                                       }}
                                     />
                                   </FormControl>
@@ -855,7 +940,9 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
                       </div>
                     ) : (
                       <div className="text-sm text-muted-foreground">
-                        No recurring sessions available. Please create recurring sessions first.
+                        {startDate && endDate
+                          ? "No recurring sessions available for the selected date range."
+                          : "No recurring sessions available. Please create recurring sessions first."}
                       </div>
                     )}
                     <FormMessage />
@@ -864,14 +951,14 @@ const ScheduleSessionManagement: React.FC<ScheduleSessionManagementProps> = ({ c
               />
 
               <DialogFooter>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={() => setIsGenerateDialogOpen(false)}
                 >
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   type="submit"
                   disabled={recurringSessions.length === 0}
                 >

@@ -412,20 +412,25 @@ const AdminUsers = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Options</DropdownMenuLabel>
                                 <DropdownMenuItem onClick={() => userManagement.handleUserAction('view', user)}>
                                   View Details
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => userManagement.handleUserAction('edit', user)}>
                                   Edit User
                                 </DropdownMenuItem>
-                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="h-px bg-muted p-0 my-1" />
                                 {user.status === 'Active' ? (
-                                  <DropdownMenuItem onClick={() => userManagement.handleUserAction('deactivate', user)}>
+                                  <DropdownMenuItem 
+                                    onClick={() => userManagement.handleUserAction('deactivate', user)}
+                                    className="text-amber-500"
+                                  >
                                     Deactivate User
                                   </DropdownMenuItem>
                                 ) : (
-                                  <DropdownMenuItem onClick={() => userManagement.handleUserAction('activate', user)}>
+                                  <DropdownMenuItem 
+                                    onClick={() => userManagement.handleUserAction('activate', user)}
+                                    className="text-green-500"
+                                  >
                                     Activate User
                                   </DropdownMenuItem>
                                 )}

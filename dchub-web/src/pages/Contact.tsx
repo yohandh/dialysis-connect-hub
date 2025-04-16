@@ -38,7 +38,7 @@ const Contact = () => {
                 <div className="flex items-center">
                   <Mail className="h-5 w-5 text-medical-blue mr-2" />
                   <div>
-                    <p className="text-gray-600">dialysis.connect.hub@gmail.com</p>
+                    <p className="text-gray-600">dialyzeease@gmail.com</p>
                   </div>
                 </div>
                 

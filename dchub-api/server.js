@@ -15,6 +15,8 @@ const ckdRoutes = require('./routes/ckd.routes');
 const bedRoutes = require('./routes/bed.routes');
 const sessionRoutes = require('./routes/session.routes');
 const scheduleSessionRoutes = require('./routes/schedule-session.routes');
+const notificationRoutes = require('./routes/notification.routes');
+const auditRoutes = require('./routes/audit.routes');
 
 // Import controllers for direct route registration
 const userController = require('./controllers/user.controller');
@@ -60,9 +62,11 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/centers', centerRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/ckd-records', ckdRoutes);
-app.use('/api', bedRoutes);
+app.use('/api/beds', bedRoutes);
 app.use('/api', sessionRoutes);
 app.use('/api', scheduleSessionRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/audit-logs', auditRoutes);
 
 // Test endpoint
 app.get('/api/test', (req, res) => {
@@ -86,10 +90,13 @@ app.get('/api', (req, res) => {
       centers: '/api/centers',
       users: '/api/users',
       ckdRecords: '/api/ckd-records',
-      beds: '/api/centers/:centerId/beds',
+      beds: '/api/beds',
+      availableBeds: '/api/beds/sessions/:sessionId/available-beds',
       sessions: '/api/centers/:centerId/sessions',
       scheduleSessions: '/api/centers/:centerId/schedule-sessions',
-      roles: '/api/roles'
+      roles: '/api/roles',
+      notifications: '/api/notifications',
+      auditLogs: '/api/audit-logs'
     }
   });
 });
@@ -104,8 +111,17 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+}).on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.log(`Port ${PORT} is already in use. Trying port ${PORT + 1}...`);
+    app.listen(PORT + 1, () => {
+      console.log(`Server running on port ${PORT + 1}`);
+    });
+  } else {
+    console.error('Server error:', err);
+  }
 });
 
 module.exports = app;

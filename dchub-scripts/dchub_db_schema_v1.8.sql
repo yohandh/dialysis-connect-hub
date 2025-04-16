@@ -124,7 +124,7 @@ CREATE TABLE sessions (
   start_time TIME,
   end_time TIME,
   default_capacity INT,
-  recurrence_pattern ENUM('daily', 'weekly') DEFAULT 'daily',
+  recurrence_pattern ENUM('daily', 'weekly') DEFAULT 'weekly',
   status ENUM('active', 'inactive') DEFAULT 'active',
   created_by_id INT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -259,7 +259,7 @@ CREATE TABLE notifications (
   INDEX idx_notifications_recipient_id (recipient_id)
 );
 
--- CENTRALIZED AUDIT LOGS
+-- AUDIT LOGS
 CREATE TABLE audit_logs (
   id INT PRIMARY KEY AUTO_INCREMENT,
   table_name VARCHAR(128),

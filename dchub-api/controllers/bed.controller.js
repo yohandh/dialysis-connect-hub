@@ -1,4 +1,5 @@
 const { pool } = require('../config/db');
+const auditService = require('../services/auditService');
 
 // Get all beds for a specific center
 exports.getBedsByCenter = async (req, res) => {
@@ -143,9 +144,90 @@ exports.deleteBed = async (req, res) => {
       [id]
     );
     
+    // Log the audit
+    await auditService.logAction('beds', id, 'delete', req.user?.userId, existing[0], null, req.ip, req.headers['user-agent']);
+    
     res.status(200).json({ message: 'Bed deleted successfully', id });
   } catch (error) {
     console.error('Error deleting bed:', error);
     res.status(500).json({ message: 'Failed to delete bed', error: error.message });
+  }
+};
+
+// Get available beds for a specific schedule session
+exports.getAvailableBedsForSession = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    
+    // First, get the center ID and session details for this schedule session
+    const [sessionResult] = await pool.query(
+      'SELECT center_id, session_date, start_time, end_time FROM schedule_sessions WHERE id = ?',
+      [sessionId]
+    );
+    
+    if (sessionResult.length === 0) {
+      return res.status(404).json({ message: 'Schedule session not found' });
+    }
+    
+    const centerId = sessionResult[0].center_id;
+    const sessionDate = sessionResult[0].session_date;
+    const startTime = sessionResult[0].start_time;
+    const endTime = sessionResult[0].end_time;
+    
+    console.log(`Finding available beds for center ${centerId}, session ${sessionId} on ${sessionDate} from ${startTime} to ${endTime}`);
+    
+    // Get all active beds for this center
+    const [allBeds] = await pool.query(
+      'SELECT * FROM beds WHERE center_id = ? AND status = "active" ORDER BY code ASC',
+      [centerId]
+    );
+    
+    if (allBeds.length === 0) {
+      return res.status(200).json([]);
+    }
+    
+    console.log(`Total active beds for center ${centerId}: ${allBeds.length}`);
+    
+    // Get beds that are already booked for this session or any overlapping sessions
+    // This query finds beds that are already booked in appointments for:
+    // 1. The exact same schedule session
+    // 2. Any other schedule session that overlaps in time on the same date
+    const [bookedBeds] = await pool.query(
+      `SELECT DISTINCT a.bed_id 
+       FROM appointments a 
+       JOIN schedule_sessions ss ON a.schedule_session_id = ss.id 
+       WHERE a.status = 'scheduled' 
+       AND ss.center_id = ? 
+       AND ss.session_date = ? 
+       AND (
+         (ss.start_time < ? AND ss.end_time > ?) OR  -- Session starts before and ends after our start time
+         (ss.start_time < ? AND ss.end_time > ?) OR  -- Session starts before and ends after our end time
+         (ss.start_time >= ? AND ss.end_time <= ?) OR  -- Session is completely within our time range
+         (ss.start_time <= ? AND ss.end_time >= ?)    -- Our session is completely within this session
+       )`,
+      [
+        centerId, 
+        sessionDate, 
+        startTime, startTime,  // For first condition
+        endTime, endTime,      // For second condition
+        startTime, endTime,    // For third condition
+        startTime, endTime     // For fourth condition
+      ]
+    );
+    
+    // Create a set of booked bed IDs for easy lookup
+    const bookedBedIds = new Set(bookedBeds.map(bed => bed.bed_id));
+    
+    console.log(`Booked bed IDs for this session: ${Array.from(bookedBedIds).join(', ')}`);
+    
+    // Filter out booked beds
+    const availableBeds = allBeds.filter(bed => !bookedBedIds.has(bed.id));
+    
+    console.log(`Available beds: ${availableBeds.length}`);
+    
+    res.status(200).json(availableBeds);
+  } catch (error) {
+    console.error('Error fetching available beds:', error);
+    res.status(500).json({ message: 'Failed to fetch available beds', error: error.message });
   }
 };

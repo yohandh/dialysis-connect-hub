@@ -29,7 +29,7 @@ const AppointmentManagement: React.FC<AppointmentManagementProps> = ({ centerId:
           <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="appointments">Appointments</TabsTrigger>
-              <TabsTrigger value="slots">Appointment Slots</TabsTrigger>
+              <TabsTrigger value="slots">Appointments</TabsTrigger>
             </TabsList>
             <TabsContent value="appointments" className="mt-4">
               <AppointmentList centerId={centerId} />

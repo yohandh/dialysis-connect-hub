@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import {
   Card,
   CardContent,
@@ -134,11 +134,12 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ centerId }) => {
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
+                <TableHead>Day</TableHead>
                 <TableHead>Time</TableHead>
                 <TableHead>Patient</TableHead>
                 <TableHead>Staff</TableHead>
                 <TableHead>Doctor</TableHead>
-                <TableHead>Bed</TableHead>
+                <TableHead>Bed Code</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -151,6 +152,9 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ centerId }) => {
                       <Calendar className="mr-2 h-4 w-4" />
                       {appointment.date}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    {format(parseISO(appointment.date), 'EEEE')}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center">
@@ -179,7 +183,7 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ centerId }) => {
                   <TableCell>
                     <div className="flex items-center">
                       <Bed className="mr-2 h-4 w-4" />
-                      {appointment.bedId || 'None'}
+                      {appointment.bedCode || 'Not assigned'}
                     </div>
                   </TableCell>
                   <TableCell>{getStatusBadge(appointment.status)}</TableCell>
@@ -238,6 +242,10 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ centerId }) => {
                   <p>{selectedAppointment.date}</p>
                 </div>
                 <div>
+                  <h3 className="font-medium">Day:</h3>
+                  <p>{format(parseISO(selectedAppointment.date), 'EEEE')}</p>
+                </div>
+                <div>
                   <h3 className="font-medium">Time:</h3>
                   <p>{`${selectedAppointment.startTime} - ${selectedAppointment.endTime}`}</p>
                 </div>
@@ -254,8 +262,8 @@ const AppointmentList: React.FC<AppointmentListProps> = ({ centerId }) => {
                   <p>{selectedAppointment.doctorId || 'None'}</p>
                 </div>
                 <div>
-                  <h3 className="font-medium">Bed:</h3>
-                  <p>{selectedAppointment.bedId || 'None'}</p>
+                  <h3 className="font-medium">Bed Code:</h3>
+                  <p>{selectedAppointment.bedCode || 'None'}</p>
                 </div>
                 <div>
                   <h3 className="font-medium">Status:</h3>

@@ -132,9 +132,9 @@ const AppointmentSlotManager: React.FC<AppointmentSlotManagerProps> = ({ centerI
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Appointment Slots</CardTitle>
+          <CardTitle>Appointments</CardTitle>
           <CardDescription>
-            Manage appointment slots for this center
+            Manage appointments center
           </CardDescription>
         </div>
         <Button onClick={() => setIsDialogOpen(true)}>

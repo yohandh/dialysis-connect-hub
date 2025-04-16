@@ -202,13 +202,12 @@ const AdminCenterDetails = () => {
         </div>
 
         <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="equipments">Equipments</TabsTrigger>
             <TabsTrigger value="sessions">Sessions</TabsTrigger>
             <TabsTrigger value="schedules">Schedule Sessions</TabsTrigger>
             <TabsTrigger value="appointments">Appointments</TabsTrigger>
-            <TabsTrigger value="staff">Staff</TabsTrigger>
           </TabsList>
           
           <div className="mt-6">
@@ -324,18 +323,6 @@ const AdminCenterDetails = () => {
             
             <TabsContent value="appointments">
               <AppointmentSlotManagement centerId={center.id.toString()} />
-            </TabsContent>
-            
-            <TabsContent value="staff">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Staff Management</CardTitle>
-                  <CardDescription>Manage staff members assigned to this center.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p>Staff management UI will be implemented here.</p>
-                </CardContent>
-              </Card>
             </TabsContent>
           </div>
         </Tabs>

@@ -12,6 +12,17 @@ export const fetchBedsByCenter = async (centerId: string) => {
   }
 };
 
+// Fetch available beds for a specific schedule session
+export const fetchAvailableBedsForSession = async (sessionId: string) => {
+  try {
+    const response = await axios.get(`/api/beds/sessions/${sessionId}/available-beds`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching available beds for session:', error);
+    throw error;
+  }
+};
+
 // Create a new bed
 export const createBed = async (data: { center_id: number; code: string }) => {
   const response = await axios.post('/api/beds', data);
