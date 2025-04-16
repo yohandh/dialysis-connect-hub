@@ -1,4 +1,3 @@
-
 import { 
   Role, 
   User, 
@@ -13,10 +12,10 @@ import {
 
 // Mock Roles data
 export const roles: Role[] = [
-  { id: 1, name: 'admin' },
-  { id: 2, name: 'staff' },
-  { id: 3, name: 'patient' },
-  { id: 4, name: 'doctor' }
+  { id: 1, name: 'Admin' },
+  { id: 2, name: 'Staff' },
+  { id: 4, name: 'Doctor' },
+  { id: 3, name: 'Patient' }
 ];
 
 // Mock Users data

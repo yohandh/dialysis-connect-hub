@@ -14,8 +14,8 @@ import { Settings, Bell, Lock, User } from 'lucide-react';
 
 const navLinks = [
   { name: 'Dashboard', path: '/admin/dashboard' },
-  { name: 'Centers', path: '/admin/centers' },
   { name: 'Users', path: '/admin/users' },
+  { name: 'Centers', path: '/admin/centers' },
   { name: 'Education', path: '/admin/education' },
   { name: 'Reports', path: '/admin/reports' }
 ];

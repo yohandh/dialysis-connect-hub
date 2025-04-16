@@ -30,7 +30,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD || 'DC-Hu2';
 const DB_NAME = process.env.DB_NAME || 'dc_hub';
 
 // Path to schema file - updated to point to the correct location
-const schemaFilePath = path.join(__dirname, '../../dchub-scripts/dchub_db_schema_v1.7.sql');
+const schemaFilePath = path.join(__dirname, '../../dchub-scripts/dchub_db_schema_v1.8.sql');
 
 async function initializeDatabase() {
   let connection;

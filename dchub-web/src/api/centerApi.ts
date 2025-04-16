@@ -1,9 +1,31 @@
-
 import { useMockApi, apiCall } from "@/config/api.config";
-import { dialysisCenters, DialysisCenter } from "@/data/centerData";
+import { dialysisCenters } from "@/data/centerData";
+import { DialysisCenter } from "@/types/centerTypes";
 
 // Mock API delay
 const API_DELAY = 300;
+
+// Function to convert time format
+function convertTimeFormat(time: string): string {
+  try {
+    // Parse time like "6:00 AM" or "7:30 PM" to database format "06:00:00" or "19:30:00"
+    const [timePart, ampm] = time.split(' ');
+    let [hours, minutes] = timePart.split(':').map(Number);
+    
+    // Convert to 24-hour format
+    if (ampm.toUpperCase() === 'PM' && hours < 12) {
+      hours += 12;
+    } else if (ampm.toUpperCase() === 'AM' && hours === 12) {
+      hours = 0;
+    }
+    
+    // Format as HH:MM:SS
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:00`;
+  } catch (error) {
+    console.error('Error converting time format:', error);
+    return time; // Return original if parsing fails
+  }
+}
 
 // Get all dialysis centers
 export const getAllCenters = async (): Promise<DialysisCenter[]> => {
@@ -14,6 +36,8 @@ export const getAllCenters = async (): Promise<DialysisCenter[]> => {
       return dialysisCenters;
     } else {
       const response = await apiCall<DialysisCenter[]>('/centers');
+      console.log('API Response - Centers:', response);
+      console.log('First center data structure:', response[0]);
       return response;
     }
   } catch (error) {
@@ -28,7 +52,7 @@ export const getCenterDetails = async (centerId: string): Promise<DialysisCenter
     if (useMockApi()) {
       await new Promise(resolve => setTimeout(resolve, API_DELAY));
       
-      const center = dialysisCenters.find(c => c.id === centerId);
+      const center = dialysisCenters.find(c => c.id.toString() === centerId);
       
       if (!center) {
         throw new Error("Center not found");
@@ -37,6 +61,7 @@ export const getCenterDetails = async (centerId: string): Promise<DialysisCenter
       return center;
     } else {
       const response = await apiCall<DialysisCenter>(`/centers/${centerId}`);
+      console.log('API Response - Centers: ', response);
       return response;
     }
   } catch (error) {
@@ -46,31 +71,55 @@ export const getCenterDetails = async (centerId: string): Promise<DialysisCenter
 };
 
 // Create new center
-export const createCenter = async (centerData: Omit<DialysisCenter, 'id' | 'currentPatients' | 'nephrologists'>): Promise<DialysisCenter> => {
+export const createCenter = async (centerData: any): Promise<DialysisCenter> => {
   try {
+    // Extract operating hours data if present
+    const { centerHours, ...centerFields } = centerData;
+    
     if (useMockApi()) {
       await new Promise(resolve => setTimeout(resolve, API_DELAY));
       
       // Generate a new ID
-      const newId = `center-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+      const newId = Math.floor(Math.random() * 1000) + 10;
       
       // Create new center object
       const newCenter: DialysisCenter = {
-        ...centerData,
+        ...centerFields,
         id: newId,
-        currentPatients: 0,
-        nephrologists: [] // Initialize with empty array
+        isActive: true
       };
       
-      // In a real implementation, this would be persisted to a database
-      // For now, we'll just return the created center
+      console.log('Creating new center with mock API:', newCenter);
+      console.log('Operating hours data:', centerHours);
+      
+      // Add the center to the mock data array for this session
+      dialysisCenters.push(newCenter);
       
       return newCenter;
     } else {
+      // Prepare center data for the API
+      const apiData = {
+        name: centerFields.name,
+        address: centerFields.address,
+        contact_no: centerFields.contactNo,
+        email: centerFields.email,
+        total_capacity: centerFields.totalCapacity,
+        manage_by_id: centerFields.manageById,
+        is_active: true,
+        center_hours: centerHours.map((hour: any) => ({
+          weekday: hour.day,
+          open_time: hour.openTime ? convertTimeFormat(hour.openTime) : null,
+          close_time: hour.closeTime ? convertTimeFormat(hour.closeTime) : null
+        }))
+      };
+      
+      console.log('Submitting center data to API:', apiData);
+      
       const response = await apiCall<DialysisCenter>('/centers', {
         method: 'POST',
-        body: JSON.stringify(centerData)
+        body: JSON.stringify(apiData)
       });
+      
       return response;
     }
   } catch (error) {
@@ -80,29 +129,54 @@ export const createCenter = async (centerData: Omit<DialysisCenter, 'id' | 'curr
 };
 
 // Update existing center
-export const updateCenter = async (centerData: Partial<DialysisCenter> & { id: string }): Promise<DialysisCenter> => {
+export const updateCenter = async (centerData: any): Promise<DialysisCenter> => {
   try {
+    // Extract operating hours data if present
+    const { centerHours, ...centerFields } = centerData;
+    
     if (useMockApi()) {
       await new Promise(resolve => setTimeout(resolve, API_DELAY));
       
-      // Find the center to update
-      const centerIndex = dialysisCenters.findIndex(c => c.id === centerData.id);
+      const centerIndex = dialysisCenters.findIndex(c => c.id === centerFields.id);
       
       if (centerIndex === -1) {
         throw new Error("Center not found");
       }
       
-      // In a real implementation, this would update the database
-      // Return the updated center
-      return {
+      console.log('Updating center with mock API:', centerFields);
+      console.log('Operating hours data:', centerHours);
+      
+      // Update center in mock data
+      dialysisCenters[centerIndex] = {
         ...dialysisCenters[centerIndex],
-        ...centerData
+        ...centerFields,
       };
+      
+      return dialysisCenters[centerIndex];
     } else {
-      const response = await apiCall<DialysisCenter>(`/centers/${centerData.id}`, {
+      // Prepare center data for the API
+      const apiData = {
+        name: centerFields.name,
+        address: centerFields.address,
+        contact_no: centerFields.contactNo,
+        email: centerFields.email,
+        total_capacity: centerFields.totalCapacity,
+        manage_by_id: centerFields.manageById,
+        is_active: centerFields.isActive,
+        center_hours: centerHours.map((hour: any) => ({
+          weekday: hour.day,
+          open_time: hour.openTime ? convertTimeFormat(hour.openTime) : null,
+          close_time: hour.closeTime ? convertTimeFormat(hour.closeTime) : null
+        }))
+      };
+      
+      console.log('Submitting update to API:', apiData);
+      
+      const response = await apiCall<DialysisCenter>(`/centers/${centerFields.id}`, {
         method: 'PUT',
-        body: JSON.stringify(centerData)
+        body: JSON.stringify(apiData)
       });
+      
       return response;
     }
   } catch (error) {
@@ -111,24 +185,72 @@ export const updateCenter = async (centerData: Partial<DialysisCenter> & { id: s
   }
 };
 
-// Delete center
-export const deleteCenter = async (centerId: string): Promise<void> => {
+// Deactivate center (soft delete - sets is_active to 0)
+export const deactivateCenter = async (centerId: string): Promise<void> => {
   try {
     if (useMockApi()) {
       await new Promise(resolve => setTimeout(resolve, API_DELAY));
       
-      // Find the center to delete
-      const centerIndex = dialysisCenters.findIndex(c => c.id === centerId);
+      const centerIndex = dialysisCenters.findIndex(c => c.id.toString() === centerId);
       
       if (centerIndex === -1) {
         throw new Error("Center not found");
       }
       
-      // In a real implementation, this would delete from the database
-      // For our mock, we just return success
-      return;
+      // Instead of removing from array, mark as inactive
+      dialysisCenters[centerIndex].isActive = false;
     } else {
-      await apiCall(`/centers/${centerId}`, {
+      await apiCall<void>(`/centers/${centerId}/deactivate`, {
+        method: 'PUT'
+      });
+    }
+  } catch (error) {
+    console.error("Failed to deactivate center:", error);
+    throw error;
+  }
+};
+
+// Activate center (sets is_active to 1)
+export const activateCenter = async (centerId: string): Promise<void> => {
+  try {
+    if (useMockApi()) {
+      await new Promise(resolve => setTimeout(resolve, API_DELAY));
+      
+      const centerIndex = dialysisCenters.findIndex(c => c.id.toString() === centerId);
+      
+      if (centerIndex === -1) {
+        throw new Error("Center not found");
+      }
+      
+      // Mark as active
+      dialysisCenters[centerIndex].isActive = true;
+    } else {
+      await apiCall<void>(`/centers/${centerId}/activate`, {
+        method: 'PUT'
+      });
+    }
+  } catch (error) {
+    console.error("Failed to activate center:", error);
+    throw error;
+  }
+};
+
+// Hard delete center (completely removes from database)
+export const deleteCenter = async (centerId: string): Promise<void> => {
+  try {
+    if (useMockApi()) {
+      await new Promise(resolve => setTimeout(resolve, API_DELAY));
+      
+      const centerIndex = dialysisCenters.findIndex(c => c.id.toString() === centerId);
+      
+      if (centerIndex === -1) {
+        throw new Error("Center not found");
+      }
+      
+      // Remove from array
+      dialysisCenters.splice(centerIndex, 1);
+    } else {
+      await apiCall<void>(`/centers/${centerId}`, {
         method: 'DELETE'
       });
     }

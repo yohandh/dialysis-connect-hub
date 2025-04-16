@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -17,11 +16,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { CenterFormValues } from "@/types/centerTypes";
 import CenterOperatingHoursForm from './CenterOperatingHoursForm';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { getUsersByRoles } from "@/api/userApi";
 
 interface CenterFormDialogProps {
   isOpen: boolean;
@@ -31,6 +39,13 @@ interface CenterFormDialogProps {
   isEditing: boolean;
 }
 
+interface Manager {
+  id: number;
+  name: string;
+  email: string;
+  roleName: string;
+}
+
 const CenterFormDialog: React.FC<CenterFormDialogProps> = ({
   isOpen,
   onOpenChange,
@@ -38,165 +53,204 @@ const CenterFormDialog: React.FC<CenterFormDialogProps> = ({
   onSubmit,
   isEditing
 }) => {
+  const [step, setStep] = useState(1);
+  const totalSteps = 2;
+  const [managers, setManagers] = useState<Manager[]>([]);
+  
+  useEffect(() => {
+    const fetchManagers = async () => {
+      try {
+        const data = await getUsersByRoles(['admin', 'staff']);
+        setManagers(data);
+      } catch (error) {
+        console.error('Error fetching managers:', error);
+      }
+    };
+    fetchManagers();
+  }, []);
+
+  const nextStep = () => {
+    if (step < totalSteps) {
+      // Validate current step fields before proceeding
+      const fieldsToValidate = step === 1 
+        ? ['name', 'address', 'contactNo', 'email', 'totalCapacity', 'manageById'] as const
+        : [];
+        
+      form.trigger(fieldsToValidate).then(isValid => {
+        if (isValid) setStep(step + 1);
+      });
+    }
+  };
+  
+  const prevStep = () => {
+    if (step > 1) setStep(step - 1);
+  };
+  
+  const handleSubmit = (data: any) => {
+    if (step === totalSteps) {
+      onSubmit(data);
+    } else {
+      nextStep();
+    }
+  };
+  
+  const handleClose = () => {
+    setStep(1); // Reset to first step when closing
+    onOpenChange(false);
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl p-6">
         <DialogHeader>
-          <DialogTitle>{isEditing ? "Edit Center" : "Add New Center"}</DialogTitle>
+          <DialogTitle>{isEditing ? `Edit Center (Step ${step}/${totalSteps})` : `Add New Center (Step ${step}/${totalSteps})`}</DialogTitle>
           <DialogDescription>
-            {isEditing 
-              ? "Update the dialysis center details below." 
-              : "Enter the details for the new dialysis center."}
+            {step === 1 
+              ? "Enter the basic information for the dialysis center." 
+              : "Set the operating hours for the dialysis center."}
           </DialogDescription>
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Center Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter center name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 max-w-full">
+            {step === 1 && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Center Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter center name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Address</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          placeholder="Address" 
+                          className="min-h-[80px]" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="grid grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="contactNo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contact Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Contact Number" className="max-w-full" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Contact email" className="max-w-full" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="totalCapacity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Total Capacity</FormLabel>
+                        <FormControl>
+                          <Input type="number" className="max-w-full" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="manageById"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Manager</FormLabel>
+                        <FormControl>
+                          <Select 
+                            onValueChange={(value) => field.onChange(value === "0" ? null : Number(value))}
+                            value={field.value ? String(field.value) : "0"}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a manager" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="0">None</SelectItem>
+                              {managers.map((manager) => (
+                                <SelectItem key={manager.id} value={String(manager.id)}>
+                                  {manager.name} ({manager.roleName})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </>
+            )}
             
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Street address" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <div className="grid grid-cols-3 gap-4">
-              <FormField
-                control={form.control}
-                name="city"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>City</FormLabel>
-                    <FormControl>
-                      <Input placeholder="City" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="state"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>State</FormLabel>
-                    <FormControl>
-                      <Input placeholder="State" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="zip"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>ZIP</FormLabel>
-                    <FormControl>
-                      <Input placeholder="ZIP Code" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Phone number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Contact email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="capacity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Total Capacity (Stations)</FormLabel>
-                    <FormControl>
-                      <Input type="number" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Center Type</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Hospital-based, Independent" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Operating Hours Form */}
-            <CenterOperatingHoursForm form={form} />
+            {step === 2 && (
+              <>
+                {/* Center Type field hidden as requested */}
+                <input type="hidden" {...form.register("type")} />
+                
+                {/* Operating Hours Form */}
+                <CenterOperatingHoursForm form={form} />
+              </>
+            )}
 
             <DialogFooter>
+              {step > 1 && (
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={prevStep}
+                >
+                  Back
+                </Button>
+              )}
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => onOpenChange(false)}
+                onClick={handleClose}
               >
                 Cancel
               </Button>
               <Button type="submit">
-                {isEditing ? "Update Center" : "Create Center"}
+                {step < totalSteps ? "Next" : (isEditing ? "Update Center" : "Create Center")}
               </Button>
             </DialogFooter>
           </form>

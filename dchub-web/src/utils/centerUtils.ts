@@ -4,26 +4,26 @@ import { DialysisCenter } from "@/data/centerData";
 // Format operating hours for display
 export const formatOperatingHours = (center: DialysisCenter) => {
   // Check if all weekdays have the same hours
-  const weekdayHours = center.operatingHours.monday;
+  const weekdayHours = center.centerHours.monday;
   const allWeekdaysSame = [
-    center.operatingHours.tuesday,
-    center.operatingHours.wednesday,
-    center.operatingHours.thursday,
-    center.operatingHours.friday
+    center.centerHours.tuesday,
+    center.centerHours.wednesday,
+    center.centerHours.thursday,
+    center.centerHours.friday
   ].every(hours => hours === weekdayHours);
 
   // Check if weekend days have the same hours
-  const weekendSame = center.operatingHours.saturday === center.operatingHours.sunday;
+  const weekendSame = center.centerHours.saturday === center.centerHours.sunday;
 
-  if (allWeekdaysSame && weekendSame && center.operatingHours.saturday === weekdayHours) {
+  if (allWeekdaysSame && weekendSame && center.centerHours.saturday === weekdayHours) {
     return `All days: ${weekdayHours}`;
   } else if (allWeekdaysSame) {
     const result = [`Mon-Fri: ${weekdayHours}`];
-    if (center.operatingHours.saturday !== 'Closed') {
-      result.push(`Sat: ${center.operatingHours.saturday}`);
+    if (center.centerHours.saturday !== 'Closed') {
+      result.push(`Sat: ${center.centerHours.saturday}`);
     }
-    if (center.operatingHours.sunday !== 'Closed') {
-      result.push(`Sun: ${center.operatingHours.sunday}`);
+    if (center.centerHours.sunday !== 'Closed') {
+      result.push(`Sun: ${center.centerHours.sunday}`);
     }
     return result.join('; ');
   } else {

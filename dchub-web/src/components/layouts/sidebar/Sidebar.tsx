@@ -51,7 +51,7 @@ const Sidebar = ({
       {/* Sidebar Footer */}
       <div className="absolute bottom-0 w-full border-t p-4">
         <div className="flex flex-col items-center text-center">
-          <div className="text-xs text-gray-500">© 2023 Dialysis Connect</div>
+          <div className="text-xs text-gray-500">© 2025 Dialysis Connect</div>
           <div className="text-xs text-gray-500">All Rights Reserved</div>
         </div>
       </div>

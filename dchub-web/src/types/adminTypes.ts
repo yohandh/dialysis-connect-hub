@@ -1,4 +1,3 @@
-
 // Admin portal type definitions based on DB schema
 
 export type Role = {
@@ -12,11 +11,35 @@ export type User = {
   name: string;
   email: string;
   mobileNo: string;
-  status: 'active' | 'inactive';
+  status: 'Active' | 'Inactive';
   password?: string; // Only used for creation/updates, never returned from API
   roleName?: string; // Joined data
   lastLogin?: string;
   createdAt?: string;
+};
+
+export type Staff = {
+  id: number;
+  userId: number;
+  gender: 'male' | 'female' | 'other';
+  designation: string;
+  // User joined data
+  name?: string;
+  email?: string;
+  mobileNo?: string;
+};
+
+export type Doctor = {
+  id: number;
+  userId: number;
+  specialization: string;
+  address: string;
+  emergencyContactNo: string;
+  gender: 'male' | 'female' | 'other';
+  // User joined data
+  name?: string;
+  email?: string;
+  mobileNo?: string;
 };
 
 export type Patient = {
@@ -37,19 +60,6 @@ export type Patient = {
   mobileNo?: string;
 };
 
-export type Doctor = {
-  id: number;
-  userId: number;
-  specialization: string;
-  address: string;
-  emergencyContactNo: string;
-  gender: 'male' | 'female' | 'other';
-  // User joined data
-  name?: string;
-  email?: string;
-  mobileNo?: string;
-};
-
 export type Center = {
   id: number;
   name: string;
@@ -57,7 +67,7 @@ export type Center = {
   phoneNo: string;
   email: string;
   totalCapacity: number;
-  operatingHours?: CenterHours[];
+  centerHours?: CenterHours[];
 };
 
 export type CenterHours = {

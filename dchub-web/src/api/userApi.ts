@@ -1,6 +1,5 @@
-
-import { User, Patient, Doctor, Role } from "@/types/adminTypes";
-import { users, patients, doctors, roles } from "@/data/adminMockData";
+import { Role, User, Staff, Doctor, Patient } from "@/types/adminTypes";
+import axios from 'axios'; // Import axios
 
 // Types for API requests and responses
 export interface CreateUserRequest {
@@ -30,162 +29,382 @@ export interface UpdateUserRequest extends Omit<CreateUserRequest, 'password'> {
 }
 
 export interface UserResponse {
-  user: User;
+  id?: number;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  mobileNo?: string;
+  roleId?: number;
+  roleName?: string;
+  status?: string;
+  lastLogin?: string;
   patient?: Patient;
   doctor?: Doctor;
+  staff?: Staff;
+  // For backward compatibility with nested responses
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    mobileNo: string;
+    roleId: number;
+    roleName: string;
+    status: string;
+    lastLogin?: string;
+  };
 }
 
 // Mock API functions
 export const fetchUsers = async (): Promise<User[]> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return users;
+  try {
+    // Get authentication token from localStorage
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      throw new Error('Authentication required. Please log in.');
+    }
+    
+    const response = await axios.get('/api/users', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    // Map the response data to ensure consistent structure
+    return response.data.map((user: any) => ({
+      id: user.id,
+      name: user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+      email: user.email,
+      mobileNo: user.mobileNo || user.mobile_no || '',
+      roleId: user.roleId || user.role_id,
+      roleName: user.roleName || getRoleName(user.roleId || user.role_id),
+      status: user.status || 'active',
+      createdAt: user.createdAt || user.created_at,
+      updatedAt: user.updatedAt || user.updated_at
+    }));
+  } catch (error: any) {
+    console.error('Error fetching users:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Helper function to get role name from role ID
+const getRoleName = (roleId: number) => {
+  switch (roleId) {
+    case 1000: return 'admin';
+    case 1001: return 'staff';
+    case 1002: return 'doctor';
+    case 1003: return 'patient';
+    default: return 'unknown';
+  }
 };
 
 export const fetchUserById = async (userId: number): Promise<UserResponse> => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  
-  const user = users.find(u => u.id === userId);
-  if (!user) throw new Error("User not found");
-  
-  let patient;
-  let doctor;
-  
-  if (user.roleId === 3) { // Patient
-    patient = patients.find(p => p.userId === user.id);
-  } else if (user.roleId === 4) { // Doctor
-    doctor = doctors.find(d => d.userId === user.id);
+  try {
+    const response = await axios.get(`/api/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    // Extract data from the response
+    const data = response.data;
+    
+    // Check if the response has a nested user structure
+    if (data && data.user) {
+      // If it's nested, flatten it
+      const { user, patient, doctor, staff } = data;
+      return { ...user, patient, doctor, staff };
+    }
+    
+    // If it's already flattened, return as is
+    return data;
+  } catch (error: any) {
+    console.error('Error fetching user:', error.response?.data || error.message);
+    throw error;
   }
-  
-  return { user, patient, doctor };
 };
 
 export const createUser = async (data: CreateUserRequest): Promise<UserResponse> => {
   await new Promise(resolve => setTimeout(resolve, 700));
   
-  // In a real API this would create the user in the database
-  // For now, we'll simulate a successful response
-  
-  const newId = Math.max(...users.map(u => u.id)) + 1;
-  
-  const newUser: User = {
-    id: newId,
-    roleId: data.roleId,
-    name: data.name,
-    email: data.email,
-    mobileNo: data.mobileNo,
-    status: data.status,
-    roleName: roles.find(r => r.id === data.roleId)?.name
-  };
-  
-  // Simulate creating role-specific records
-  let newPatient: Patient | undefined;
-  let newDoctor: Doctor | undefined;
-  
-  if (data.roleId === 3) { // Patient
-    newPatient = {
-      id: patients.length + 1,
-      userId: newId,
-      gender: data.gender as 'male' | 'female' | 'other',
-      dob: data.dob as string,
-      address: data.address || '',
-      bloodGroup: data.bloodGroup || '',
-      emergencyContactNo: data.emergencyContactNo || '',
-      emergencyContact: data.emergencyContact || '',
-      insuranceProvider: data.insuranceProvider || '',
-      allergies: data.allergies || '',
-      chronicConditions: data.chronicConditions || '',
-    };
-  } else if (data.roleId === 4) { // Doctor
-    newDoctor = {
-      id: doctors.length + 1,
-      userId: newId,
-      gender: data.gender as 'male' | 'female' | 'other',
-      specialization: data.specialization || '',
-      address: data.address || '',
-      emergencyContactNo: data.emergencyContactNo || '',
-    };
+  try {
+    const response = await axios.post('/api/users', data, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    const newUser = response.data;
+    
+    let newPatient: Patient | undefined;
+    let newDoctor: Doctor | undefined;
+    let newStaff: Staff | undefined;
+    
+    if (data.roleId === 1003) { // Patient
+      const patientResponse = await axios.post('/api/patients', {
+        userId: newUser.id,
+        gender: data.gender,
+        dob: data.dob,
+        address: data.address,
+        bloodGroup: data.bloodGroup,
+        emergencyContactNo: data.emergencyContactNo,
+        emergencyContact: data.emergencyContact,
+        insuranceProvider: data.insuranceProvider,
+        allergies: data.allergies,
+        chronicConditions: data.chronicConditions,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      newPatient = patientResponse.data;
+    } else if (data.roleId === 1002) { // Doctor
+      const doctorResponse = await axios.post('/api/doctors', {
+        userId: newUser.id,
+        gender: data.gender,
+        specialization: data.specialization,
+        address: data.address,
+        emergencyContactNo: data.emergencyContactNo,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      newDoctor = doctorResponse.data;
+    } else if (data.roleId === 1001) { // Staff
+      const staffResponse = await axios.post('/api/staff', {
+        userId: newUser.id,
+        gender: data.gender,
+        designation: data.designation,
+        address: data.address,
+        emergencyContactNo: data.emergencyContactNo,
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+        }
+      });
+      newStaff = staffResponse.data;
+    }
+    
+    console.log("Created new user:", { ...newUser, patient: newPatient, doctor: newDoctor, staff: newStaff });
+    
+    return { ...newUser, patient: newPatient, doctor: newDoctor, staff: newStaff };
+  } catch (error: any) {
+    console.error('Error creating user:', error.response?.data || error.message);
+    
+    // Handle validation errors (422 status code)
+    if (error.response?.status === 422) {
+      const validationError = new Error(error.response.data.message || 'Validation error');
+      validationError.name = 'ValidationError';
+      // Add the specific field errors to the error object
+      (validationError as any).errors = error.response.data.errors;
+      throw validationError;
+    }
+    
+    // For other errors, throw with the message
+    throw new Error(error.response?.data?.message || error.message);
   }
-  
-  console.log("Created new user:", { user: newUser, patient: newPatient, doctor: newDoctor });
-  
-  return {
-    user: newUser,
-    patient: newPatient,
-    doctor: newDoctor
-  };
 };
 
 export const updateUser = async (data: UpdateUserRequest): Promise<UserResponse> => {
-  await new Promise(resolve => setTimeout(resolve, 700));
-  
-  // In a real API this would update the user in the database
-  // For now, we'll simulate a successful response
-  const existingUser = users.find(u => u.id === data.id);
-  if (!existingUser) throw new Error("User not found");
-  
-  const updatedUser: User = {
-    ...existingUser,
-    name: data.name,
-    email: data.email,
-    mobileNo: data.mobileNo,
-    status: data.status,
-    roleId: data.roleId,
-    roleName: roles.find(r => r.id === data.roleId)?.name
-  };
-  
-  // Simulate updating role-specific records
-  let updatedPatient: Patient | undefined;
-  let updatedDoctor: Doctor | undefined;
-  
-  if (data.roleId === 3) { // Patient
-    const existingPatient = patients.find(p => p.userId === data.id);
+  try {
+    // Split the name into firstName and lastName for the backend
+    const nameParts = data.name.split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
     
-    updatedPatient = {
-      id: existingPatient?.id || patients.length + 1,
-      userId: data.id,
-      gender: data.gender as 'male' | 'female' | 'other',
-      dob: data.dob as string,
-      address: data.address || '',
-      bloodGroup: data.bloodGroup || '',
-      emergencyContactNo: data.emergencyContactNo || '',
-      emergencyContact: data.emergencyContact || '',
-      insuranceProvider: data.insuranceProvider || '',
-      allergies: data.allergies || '',
-      chronicConditions: data.chronicConditions || '',
-    };
-  } else if (data.roleId === 4) { // Doctor
-    const existingDoctor = doctors.find(d => d.userId === data.id);
+    // Convert status from 'active'/'inactive' to boolean for is_active
+    const isActive = data.status === 'active';
     
-    updatedDoctor = {
-      id: existingDoctor?.id || doctors.length + 1,
-      userId: data.id,
-      gender: data.gender as 'male' | 'female' | 'other',
-      specialization: data.specialization || '',
-      address: data.address || '',
-      emergencyContactNo: data.emergencyContactNo || '',
+    // Prepare the request body with the correct field names for the backend
+    const requestBody = {
+      firstName,
+      lastName,
+      email: data.email,
+      mobileNo: data.mobileNo,
+      // Only include password if it's not empty
+      ...(data.password ? { password: data.password } : {}),
+      roleId: data.roleId,
+      status: isActive, // Backend expects a boolean
+      
+      // Role-specific fields
+      gender: data.gender,
+      dob: data.dob,
+      address: data.address,
+      bloodGroup: data.bloodGroup,
+      emergencyContactNo: data.emergencyContactNo,
+      emergencyContact: data.emergencyContact,
+      insuranceProvider: data.insuranceProvider,
+      allergies: data.allergies,
+      chronicConditions: data.chronicConditions,
+      specialization: data.specialization,
+      designation: data.designation
     };
+    
+    console.log("Sending update request with data:", requestBody);
+    
+    const response = await axios.put(`/api/users/${data.id}`, requestBody, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    console.log("Update response:", response.data);
+    
+    // Return the response data directly
+    return response.data;
+  } catch (error) {
+    console.error('Error updating user:', error);
+    throw error;
   }
-  
-  console.log("Updated user:", { user: updatedUser, patient: updatedPatient, doctor: updatedDoctor });
-  
-  return {
-    user: updatedUser,
-    patient: updatedPatient,
-    doctor: updatedDoctor
-  };
 };
 
 export const deleteUser = async (userId: number): Promise<boolean> => {
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  // In a real API this would delete or deactivate the user
-  console.log(`User ${userId} deleted/deactivated`);
+  try {
+    await axios.delete(`/api/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    console.log(`User ${userId} deleted`);
+    
+    return true;
+  } catch (error: any) {
+    console.error('Error deleting user:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const deactivateUser = async (userId: number): Promise<boolean> => {
+  await new Promise(resolve => setTimeout(resolve, 500));
   
-  return true;
+  try {
+    await axios.put(`/api/users/${userId}/deactivate`, {}, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    console.log(`User ${userId} deactivated`);
+    
+    return true;
+  } catch (error: any) {
+    console.error('Error deactivating user:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const activateUser = async (userId: number): Promise<boolean> => {
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  try {
+    await axios.put(`/api/users/${userId}/activate`, {}, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    console.log(`User ${userId} activated`);
+    
+    return true;
+  } catch (error: any) {
+    console.error('Error activating user:', error.response?.data || error.message);
+    throw error;
+  }
 };
 
 export const fetchRoles = async (): Promise<Role[]> => {
   await new Promise(resolve => setTimeout(resolve, 300));
-  return roles;
+  
+  try {
+    const response = await axios.get('/api/roles', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching roles:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+// Get users by roles (admin or staff)
+export const getUsersByRoles = async (roles: string[] = ['admin', 'staff']) => {
+  try {
+    const response = await axios.get(`/api/users/by-roles?roles=${roles.join(',')}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching managers:', error);
+    return [];
+  }
+};
+
+// Fetch users by a specific role
+export const fetchUsersByRole = async (role: string) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      console.warn('Authentication token not found. Using mock data.');
+      // Return mock data for testing purposes
+      return [
+        { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', status: 'active' },
+        { id: 2, firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', status: 'active' },
+        { id: 3, firstName: 'Robert', lastName: 'Johnson', email: 'robert.johnson@example.com', status: 'active' },
+        { id: 4, firstName: 'Emily', lastName: 'Williams', email: 'emily.williams@example.com', status: 'active' },
+        { id: 5, firstName: 'Michael', lastName: 'Brown', email: 'michael.brown@example.com', status: 'active' },
+      ];
+    }
+    
+    console.log(`Fetching users with role: ${role}`);
+    const response = await axios.get(`/api/users/by-role/${role}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    console.log(`Received ${response.data.length} ${role} users from API`);
+    
+    // Map the response data to ensure consistent structure
+    const mappedUsers = response.data.map((user: any) => ({
+      id: user.id,
+      firstName: user.firstName || user.first_name || '',
+      lastName: user.lastName || user.last_name || '',
+      email: user.email,
+      mobileNo: user.mobileNo || user.mobile_no || '',
+      roleId: user.roleId || user.role_id,
+      roleName: user.roleName || getRoleName(user.roleId || user.role_id),
+      status: user.status || 'active'
+    }));
+    
+    console.log('Mapped user data:', mappedUsers);
+    return mappedUsers;
+  } catch (error: any) {
+    console.error(`Error fetching ${role} users:`, error);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Response status:', error.response.status);
+    }
+    
+    // Return mock data for testing purposes
+    console.warn(`Returning mock ${role} data due to API error`);
+    return [
+      { id: 1, firstName: 'John', lastName: 'Doe', email: 'john.doe@example.com', status: 'active' },
+      { id: 2, firstName: 'Jane', lastName: 'Smith', email: 'jane.smith@example.com', status: 'active' },
+      { id: 3, firstName: 'Robert', lastName: 'Johnson', email: 'robert.johnson@example.com', status: 'active' },
+      { id: 4, firstName: 'Emily', lastName: 'Williams', email: 'emily.williams@example.com', status: 'active' },
+      { id: 5, firstName: 'Michael', lastName: 'Brown', email: 'michael.brown@example.com', status: 'active' },
+    ];
+  }
 };

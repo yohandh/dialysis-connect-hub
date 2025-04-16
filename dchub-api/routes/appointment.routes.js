@@ -11,6 +11,9 @@ router.get('/', authMiddleware, appointmentController.getAllAppointments);
 // Get appointment by ID
 router.get('/:id', authMiddleware, appointmentController.getAppointmentById);
 
+// Get appointment details with related information
+router.get('/:id/details', authMiddleware, appointmentController.getAppointmentDetails);
+
 // Get appointments by center
 router.get('/center/:centerId', authMiddleware, appointmentController.getAppointmentsByCenter);
 
@@ -23,11 +26,10 @@ router.get('/status/available', authMiddleware, appointmentController.getAvailab
 // Create appointment slot
 router.post('/', [
   authMiddleware,
-  body('centerId').notEmpty().withMessage('Center ID is required'),
-  body('date').notEmpty().withMessage('Date is required'),
-  body('startTime').notEmpty().withMessage('Start time is required'),
-  body('endTime').notEmpty().withMessage('End time is required'),
-  body('type').isIn(['dialysis', 'consultation', 'checkup']).withMessage('Invalid appointment type')
+  body('scheduleSessionId').notEmpty().withMessage('Schedule session ID is required'),
+  body('patientId').optional(),
+  body('bedId').optional(),
+  body('notes').optional()
 ], appointmentController.createAppointmentSlot);
 
 // Update appointment slot
@@ -38,7 +40,10 @@ router.put('/:id', [
   body('startTime').optional(),
   body('endTime').optional(),
   body('type').optional().isIn(['dialysis', 'consultation', 'checkup']).withMessage('Invalid appointment type'),
-  body('status').optional().isIn(['booked', 'canceled', 'completed', 'available']).withMessage('Invalid status')
+  body('patientId').optional(),
+  body('bedId').optional(),
+  body('notes').optional(),
+  body('status').optional().isIn(['scheduled', 'in-progress', 'completed', 'cancelled', 'no-show']).withMessage('Invalid status')
 ], appointmentController.updateAppointmentSlot);
 
 // Delete appointment slot

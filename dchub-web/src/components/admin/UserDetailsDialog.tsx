@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserById } from '@/api/userApi';
@@ -61,10 +60,10 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
   // Get role badge variant
   const getRoleBadgeVariant = (roleId: number): "default" | "secondary" | "outline" | "destructive" => {
     switch (roleId) {
-      case 1: return "destructive"; // Admin
-      case 2: return "secondary";   // Staff
-      case 3: return "outline";     // Patient
-      case 4: return "default";     // Doctor
+      case 1001: return "destructive"; // Admin
+      case 1002: return "secondary";   // Staff
+      case 1003: return "outline";     // Patient
+      case 1004: return "default";     // Doctor
       default: return "outline";
     }
   };
@@ -93,7 +92,11 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
     );
   }
 
-  const { user, patient, doctor } = userData;
+  // Handle both nested and flattened data structures
+  const userObj = userData.hasOwnProperty('user') ? (userData as any).user : userData;
+  const patientObj = userData.patient;
+  const doctorObj = userData.doctor;
+  const staffObj = userData.staff;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -106,39 +109,39 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
           {/* User Avatar & Basic Info */}
           <div className="flex flex-col items-center space-y-2 w-full md:w-1/3">
             <Avatar className="h-24 w-24">
-              <AvatarFallback className="text-2xl">{getInitials(user.name)}</AvatarFallback>
+              <AvatarFallback className="text-2xl">{getInitials(userObj.name)}</AvatarFallback>
             </Avatar>
             
-            <h2 className="text-xl font-semibold mt-4">{user.name}</h2>
+            <h2 className="text-xl font-semibold mt-4">{userObj.name}</h2>
             
-            <Badge variant={getRoleBadgeVariant(user.roleId)} className="mt-1">
-              {user.roleName}
+            <Badge variant={getRoleBadgeVariant(userObj.roleId)} className="mt-1">
+              {userObj.roleName}
             </Badge>
             
             <Badge 
-              variant={user.status === 'active' ? 'default' : 'outline'}
-              className={user.status === 'active' ? 'bg-green-500 hover:bg-green-600 mt-1' : 'mt-1'}
+              variant={userObj.status === 'active' ? 'default' : 'outline'}
+              className={userObj.status === 'active' ? 'bg-green-500 hover:bg-green-600 mt-1' : 'mt-1'}
             >
-              {user.status}
+              {userObj.status}
             </Badge>
 
             <div className="w-full mt-4 space-y-3">
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm truncate">{user.email}</span>
+                <p className="text-sm">{userObj.email}</p>
               </div>
               
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">{user.mobileNo}</span>
+                <p className="text-sm">{userObj.mobileNo}</p>
               </div>
               
-              <Separator className="my-2" />
-              
-              <div className="flex items-center space-x-2">
-                <UserCog className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">ID: {user.id}</span>
-              </div>
+              {userObj.lastLogin && (
+                <div className="flex items-center space-x-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <p className="text-sm">Last login: {format(new Date(userObj.lastLogin), 'PPP')}</p>
+                </div>
+              )}
             </div>
           </div>
           
@@ -148,15 +151,15 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
               <TabsList className="grid grid-cols-3">
                 <TabsTrigger value="profile">Profile</TabsTrigger>
                 <TabsTrigger value="centers">Assigned Centers</TabsTrigger>
-                {user.roleId === 4 && <TabsTrigger value="specialization">Specialization</TabsTrigger>}
-                {user.roleId === 3 && <TabsTrigger value="medical">Medical Info</TabsTrigger>}
-                {user.roleId === 2 && <TabsTrigger value="appointments">Appointments</TabsTrigger>}
+                {userObj.roleId === 1004 && <TabsTrigger value="specialization">Specialization</TabsTrigger>}
+                {userObj.roleId === 1003 && <TabsTrigger value="medical">Medical Info</TabsTrigger>}
+                {userObj.roleId === 1001 && <TabsTrigger value="appointments">Appointments</TabsTrigger>}
               </TabsList>
               
               {/* Profile Tab */}
               <TabsContent value="profile" className="space-y-4">
                 {/* Patient Information */}
-                {user.roleId === 3 && patient && (
+                {userObj.roleId === 1003 && patientObj && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center">
@@ -167,34 +170,34 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                     <CardContent className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Gender</p>
-                        <p>{patient.gender}</p>
+                        <p>{patientObj.gender}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Date of Birth</p>
-                        <p>{patient.dob ? format(new Date(patient.dob), 'PPP') : 'Not provided'}</p>
+                        <p>{patientObj.dob ? format(new Date(patientObj.dob), 'PPP') : 'Not provided'}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Blood Group</p>
-                        <p>{patient.bloodGroup || 'Not provided'}</p>
+                        <p>{patientObj.bloodGroup || 'Not provided'}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Insurance</p>
-                        <p>{patient.insuranceProvider || 'Not provided'}</p>
+                        <p>{patientObj.insuranceProvider || 'Not provided'}</p>
                       </div>
                       <div className="col-span-2 space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Address</p>
-                        <p>{patient.address || 'Not provided'}</p>
+                        <p>{patientObj.address || 'Not provided'}</p>
                       </div>
                       <div className="col-span-2 space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Emergency Contact</p>
-                        <p>{patient.emergencyContact || 'Not provided'} {patient.emergencyContactNo && `(${patient.emergencyContactNo})`}</p>
+                        <p>{patientObj.emergencyContact || 'Not provided'} {patientObj.emergencyContactNo && `(${patientObj.emergencyContactNo})`}</p>
                       </div>
                     </CardContent>
                   </Card>
                 )}
                 
                 {/* Doctor Information */}
-                {user.roleId === 4 && doctor && (
+                {userObj.roleId === 1004 && doctorObj && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center">
@@ -205,26 +208,26 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                     <CardContent className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Gender</p>
-                        <p>{doctor.gender}</p>
+                        <p>{doctorObj.gender}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Specialization</p>
-                        <p>{doctor.specialization}</p>
+                        <p>{doctorObj.specialization}</p>
                       </div>
                       <div className="col-span-2 space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Address</p>
-                        <p>{doctor.address || 'Not provided'}</p>
+                        <p>{doctorObj.address || 'Not provided'}</p>
                       </div>
                       <div className="col-span-2 space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Emergency Contact Number</p>
-                        <p>{doctor.emergencyContactNo || 'Not provided'}</p>
+                        <p>{doctorObj.emergencyContactNo || 'Not provided'}</p>
                       </div>
                     </CardContent>
                   </Card>
                 )}
                 
                 {/* Staff Information */}
-                {user.roleId === 2 && (
+                {userObj.roleId === 1001 && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center">
@@ -239,7 +242,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                 )}
                 
                 {/* Admin Information */}
-                {user.roleId === 1 && (
+                {userObj.roleId === 1001 && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center">
@@ -305,7 +308,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
               </TabsContent>
               
               {/* Specialization Tab (For Doctors) */}
-              {user.roleId === 4 && (
+              {userObj.roleId === 1004 && (
                 <TabsContent value="specialization">
                   <Card>
                     <CardHeader>
@@ -315,11 +318,11 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {doctor ? (
+                      {doctorObj ? (
                         <div className="space-y-4">
                           <div>
                             <h3 className="font-medium">Primary Specialization</h3>
-                            <p className="mt-1">{doctor.specialization}</p>
+                            <p className="mt-1">{doctorObj.specialization}</p>
                           </div>
                           
                           <div>
@@ -350,7 +353,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
               )}
               
               {/* Medical Tab (For Patients) */}
-              {user.roleId === 3 && (
+              {userObj.roleId === 1003 && (
                 <TabsContent value="medical">
                   <Card>
                     <CardHeader>
@@ -360,17 +363,17 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {patient ? (
+                      {patientObj ? (
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
                               <p className="text-sm font-medium text-muted-foreground">Allergies</p>
-                              <p>{patient.allergies || 'None reported'}</p>
+                              <p>{patientObj.allergies || 'None reported'}</p>
                             </div>
                             
                             <div className="space-y-1">
                               <p className="text-sm font-medium text-muted-foreground">Chronic Conditions</p>
-                              <p>{patient.chronicConditions || 'None reported'}</p>
+                              <p>{patientObj.chronicConditions || 'None reported'}</p>
                             </div>
                           </div>
                           
@@ -398,7 +401,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
               )}
               
               {/* Appointments Tab (For Staff) */}
-              {user.roleId === 2 && (
+              {userObj.roleId === 1001 && (
                 <TabsContent value="appointments">
                   <Card>
                     <CardHeader>

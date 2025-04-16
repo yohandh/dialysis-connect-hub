@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "@/hooks/useAuth";
 
 // Public Website Routes
 import Index from "./pages/Index";
@@ -38,8 +39,10 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminEducation from "./pages/admin/AdminEducation";
 import AdminNotifications from "./pages/admin/AdminNotifications";
 import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
+import AdminAudit from "./pages/admin/AdminAudit";
 import AdminReports from "./pages/admin/AdminReports";
 import AdminAccountSettings from "./pages/admin/AdminAccountSettings";
+
 
 // Resources Pages
 import UserGuide from "./pages/resources/UserGuide";
@@ -56,9 +59,10 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <Toaster />
-        <Sonner />
-        <Routes>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Index />} />
           <Route path="/centers" element={<Centers />} />
@@ -97,11 +101,13 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/centers" element={<AdminCenters />} />
-          <Route path="/admin/center/:id" element={<AdminCenterDetails />} />
+          <Route path="/admin/centers/:id" element={<AdminCenterDetails />} />
           <Route path="/admin/notifications" element={<AdminNotifications />} />
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/education" element={<AdminEducation />} />
+          <Route path="/admin/audit" element={<AdminAudit />} />
           <Route path="/admin/audit-logs" element={<AdminAuditLogs />} />
+
           <Route path="/admin/account-settings" element={<AdminAccountSettings />} />
           
           {/* Resource Routes */}
@@ -113,6 +119,7 @@ function App() {
           {/* 404 Page */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </AuthProvider>
       </Router>
     </QueryClientProvider>
   );

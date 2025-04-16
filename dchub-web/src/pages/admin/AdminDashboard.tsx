@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   CalendarIcon, 
@@ -7,6 +6,10 @@ import {
   Building2, 
   Users, 
   BookOpen, 
+  LayoutDashboard,
+  FileBarChart2,
+  Bell,
+  ClipboardList
 } from "lucide-react";
 import PortalLayout from "@/components/layouts/PortalLayout";
 import { patients, users, centers, doctors } from '@/data/adminMockData';
@@ -72,11 +75,13 @@ const AdminDashboard = () => {
     <PortalLayout
       portalName="Admin Portal"
       navLinks={[
-        { name: "Dashboard", path: "/admin/dashboard" },
-        { name: "Centers", path: "/admin/centers" },
-        { name: "Users", path: "/admin/users" },
+        { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
+        { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
+        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
+        { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
-        { name: "Reports", path: "/admin/reports" },
+        { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
       userName="Michael Adams"
       userRole="System Administrator"
