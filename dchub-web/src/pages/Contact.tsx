@@ -31,7 +31,7 @@ const Contact = () => {
                 <div className="flex items-center">
                   <Phone className="h-5 w-5 text-medical-blue mr-2" />
                   <div>
-                    <p className="text-gray-600">94-11-242-2335</p>
+                    <p className="text-gray-600">(94) 11 242 2335</p>
                   </div>
                 </div>
                 
@@ -62,7 +62,7 @@ const Contact = () => {
               <CardContent className="space-y-4">
                 <div>
                   <h3 className="font-medium text-medical-blue">Emergency Support</h3>
-                  <p className="text-gray-600">Call our 24/7 hotline: 94-11-242-2335</p>
+                  <p className="text-gray-600">Call our 24/7 hotline: (94) 11 242 2335</p>
                 </div>
                 
                 <div>

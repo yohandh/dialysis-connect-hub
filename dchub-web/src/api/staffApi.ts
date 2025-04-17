@@ -1,11 +1,12 @@
-import { appointments } from "@/data/appointmentData";
+import { useMockApi, apiCall } from "@/config/api.config";
+import { appointments, Appointment } from "@/data/appointmentData";
 import { patients, PatientRecord } from "@/data/patientData";
 import { users } from "@/data/userData";
-import { dialysisCenters, DialysisCenter } from "@/data/centerData";
-import { useMockApi, apiCall } from "@/config/api.config";
+import { dialysisCenters } from "@/data/centerData";
+import { DialysisCenter } from "@/types/centerTypes";
 import { getUserById, normalizeUser } from "@/data/userData";
-import { Appointment } from "@/data/appointmentData";
 import { getUserFirstName, getUserLastName } from "@/utils/userUtils";
+import { getScheduleSessionsByCenterAndDate, convertScheduleSessionsToAppointments } from "@/data/scheduleSessionData";
 
 // Types
 export interface DialogysisSession {
@@ -243,7 +244,7 @@ export const createAppointmentSlot = async (data: CreateAppointmentSlotRequest):
         date: data.date,
         startTime: data.startTime,
         endTime: data.endTime,
-        status: data.patientId ? 'booked' : 'available',
+        status: data.patientId ? 'scheduled' : 'scheduled',
         type: data.type
       };
       
@@ -269,7 +270,7 @@ export interface UpdateAppointmentRequest {
   startTime?: string;
   endTime?: string;
   type?: 'dialysis' | 'consultation' | 'checkup';
-  status?: 'booked' | 'canceled' | 'completed' | 'available';
+  status?: 'scheduled' | 'in-progress' | 'completed' | 'cancelled' | 'no-show';
   notes?: string;
 }
 
@@ -280,9 +281,24 @@ export const updateAppointment = async (data: UpdateAppointmentRequest): Promise
       const index = appointments.findIndex(a => a.id === data.id);
       if (index === -1) throw new Error("Appointment not found");
       
+      // Convert any non-standard status to a valid Appointment status
+      let appointmentStatus: Appointment['status'] = 'scheduled';
+      if (data.status) {
+        if (data.status === 'completed' || data.status === 'scheduled' || 
+            data.status === 'in-progress' || data.status === 'cancelled' || 
+            data.status === 'no-show') {
+          appointmentStatus = data.status;
+        } else if (data.status === 'booked') {
+          appointmentStatus = 'scheduled';
+        } else if (data.status === 'canceled') {
+          appointmentStatus = 'cancelled';
+        }
+      }
+      
       const updatedAppointment = {
         ...appointments[index],
-        ...data
+        ...data,
+        status: appointmentStatus
       };
       
       appointments[index] = updatedAppointment;
@@ -329,14 +345,14 @@ export const bookAppointmentForPatient = async (appointmentId: string, patientId
       const index = appointments.findIndex(a => a.id === appointmentId);
       if (index === -1) throw new Error("Appointment not found");
       
-      if (appointments[index].status !== 'available') {
+      if (appointments[index].status !== 'scheduled') {
         throw new Error("Appointment is not available");
       }
       
-      const updatedAppointment = {
+      const updatedAppointment: Appointment = {
         ...appointments[index],
         patientId,
-        status: 'booked' as const
+        status: 'scheduled' // Use 'scheduled' instead of 'booked'
       };
       
       appointments[index] = updatedAppointment;
@@ -361,9 +377,9 @@ export const cancelAppointment = async (appointmentId: string): Promise<Appointm
       const index = appointments.findIndex(a => a.id === appointmentId);
       if (index === -1) throw new Error("Appointment not found");
       
-      const updatedAppointment = {
+      const updatedAppointment: Appointment = {
         ...appointments[index],
-        status: 'canceled' as const
+        status: 'cancelled' // Use 'cancelled' instead of 'canceled'
       };
       
       appointments[index] = updatedAppointment;
@@ -387,7 +403,7 @@ export const completeAppointment = async (appointmentId: string): Promise<Appoin
       const index = appointments.findIndex(a => a.id === appointmentId);
       if (index === -1) throw new Error("Appointment not found");
       
-      const updatedAppointment = {
+      const updatedAppointment: Appointment = {
         ...appointments[index],
         status: 'completed' as const
       };
@@ -513,11 +529,29 @@ export const getAvailableTimeSlots = async (centerId: string, date: string): Pro
   try {
     if (useMockApi()) {
       await new Promise(resolve => setTimeout(resolve, API_DELAY));
-      return appointments.filter(apt => 
-        apt.centerId === centerId && 
-        apt.date === date && 
-        apt.status === 'available'
-      );
+      
+      console.log(`Fetching schedule sessions for center ${centerId} and date ${date}`);
+      
+      // Get schedule sessions from the schedule_sessions table
+      const scheduleSessions = getScheduleSessionsByCenterAndDate(centerId, date);
+      console.log(`Found ${scheduleSessions.length} schedule sessions`);
+      
+      // Convert schedule sessions to appointments format
+      const availableSlots = convertScheduleSessionsToAppointments(scheduleSessions);
+      console.log(`Converted to ${availableSlots.length} available slots`);
+      
+      // If no schedule sessions are found, fall back to the appointments data
+      if (availableSlots.length === 0) {
+        console.log(`No schedule sessions found, falling back to appointments data`);
+        return appointments.filter(apt => 
+          apt.centerId === centerId && 
+          apt.date === date && 
+          apt.status === 'scheduled' && 
+          apt.patientId === null
+        );
+      }
+      
+      return availableSlots;
     } else {
       return await apiCall<Appointment[]>(`/centers/${centerId}/available-slots?date=${date}`);
     }

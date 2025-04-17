@@ -27,14 +27,14 @@ const PatientEducation = () => {
   
   return (
     <PatientPortalLayout>
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold tracking-tight mb-6">CKD Education</h1>
+      <div className="space-y-6 bg-blue-50 p-6 rounded-lg">
+        <h1 className="text-3xl font-bold tracking-tight text-medical-blue">CKD Education</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Select CKD Stage</CardTitle>
+            <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+              <CardHeader className="border-b border-blue-100">
+                <CardTitle className="text-medical-blue">Select CKD Stage</CardTitle>
                 <CardDescription>
                   Choose a stage to view relevant education materials.
                 </CardDescription>
@@ -44,7 +44,7 @@ const PatientEducation = () => {
                   <button
                     key={stage}
                     className={`w-full py-2 px-4 rounded-md text-sm font-medium 
-                                ${selectedStage === stage ? 'bg-secondary text-secondary-foreground hover:bg-secondary/80' : 'bg-muted hover:bg-muted/80'}`}
+                                ${selectedStage === stage ? 'bg-medical-blue text-white hover:bg-medical-blue/90' : 'bg-blue-50 text-medical-blue hover:bg-blue-100'}`}
                     onClick={() => handleStageChange(stage)}
                   >
                     Stage {stage}
@@ -57,18 +57,18 @@ const PatientEducation = () => {
           <div className="md:col-span-3">
             {educationContent.length > 0 ? (
               <Tabs defaultValue={educationContent[0].id}>
-                <TabsList>
+                <TabsList className="bg-medical-blue/10">
                   {educationContent.map(content => (
-                    <TabsTrigger key={content.id} value={content.id}>
+                    <TabsTrigger key={content.id} value={content.id} className="data-[state=active]:bg-medical-blue data-[state=active]:text-white">
                       {content.title}
                     </TabsTrigger>
                   ))}
                 </TabsList>
                 {educationContent.map(content => (
                   <TabsContent key={content.id} value={content.id}>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>{content.title}</CardTitle>
+                    <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+                      <CardHeader className="border-b border-blue-100">
+                        <CardTitle className="text-medical-blue">{content.title}</CardTitle>
                         <CardDescription>{content.summary}</CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -83,7 +83,10 @@ const PatientEducation = () => {
                 ))}
               </Tabs>
             ) : (
-              <Card>
+              <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+                <CardHeader className="border-b border-blue-100">
+                  <CardTitle className="text-medical-blue">Stage {selectedStage} Content</CardTitle>
+                </CardHeader>
                 <CardContent className="text-center py-8">
                   <p className="text-gray-500">No education content available for Stage {selectedStage}.</p>
                 </CardContent>

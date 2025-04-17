@@ -51,7 +51,7 @@ export const emailTemplates = {
             <li>Consider bringing something to keep you occupied during treatment (book, tablet, etc.).</li>
           </ul>
           
-          <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:94-11-242-2335">94-11-242-2335</a> or reply to this email.</p>
+          <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:(94) 11 242 2335">(94) 11 242 2335</a> or reply to this email.</p>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
             <p style="color: #666;">Best regards,</p>
@@ -106,7 +106,7 @@ export const emailTemplates = {
             <li>Stay hydrated according to your doctor's recommendations</li>
           </ul>
           
-          <p>If you need to reschedule, please contact us as soon as possible at <a href="tel:94-11-242-2335">94-11-242-2335</a>.</p>
+          <p>If you need to reschedule, please contact us as soon as possible at <a href="tel:(94) 11 242 2335">(94) 11 242 2335</a>.</p>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
             <p style="color: #666;">Best regards,</p>
@@ -150,7 +150,7 @@ export const emailTemplates = {
             <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
           </div>
           
-          <p>If you did not request this cancellation or would like to reschedule, please contact our scheduling department at <a href="tel:94-11-242-2335">94-11-242-2335</a> as soon as possible.</p>
+          <p>If you did not request this cancellation or would like to reschedule, please contact our scheduling department at <a href="tel:(94) 11 242 2335">(94) 11 242 2335</a> as soon as possible.</p>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
             <p style="color: #666;">Best regards,</p>
@@ -217,7 +217,7 @@ export const emailTemplates = {
             ${bedCode ? `<p><strong>Bed/Machine:</strong> ${bedCode}</p>` : ''}
           </div>
           
-          <p>If this new schedule doesn't work for you, please contact us as soon as possible at <a href="tel:94-11-242-2335">94-11-242-2335</a> to discuss alternatives.</p>
+          <p>If this new schedule doesn't work for you, please contact us as soon as possible at <a href="tel:(94) 11 242 2335">(94) 11 242 2335</a> to discuss alternatives.</p>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
             <p style="color: #666;">Best regards,</p>

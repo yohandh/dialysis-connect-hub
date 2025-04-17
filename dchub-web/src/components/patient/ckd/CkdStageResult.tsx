@@ -22,11 +22,11 @@ const CkdStageResult: React.FC<CkdStageResultProps> = ({ stage, stageInfo }) => 
   
   return (
     <div className="space-y-6">
-      <Card className={`border-l-4 border-l-kidney-stage-${stageInfo.stage}`}>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+      <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+        <CardHeader className="border-b border-blue-100">
+          <CardTitle className="flex items-center justify-between text-medical-blue">
             <span>CKD Stage {stageInfo.stage}: {stageInfo.name}</span>
-            <Badge className={`kidney-stage-${stageInfo.stage} text-xs px-3 py-1 rounded-full font-medium`}>
+            <Badge className="bg-medical-blue/10 text-medical-blue border-medical-blue text-xs px-3 py-1 rounded-full font-medium">
               Stage {stageInfo.stage}
             </Badge>
           </CardTitle>
@@ -39,27 +39,27 @@ const CkdStageResult: React.FC<CkdStageResultProps> = ({ stage, stageInfo }) => 
             <p>{stageInfo.description}</p>
             
             <div>
-              <h4 className="font-medium mb-2">Recommended Actions:</h4>
+              <h4 className="font-medium mb-2 text-medical-blue">Recommended Actions:</h4>
               <ul className="space-y-2">
                 <li className="flex items-center space-x-2">
-                  <div className="bg-blue-100 p-1 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-medical-blue/20 p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-medical-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <span>Regular check-ups with your nephrologist</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <div className="bg-blue-100 p-1 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-medical-blue/20 p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-medical-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
                   <span>Follow dietary and lifestyle recommendations</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <div className="bg-blue-100 p-1 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="bg-medical-blue/20 p-1 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-medical-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
@@ -72,7 +72,7 @@ const CkdStageResult: React.FC<CkdStageResultProps> = ({ stage, stageInfo }) => 
         <CardFooter>
           <Button 
             onClick={toggleDetailedRecommendations} 
-            className="w-full flex items-center justify-center"
+            className="w-full flex items-center justify-center bg-medical-blue text-white hover:bg-medical-blue/90"
             variant="default"
           >
             {showDetailedRecommendations ? (
@@ -85,25 +85,25 @@ const CkdStageResult: React.FC<CkdStageResultProps> = ({ stage, stageInfo }) => 
       </Card>
       
       {showDetailedRecommendations && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Detailed Recommendations for Stage {stageInfo.stage}</CardTitle>
+        <Card className="mt-6 border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+          <CardHeader className="border-b border-blue-100">
+            <CardTitle className="text-medical-blue">Detailed Recommendations for Stage {stageInfo.stage}</CardTitle>
             <CardDescription>
               These recommendations are tailored for your CKD stage. Always consult with your healthcare provider.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="diet" onValueChange={(v) => setActiveTab(v as 'diet' | 'lifestyle' | 'monitoring')}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="diet">Diet</TabsTrigger>
-                <TabsTrigger value="lifestyle">Lifestyle</TabsTrigger>
-                <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
+              <TabsList className="grid grid-cols-3 w-full bg-medical-blue/10">
+                <TabsTrigger value="diet" onClick={() => setActiveTab('diet')} className="data-[state=active]:bg-medical-blue data-[state=active]:text-white">Diet</TabsTrigger>
+                <TabsTrigger value="lifestyle" onClick={() => setActiveTab('lifestyle')} className="data-[state=active]:bg-medical-blue data-[state=active]:text-white">Lifestyle</TabsTrigger>
+                <TabsTrigger value="monitoring" onClick={() => setActiveTab('monitoring')} className="data-[state=active]:bg-medical-blue data-[state=active]:text-white">Monitoring</TabsTrigger>
               </TabsList>
               
               <TabsContent value="diet" className="pt-6">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium mb-2">Diet Recommendations</h3>
+                    <h3 className="text-lg font-medium mb-2 text-medical-blue">Diet Recommendations</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       Following these dietary guidelines can help manage your kidney disease and improve your overall health.
                     </p>
@@ -112,7 +112,7 @@ const CkdStageResult: React.FC<CkdStageResultProps> = ({ stage, stageInfo }) => 
                       {stageInfo.recommendations.diet.map((item, index) => (
                         <li key={index} className="flex items-start space-x-3">
                           <div className="bg-blue-100 p-1 rounded-full mt-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-medical-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                           </div>
@@ -127,7 +127,7 @@ const CkdStageResult: React.FC<CkdStageResultProps> = ({ stage, stageInfo }) => 
               <TabsContent value="lifestyle" className="pt-6">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium mb-2">Lifestyle Recommendations</h3>
+                    <h3 className="text-lg font-medium mb-2 text-medical-blue">Lifestyle Recommendations</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       These lifestyle changes can help slow the progression of kidney disease.
                     </p>
@@ -151,7 +151,7 @@ const CkdStageResult: React.FC<CkdStageResultProps> = ({ stage, stageInfo }) => 
               <TabsContent value="monitoring" className="pt-6">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium mb-2">Monitoring Recommendations</h3>
+                    <h3 className="text-lg font-medium mb-2 text-medical-blue">Monitoring Recommendations</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       Regular monitoring is important to track your kidney function and adjust treatment as needed.
                     </p>

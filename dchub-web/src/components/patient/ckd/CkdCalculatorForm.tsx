@@ -109,18 +109,18 @@ const CkdCalculatorForm: React.FC<CkdCalculatorFormProps> = ({ onCalculate, refe
   };
   
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Calculate Your CKD Stage</CardTitle>
+    <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+      <CardHeader className="border-b border-blue-100">
+        <CardTitle className="text-medical-blue">Calculate Your CKD Stage</CardTitle>
         <CardDescription>
           Enter your lab values to determine your current CKD stage
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="egfr" onValueChange={(v) => setCalculationMethod(v as 'egfr' | 'creatinine')}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="egfr">Using eGFR</TabsTrigger>
-            <TabsTrigger value="creatinine">Using Creatinine</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-medical-blue/10">
+            <TabsTrigger value="egfr" className="data-[state=active]:bg-medical-blue data-[state=active]:text-white">Using eGFR</TabsTrigger>
+            <TabsTrigger value="creatinine" className="data-[state=active]:bg-medical-blue data-[state=active]:text-white">Using Creatinine</TabsTrigger>
           </TabsList>
           
           <TabsContent value="egfr" className="space-y-4 mt-4">
@@ -183,7 +183,7 @@ const CkdCalculatorForm: React.FC<CkdCalculatorFormProps> = ({ onCalculate, refe
         
         <Button 
           onClick={handleCalculate}
-          className="w-full mt-6"
+          className="w-full mt-6 bg-medical-blue text-white hover:bg-medical-blue/90"
           disabled={addCkdRecordMutation.isPending}
         >
           {addCkdRecordMutation.isPending ? "Calculating..." : "Calculate CKD Stage"}
