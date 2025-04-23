@@ -20,6 +20,8 @@ import StaffAccountSettings from "./pages/staff/StaffAccountSettings";
 
 // Patient Portal Routes
 import PatientLogin from "./pages/patient/PatientLogin";
+import PatientRegister from "./pages/patient/PatientRegister";
+import PatientVerifyEmail from "./pages/patient/PatientVerifyEmail";
 import PatientDashboard from "./pages/patient/PatientDashboard";
 import PatientCalendar from "./pages/patient/PatientCalendar";
 import PatientBook from "./pages/patient/PatientBook";
@@ -76,6 +78,8 @@ function App() {
           
           {/* Patient Portal Routes */}
           <Route path="/patient/login" element={<PatientLogin />} />
+          <Route path="/patient/register" element={<PatientRegister />} />
+          <Route path="/patient/verify-email" element={<PatientVerifyEmail />} />
           <Route path="/patient/dashboard" element={<PatientDashboard />} />
           <Route path="/patient/calendar" element={<PatientCalendar />} />
           <Route path="/patient/book" element={<PatientBook />} />

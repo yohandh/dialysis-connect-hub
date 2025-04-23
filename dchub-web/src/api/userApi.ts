@@ -142,24 +142,66 @@ export const createUser = async (data: CreateUserRequest): Promise<UserResponse>
     let newDoctor: Doctor | undefined;
     let newStaff: Staff | undefined;
     
-    if (data.roleId === 1003) { // Patient
-      const patientResponse = await axios.post('/api/patients', {
-        userId: newUser.id,
-        gender: data.gender,
-        dob: data.dob,
-        address: data.address,
-        bloodGroup: data.bloodGroup,
-        emergencyContactNo: data.emergencyContactNo,
-        emergencyContact: data.emergencyContact,
-        insuranceProvider: data.insuranceProvider,
-        allergies: data.allergies,
-        chronicConditions: data.chronicConditions,
-      }, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`
+    // Check if the response already includes patient data (created by the backend)
+    if (newUser.patient) {
+      console.log('Patient record already created by the backend:', newUser.patient);
+      newPatient = newUser.patient;
+    }
+    // Only create patient record if not already created by the backend
+    else if (data.roleId === 1003) { // Patient
+      // Debug log to see what we're getting from the server
+      console.log('User creation response:', newUser);
+      
+      // Check if we have a user ID from the response
+      if (!newUser || !newUser.id) {
+        console.error('Error: No user ID returned from user creation');
+        throw new Error('Failed to create patient: No user ID available');
+      }
+      
+      // Ensure userId is a number
+      const userId = typeof newUser.id === 'string' ? parseInt(newUser.id, 10) : newUser.id;
+      
+      // Debug log for the userId
+      console.log('Using userId for patient creation:', userId);
+      
+      try {
+        // Create the patient with the user ID
+        const patientData = {
+          userId: userId,
+          gender: data.gender,
+          dob: data.dob,
+          address: data.address,
+          bloodGroup: data.bloodGroup,
+          emergencyContactNo: data.emergencyContactNo,
+          emergencyContact: data.emergencyContact,
+          insuranceProvider: data.insuranceProvider,
+          allergies: data.allergies,
+          chronicConditions: data.chronicConditions,
+        };
+        
+        console.log('Sending patient data:', patientData);
+        
+        const patientResponse = await axios.post('/api/patients', patientData, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        newPatient = patientResponse.data;
+      } catch (error: any) {
+        // If the error is that the patient record already exists, just fetch the existing record
+        if (error.response?.data?.message?.includes('Patient record already exists')) {
+          console.log('Patient record already exists, fetching existing record');
+          const patientFetchResponse = await axios.get(`/api/patients/by-user/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('authToken')}`
+            }
+          });
+          newPatient = patientFetchResponse.data;
+        } else {
+          // For other errors, rethrow
+          throw error;
         }
-      });
-      newPatient = patientResponse.data;
+      }
     } else if (data.roleId === 1002) { // Doctor
       const doctorResponse = await axios.post('/api/doctors', {
         userId: newUser.id,

@@ -18,4 +18,7 @@ router.post('/register', [
   body('mobileNo').notEmpty().withMessage('Mobile number is required')
 ], authController.register);
 
+// Verify email
+router.get('/verify-email/:token', authController.verifyEmail);
+
 module.exports = router;
