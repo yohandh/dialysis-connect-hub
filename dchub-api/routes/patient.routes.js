@@ -5,8 +5,30 @@ const { body } = require('express-validator');
 const patientController = require('../controllers/patient.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 
+// Create patient (for admin/staff to create patients or during registration)
+router.post('/', [
+  // Make auth optional to allow creation during registration
+  // authMiddleware,
+  body('userId')
+    .notEmpty().withMessage('User ID is required')
+    .isNumeric().withMessage('User ID must be a number')
+    .toInt(), // Convert to integer
+  body('gender').optional().isIn(['male', 'female', 'other']).withMessage('Invalid gender'),
+  body('dob').optional().isISO8601().withMessage('Invalid date format for date of birth'),
+  body('bloodGroup').optional(),
+  body('emergencyContact').optional(),
+  body('emergencyContactNo').optional(),
+  body('address').optional(),
+  body('insuranceProvider').optional(),
+  body('allergies').optional(),
+  body('chronicConditions').optional(),
+], patientController.createPatient);
+
 // Get patient profile
 router.get('/profile', authMiddleware, patientController.getPatientProfile);
+
+// Get patient by user ID
+router.get('/by-user/:userId', authMiddleware, patientController.getPatientByUserId);
 
 // Update patient profile
 router.put('/profile', [

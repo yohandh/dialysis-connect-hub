@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,8 +9,23 @@ import { toast } from '@/components/ui/use-toast';
 
 const PatientLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  
+  // Check for success message from registration in sessionStorage
+  useEffect(() => {
+    const successMessage = sessionStorage.getItem('registrationSuccess');
+    if (successMessage) {
+      toast({
+        title: "Success",
+        description: successMessage,
+      });
+      
+      // Clear the message from sessionStorage
+      sessionStorage.removeItem('registrationSuccess');
+    }
+  }, []);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,6 +96,12 @@ const PatientLogin = () => {
           </CardFooter>
         </form>
         <div className="px-8 pb-6 text-center">
+          <p className="mt-4 text-sm">
+            Don't have an account?{" "}
+            <Link to="/patient/register" className="text-medical-blue hover:underline">
+              Register here
+            </Link>
+          </p>
           <p className="mt-4 text-xs text-gray-500">
             Patient portal is secure and HIPAA compliant
           </p>

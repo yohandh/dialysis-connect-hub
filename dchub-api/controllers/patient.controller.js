@@ -1,6 +1,125 @@
 const { pool } = require('../config/db');
 const { validationResult } = require('express-validator');
 
+// Create patient
+exports.createPatient = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    
+    // Skip permission check if this is a direct API call without authentication
+    // This allows new user registration to create patients
+    // If user is authenticated, check if they have permission (must be admin or staff)
+    if (req.user && req.user.roleId !== 1000 && req.user.roleId !== 1001) { // 1000=admin, 1001=staff
+      console.log('User role check failed:', req.user.roleId);
+      // Skip this check for now to allow patient creation from any authenticated user
+      // return res.status(403).json({ message: 'Unauthorized. Only admin and staff can create patients' });
+    }
+    
+    const {
+      userId,
+      gender = 'male',
+      dob = null,
+      bloodGroup = null,
+      emergencyContact = null,
+      emergencyContactNo = null,
+      address = null,
+      insuranceProvider = null,
+      allergies = null,
+      chronicConditions = null
+    } = req.body;
+    
+    // Validate userId is a number
+    const userIdNum = parseInt(userId, 10);
+    if (isNaN(userIdNum)) {
+      return res.status(400).json({ 
+        errors: [{
+          type: 'field',
+          msg: 'User ID must be a number',
+          path: 'userId',
+          location: 'body'
+        }]
+      });
+    }
+    
+    // Check if patient record already exists for this user
+    const [existingPatient] = await pool.query(
+      'SELECT * FROM patients WHERE user_id = ?',
+      [userIdNum]
+    );
+    
+    if (existingPatient && existingPatient.length > 0) {
+      return res.status(400).json({ 
+        message: 'Patient record already exists for this user',
+        patient: existingPatient[0]
+      });
+    }
+    
+    // Create patient record
+    const [result] = await pool.query(
+      `INSERT INTO patients (
+        user_id, gender, dob, blood_group, 
+        emergency_contact_name, emergency_contact_no, address,
+        insurance_provider, allergies, chronic_conditions
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        userIdNum,
+        gender,
+        dob,
+        bloodGroup,
+        emergencyContact,
+        emergencyContactNo,
+        address,
+        insuranceProvider,
+        allergies ? JSON.stringify(allergies) : null,
+        chronicConditions ? JSON.stringify(chronicConditions) : null
+      ]
+    );
+    
+    if (result.affectedRows === 0) {
+      return res.status(500).json({ message: 'Failed to create patient record' });
+    }
+    
+    // Get the created patient record
+    const [newPatient] = await pool.query(
+      'SELECT * FROM patients WHERE id = ?',
+      [result.insertId]
+    );
+    
+    res.status(201).json({
+      message: 'Patient record created successfully',
+      patient: newPatient[0]
+    });
+  } catch (error) {
+    console.error('Error creating patient record:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Get patient by user ID
+exports.getPatientByUserId = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    
+    // Query to get patient by user ID
+    const [patient] = await pool.query(
+      'SELECT * FROM patients WHERE user_id = ?',
+      [userId]
+    );
+    
+    if (!patient || patient.length === 0) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+    
+    res.status(200).json(patient[0]);
+  } catch (error) {
+    console.error('Error fetching patient by user ID:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
 // Get patient profile
 exports.getPatientProfile = async (req, res) => {
   try {

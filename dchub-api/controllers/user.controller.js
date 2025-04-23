@@ -268,81 +268,19 @@ exports.createUser = async (req, res) => {
         [userId]
       );
       
-      // Prepare response
-      const response = {
-        user: {
-          id: newUser[0].id,
-          name: `${newUser[0].first_name || ''} ${newUser[0].last_name || ''}`.trim(),
-          email: newUser[0].email,
-          mobileNo: newUser[0].mobile_no,
-          roleId: newUser[0].role_id,
-          roleName: capitalizeFirstLetter(newUser[0].role_name),
-          status: newUser[0].is_active ? 'Active' : 'Inactive',
-          lastLogin: newUser[0].last_login_at
-        }
+      // Format response - simplified to just return the user ID and basic info
+      const userResponse = {
+        id: userId, 
+        name: `${newUser[0].first_name || ''} ${newUser[0].last_name || ''}`.trim(),
+        email: newUser[0].email,
+        mobileNo: newUser[0].mobile_no,
+        roleId: newUser[0].role_id,
+        roleName: capitalizeFirstLetter(newUser[0].role_name),
+        status: newUser[0].is_active ? 'active' : 'inactive'
       };
       
-      // If user is a patient, get patient details
-      if (roleId === 1003) {
-        const [patientResult] = await pool.query(
-          `SELECT * FROM patients WHERE user_id = ?`,
-          [userId]
-        );
-        
-        if (patientResult && patientResult.length > 0) {
-          response.patient = {
-            id: patientResult[0].id,
-            userId: patientResult[0].user_id,
-            gender: patientResult[0].gender,
-            dob: patientResult[0].dob,
-            address: patientResult[0].address,
-            bloodGroup: patientResult[0].blood_group,
-            emergencyContactNo: patientResult[0].emergency_contact_no,
-            emergencyContact: patientResult[0].emergency_contact_name,
-            insuranceProvider: patientResult[0].insurance_provider,
-            allergies: patientResult[0].allergies,
-            chronicConditions: patientResult[0].chronic_conditions
-          };
-        }
-      }
-      
-      // If user is a doctor, get doctor details
-      if (roleId === 1002) {
-        const [doctorResult] = await pool.query(
-          `SELECT * FROM doctors WHERE user_id = ?`,
-          [userId]
-        );
-        
-        if (doctorResult && doctorResult.length > 0) {
-          response.doctor = {
-            id: doctorResult[0].id,
-            userId: doctorResult[0].user_id,
-            gender: doctorResult[0].gender,
-            specialization: doctorResult[0].specialization,
-            address: doctorResult[0].address,
-            emergencyContactNo: doctorResult[0].emergency_contact_no
-          };
-        }
-      }
-      
-      // If user is a staff, get staff details
-      if (roleId === 1001) {
-        const [staffResult] = await pool.query(
-          `SELECT * FROM staff WHERE user_id = ?`,
-          [userId]
-        );
-        
-        if (staffResult && staffResult.length > 0) {
-          response.staff = {
-            id: staffResult[0].id,
-            userId: staffResult[0].user_id,
-            gender: staffResult[0].gender,
-            designation: staffResult[0].designation
-          };
-        }
-      }
-      
-      res.status(201).json(response);
+      console.log('Created user with ID:', userId);
+      res.status(201).json(userResponse);
     } catch (error) {
       // Rollback the transaction in case of error
       await connection.rollback();
