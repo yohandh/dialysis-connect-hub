@@ -8,7 +8,7 @@ export const dialysisCenters: DialysisCenter[] = [
     name: "The National Institute For Nephrology Dialysis & Transplantation",
     address: "Colombo",
     contactNo: "011-200-0000",
-    email: "national.center@dialysis.org",
+    email: "national.center@dialyzeease.org",
     totalCapacity: 10,
     isActive: true,
     centerHours: {
@@ -26,7 +26,7 @@ export const dialysisCenters: DialysisCenter[] = [
     name: "Nawaloka",
     address: "Colombo",
     contactNo: "011-200-0001",
-    email: "nawaloka@dialysis.org",
+    email: "nawaloka@dialyzeease.org",
     totalCapacity: 10,
     isActive: true,
     centerHours: {
@@ -44,7 +44,7 @@ export const dialysisCenters: DialysisCenter[] = [
     name: "Asiri Surgical",
     address: "Colombo",
     contactNo: "94-11-452-4400",
-    email: "asiri.surgical@dchub.org",
+    email: "asiri.surgical@dialyzeease.org",
     totalCapacity: 10,
     isActive: true,
     centerHours: {
@@ -62,7 +62,7 @@ export const dialysisCenters: DialysisCenter[] = [
     name: "Kings Hospital",
     address: "Colombo",
     contactNo: "011-200-0003",
-    email: "kingshospital@dialysis.org",
+    email: "kingshospital@dialyzeease.org",
     totalCapacity: 10,
     isActive: true,
     centerHours: {
@@ -80,7 +80,7 @@ export const dialysisCenters: DialysisCenter[] = [
     name: "Lanka Hospital",
     address: "Colombo",
     contactNo: "011-200-0004",
-    email: "lankahospital@dialysis.org",
+    email: "lankahospital@dialyzeease.org",
     totalCapacity: 10,
     isActive: true,
     centerHours: {

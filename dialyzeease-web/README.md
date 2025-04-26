@@ -1,11 +1,11 @@
-# Dialysis Connect Hub - Frontend
+# DialyzeEase - Frontend
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![React](https://img.shields.io/badge/React-18.3.1-61dafb)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)
 ![Vite](https://img.shields.io/badge/Vite-5.x-646cff)
 
-The frontend web application for Dialysis Connect Hub, a comprehensive platform connecting dialysis patients with healthcare providers.
+The frontend web application for DialyzeEase, a comprehensive platform connecting dialysis patients with healthcare providers.
 
 ## Features
 
@@ -41,8 +41,8 @@ The frontend web application for Dialysis Connect Hub, a comprehensive platform 
 If you're only working with the frontend:
 
 ```bash
-git clone https://github.com/yourusername/DialysisConnectHub.git
-cd DialysisConnectHub/dchub-web
+git clone https://github.com/yourusername/DialyzeEase.git
+cd DialyzeEase/dialyzeease-web
 ```
 
 ### 2. Install Dependencies
@@ -82,7 +82,7 @@ npm run preview
 ## Project Structure
 
 ```
-dchub-web/
+dialyzeease-web/
 ├── public/              # Static assets
 ├── src/
 │   ├── api/             # API service functions
@@ -144,5 +144,5 @@ This project is licensed under the MIT License - see the LICENSE file in the roo
 
 ## Related Projects
 
-- [dchub-api](../dchub-api) - Backend API server
-- [dchub-app](../dchub-app) - Mobile application (future development)
+- [dialyzeease-api](../dialyzeease-api) - Backend API server
+- [dialyzeease-app](../dialyzeease-app) - Mobile application (future development)

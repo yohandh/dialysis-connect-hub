@@ -19,7 +19,7 @@ This is the backend API server for the DiaCare dialysis center management system
 
 1. Navigate to the backend directory:
 ```bash
-cd dchub-api
+cd dialyzeease-api
 ```
 
 2. Install dependencies:
@@ -42,7 +42,7 @@ CLIENT_URL=http://localhost:8080
 
 2. Initialize the database with sample data (optional):
 ```bash
-node ../dchub-scripts/db/init-db.js
+node ../dialyzeease-scripts/db/init-db.js
 ```
 
 ## Running the Server

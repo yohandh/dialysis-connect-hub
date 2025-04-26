@@ -1,5 +1,5 @@
 // Script to activate a user account
-const { pool } = require('./dchub-api/config/db');
+const { pool } = require('./dialyzeease-api/config/db');
 
 async function activateUser(email) {
   try {
@@ -41,5 +41,5 @@ async function activateUser(email) {
 }
 
 // Get email from command line argument or use a default admin email
-const email = process.argv[2] || 'admin@dialysisconnecthub.com';
+const email = process.argv[2] || 'admin@dialyzeease.com';
 activateUser(email);

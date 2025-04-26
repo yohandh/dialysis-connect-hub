@@ -21,13 +21,13 @@ DiaCare is a comprehensive dialysis center management system designed to streaml
 
 ## Prerequisites
 - Node.js 18+ and npm/yarn
-- Backend API service running (see dchub-api README)
+- Backend API service running (see dialyzeease-api README)
 
 ## Installation
 
 1. Navigate to the frontend directory:
 ```bash
-cd dchub-web
+cd dialyzeease-web
 ```
 
 2. Install dependencies:

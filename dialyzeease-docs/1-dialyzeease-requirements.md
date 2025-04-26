@@ -1,10 +1,10 @@
-Here's a complete, clear, and professional description of our project — **Dialysis Connect Hub** — including its **purpose** and categorized **feature list** for Admin, Staff, Patient, and General access.
+Here's a complete, clear, and professional description of our project — **DialyzeEase** — including its **purpose** and categorized **feature list** for Admin, Staff, Patient, and General access.
 
 ---
 
-## 🩺 **Dialysis Connect Hub – Project Overview**
+## 🩺 **DialyzeEase – Project Overview**
 
-**Dialysis Connect Hub** is a secure, multi-role web platform designed to manage dialysis treatment appointments, track patient CKD history, and provide personalized educational resources for individuals suffering from Chronic Kidney Disease (CKD). The system is built for dialysis centers, hospital staff, nephrologists, and patients to interact through a streamlined digital experience.
+**DialyzeEase** is a secure, multi-role web platform designed to manage dialysis treatment appointments, track patient CKD history, and provide personalized educational resources for individuals suffering from Chronic Kidney Disease (CKD). The system is built for dialysis centers, hospital staff, nephrologists, and patients to interact through a streamlined digital experience.
 
 It improves operational efficiency, patient engagement, and data integrity while complying with medical data privacy best practices.
 

@@ -1,4 +1,4 @@
-**Complete list of features** for the **Admin Portal** in the **Dialysis Connect Hub** system — designed specifically for administrative users to manage operations, users, and configurations without accessing private health records.
+**Complete list of features** for the **Admin Portal** in the **DialyzeEase** system — designed specifically for administrative users to manage operations, users, and configurations without accessing private health records.
 
 ---
 

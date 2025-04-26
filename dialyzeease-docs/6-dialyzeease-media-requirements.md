@@ -1,4 +1,4 @@
-For **Dialysis Connect Hub** website — especially since it’s for **Sri Lankan users** — using culturally relevant and locally resonant images and names will make the platform feel more trusted, approachable, and inclusive.
+For **DialyzeEase** website — especially since it’s for **Sri Lankan users** — using culturally relevant and locally resonant images and names will make the platform feel more trusted, approachable, and inclusive.
 
 Here’s a practical guide:
 

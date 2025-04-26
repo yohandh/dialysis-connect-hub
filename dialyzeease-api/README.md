@@ -1,11 +1,11 @@
-# Dialysis Connect Hub - Backend API
+# DialyzeEase - Backend API
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Node.js](https://img.shields.io/badge/Node.js-18.x-339933)
 ![Express](https://img.shields.io/badge/Express-4.18.2-000000)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1)
 
-The backend API server for Dialysis Connect Hub, providing RESTful endpoints for patient management, appointment scheduling, user authentication, and dialysis center operations.
+The backend API server for DialyzeEase, providing RESTful endpoints for patient management, appointment scheduling, user authentication, and dialysis center operations.
 
 ## Features
 
@@ -41,8 +41,8 @@ The backend API server for Dialysis Connect Hub, providing RESTful endpoints for
 If you're only working with the backend:
 
 ```bash
-git clone https://github.com/yourusername/DialysisConnectHub.git
-cd DialysisConnectHub/dchub-api
+git clone https://github.com/yourusername/DialyzeEase.git
+cd DialyzeEase/dialyzeease-api
 ```
 
 ### 2. Install Dependencies
@@ -110,7 +110,7 @@ npm start
 ## Project Structure
 
 ```
-dchub-api/
+dialyzeease-api/
 ├── config/             # Configuration files
 ├── controllers/        # Request handlers
 ├── middleware/         # Express middleware

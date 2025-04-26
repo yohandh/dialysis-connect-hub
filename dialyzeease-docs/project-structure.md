@@ -1,18 +1,18 @@
 
-# Dialysis Connect Hub - Project Structure
+# DialyzeEase - Project Structure
 
 ## Monorepo Structure
 ```
 dialysis-connect-hub/
-├── dchub-web/         # React frontend
-├── dchub-api/         # Node.js backend
-├── dchub-scripts/     # DB + DevOps scripts
-├── dchub-docs/        # Documentation
+├── dialyzeease-web/         # React frontend
+├── dialyzeease-api/         # Node.js backend
+├── dialyzeease-scripts/     # DB + DevOps scripts
+├── dialyzeease-docs/        # Documentation
 ```
 
-## Frontend Structure (dchub-web)
+## Frontend Structure (dialyzeease-web)
 ```
-dchub-web/
+dialyzeease-web/
 ├── public/                     # Static assets
 ├── src/                        # Frontend code
 │   ├── api/                    # API service functions
@@ -29,9 +29,9 @@ dchub-web/
 └── package.json                # Frontend dependencies
 ```
 
-## Backend Structure (dchub-api)
+## Backend Structure (dialyzeease-api)
 ```
-dchub-api/
+dialyzeease-api/
 ├── controllers/                # API controllers
 ├── middleware/                 # Express middleware
 ├── models/                     # MongoDB models
@@ -42,9 +42,9 @@ dchub-api/
 └── package.json                # Backend dependencies
 ```
 
-## Scripts Structure (dchub-scripts)
+## Scripts Structure (dialyzeease-scripts)
 ```
-dchub-scripts/
+dialyzeease-scripts/
 ├── db/                         # Database scripts
 │   ├── init-db.js              # Database initialization script
 │   └── sampleData/             # Sample data for database initialization
@@ -52,9 +52,9 @@ dchub-scripts/
 └── README.md                   # Documentation for scripts
 ```
 
-## Documentation Structure (dchub-docs)
+## Documentation Structure (dialyzeease-docs)
 ```
-dchub-docs/
+dialyzeease-docs/
 ├── api/                        # API documentation
 ├── database/                   # Database documentation
 │   └── schema.md               # Database schema documentation

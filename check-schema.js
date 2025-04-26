@@ -1,5 +1,5 @@
 // Script to check database schema
-const { pool } = require('./dchub-api/config/db');
+const { pool } = require('./dialyzeease-api/config/db');
 
 async function checkSchema() {
   try {

@@ -1,5 +1,5 @@
 
-📌 Build the **Admin Portal UI** for **Dialysis Connect Hub** using the provided database schema.
+📌 Build the **Admin Portal UI** for **DialyzeEase** using the provided database schema.
 
 This portal is designed for administrative users to manage users, dialysis centers, appointment slots, assignments, and education material. The admin should have access to all features but must adhere to privacy rules (e.g., no access to sensitive health data directly).
 

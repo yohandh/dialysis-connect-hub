@@ -1,4 +1,4 @@
-**Full list of features** for the **Patient Portal** in the **Dialysis Connect Hub**. This interface is designed to empower CKD patients with easy appointment access, health tracking, and personalized education — all while maintaining data security and simplicity.
+**Full list of features** for the **Patient Portal** in the **DialyzeEase**. This interface is designed to empower CKD patients with easy appointment access, health tracking, and personalized education — all while maintaining data security and simplicity.
 
 ---
 

@@ -95,29 +95,29 @@ const sendConfirmationEmail = async (email, name, verificationToken) => {
 
     // Send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"Dialysis Connect Hub" <noreply@dialysisconnecthub.com>',
+      from: '"DialyzeEase" <noreply@dialyzeease.com>',
       to: email,
-      subject: 'Welcome to Dialysis Connect Hub - Verify Your Email',
-      text: `Hello ${name},\n\nThank you for registering with Dialysis Connect Hub. Please verify your email by clicking on the following link:\n\n${verificationUrl}\n\nThis link will expire in 24 hours.\n\nIf you did not register for Dialysis Connect Hub, please ignore this email.\n\nBest regards,\nThe Dialysis Connect Hub Team`,
+      subject: 'Welcome to DialyzeEase - Verify Your Email',
+      text: `Hello ${name},\n\nThank you for registering with DialyzeEase. Please verify your email by clicking on the following link:\n\n${verificationUrl}\n\nThis link will expire in 24 hours.\n\nIf you did not register for DialyzeEase, please ignore this email.\n\nBest regards,\nThe DialyzeEase Team`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
           <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://dialysisconnecthub.com/logo.png" alt="Dialysis Connect Hub Logo" style="max-width: 150px;">
+            <img src="https://dialyzeease.com/logo.png" alt="DialyzeEase Logo" style="max-width: 150px;">
           </div>
-          <h2 style="color: #3b82f6; text-align: center;">Welcome to Dialysis Connect Hub!</h2>
+          <h2 style="color: #3b82f6; text-align: center;">Welcome to DialyzeEase!</h2>
           <p>Hello ${name},</p>
-          <p>Thank you for registering with Dialysis Connect Hub. To complete your registration and access our services, please verify your email address by clicking the button below:</p>
+          <p>Thank you for registering with DialyzeEase. To complete your registration and access our services, please verify your email address by clicking the button below:</p>
           <div style="text-align: center; margin: 30px 0;">
             <a href="${verificationUrl}" style="background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Verify Email Address</a>
           </div>
           <p>If the button doesn't work, you can also copy and paste the following link into your browser:</p>
           <p style="word-break: break-all; background-color: #f3f4f6; padding: 10px; border-radius: 4px;">${verificationUrl}</p>
           <p>This link will expire in 24 hours.</p>
-          <p>If you did not register for Dialysis Connect Hub, please ignore this email.</p>
-          <p>Best regards,<br>The Dialysis Connect Hub Team</p>
+          <p>If you did not register for DialyzeEase, please ignore this email.</p>
+          <p>Best regards,<br>The DialyzeEase Team</p>
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 12px; color: #6b7280;">
             <p>This is an automated email. Please do not reply to this message.</p>
-            <p>&copy; ${new Date().getFullYear()} Dialysis Connect Hub. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} DialyzeEase. All rights reserved.</p>
           </div>
         </div>
       `

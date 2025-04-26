@@ -1,7 +1,7 @@
 /**
- * MariaDB Initialization Script for DialysisConnectHub
+ * MariaDB Initialization Script for DialyzeEase
  * 
- * This script initializes the MariaDB database for the DialysisConnectHub application.
+ * This script initializes the MariaDB database for the DialyzeEase application.
  * It creates a user, database, and grants necessary privileges.
  * It also executes the SQL schema file to create the database tables.
  */
@@ -21,12 +21,12 @@ const config = {
 };
 
 // Database user and credentials
-const DB_USER = 'dc_hub';
-const DB_PASSWORD = 'DC-Hu2';
-const DB_NAME = 'dc_hub';
+const DB_USER = 'dialyzeease';
+const DB_PASSWORD = 'D91lyz5_E1s5'
+const DB_NAME = 'dialyzeease';
 
 // Path to schema file
-const schemaFilePath = path.join(__dirname, 'dchub_db_schema_v1.7.sql');
+const schemaFilePath = path.join(__dirname, 'dialyzeease_db_schema_v1.8.sql');
 
 async function initializeDatabase() {
   let connection;

@@ -1,5 +1,5 @@
 /**
- * Email Service for Dialysis Connect Hub
+ * Email Service for DialyzeEase
  * Handles sending emails using Nodemailer with Gmail
  */
 const nodemailer = require('nodemailer');
@@ -67,7 +67,7 @@ const sendNotificationEmail = async (notification, recipientEmail) => {
           <h2 style="color: #3b82f6;">${notification.title}</h2>
           <p style="font-size: 16px; line-height: 1.5;">${notification.message}</p>
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-            <p style="color: #6b7280; font-size: 14px;">This is an automated message from Dialysis Connect Hub. Please do not reply to this email.</p>
+            <p style="color: #6b7280; font-size: 14px;">This is an automated message from DialyzeEase. Please do not reply to this email.</p>
           </div>
         </div>
       `

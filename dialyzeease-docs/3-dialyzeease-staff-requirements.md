@@ -1,4 +1,4 @@
-**Comprehensive breakdown of the Staff Portal Features** in **Dialysis Connect Hub**, tailored for center-assigned medical staff such as nurses, front-desk personnel, or dialysis technicians.
+**Comprehensive breakdown of the Staff Portal Features** in **DialyzeEase**, tailored for center-assigned medical staff such as nurses, front-desk personnel, or dialysis technicians.
 
 These features are scoped based on center assignment and exclude patient-sensitive clinical data unless relevant to appointment management.
 

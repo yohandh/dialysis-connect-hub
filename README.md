@@ -1,4 +1,4 @@
-# Dialysis Connect Hub
+# DialyzeEase
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -10,14 +10,14 @@ A comprehensive platform connecting dialysis patients with healthcare providers,
 
 ## Project Overview
 
-Dialysis Connect Hub is a monorepo containing multiple interconnected applications:
+DialyzeEase is a monorepo containing multiple interconnected applications:
 
-- **dchub-web**: React frontend application
-- **dchub-api**: Node.js backend API
-- **dchub-scripts**: Database and DevOps scripts
-- **dchub-docs**: Project documentation
-- **dchub-app**: Mobile application (future development)
-- **dchub-protocol**: Communication protocol definitions (future development)
+- **dialyzeease-web**: React frontend application
+- **dialyzeease-api**: Node.js backend API
+- **dialyzeease-scripts**: Database and DevOps scripts
+- **dialyzeease-docs**: Project documentation
+- **dialyzeease-app**: Mobile application (future development)
+- **dialyzeease-protocol**: Communication protocol definitions (future development)
 
 ## Key Features
 
@@ -47,7 +47,7 @@ Dialysis Connect Hub is a monorepo containing multiple interconnected applicatio
 
 ```
 dialysis-connect-hub/
-├── dchub-web/         # React frontend
+├── dialyzeease-web/         # React frontend
 │   ├── public/        # Static assets
 │   ├── src/           # Frontend code
 │   │   ├── api/       # API service functions
@@ -63,7 +63,7 @@ dialysis-connect-hub/
 │   │   └── main.tsx   # Entry point
 │   └── package.json   # Frontend dependencies
 │
-├── dchub-api/         # Node.js backend
+├── dialyzeease-api/         # Node.js backend
 │   ├── config/        # Backend configuration
 │   ├── controllers/   # API controllers
 │   ├── middleware/    # Express middleware
@@ -73,10 +73,10 @@ dialysis-connect-hub/
 │   ├── server.js      # Server entry point
 │   └── package.json   # Backend dependencies
 │
-├── dchub-scripts/     # DB + DevOps scripts
+├── dialyzeease-scripts/     # DB + DevOps scripts
 │   └── *.sql          # Database schema files
 │
-└── dchub-docs/        # Documentation
+└── dialyzeease-docs/        # Documentation
     ├── api/           # API documentation
     ├── database/      # Database documentation
     ├── user-guides/   # User guides
@@ -105,14 +105,14 @@ dialysis-connect-hub/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/DialysisConnectHub.git
-cd DialysisConnectHub
+git clone https://github.com/yourusername/DialyzeEase.git
+cd DialyzeEase
 ```
 
-### 2. Backend Setup (dchub-api)
+### 2. Backend Setup (dialyzeease-api)
 
 ```bash
-cd dchub-api
+cd dialyzeease-api
 npm install
 
 # Create .env file with your configuration
@@ -136,24 +136,24 @@ CLIENT_URL=http://localhost:8080
 Initialize the database:
 
 ```bash
-# Make sure you're in the dchub-api directory
-cd dchub-api
+# Make sure you're in the dialyzeease-api directory
+cd dialyzeease-api
 npm run init-db
 ```
 
 Start the backend server:
 
 ```bash
-cd dchub-api
+cd dialyzeease-api
 npm start
 ```
 
 The backend API will be available at http://localhost:5000.
 
-### 3. Frontend Setup (dchub-web)
+### 3. Frontend Setup (dialyzeease-web)
 
 ```bash
-cd dchub-web
+cd dialyzeease-web
 npm install
 ```
 
@@ -167,7 +167,7 @@ The frontend application will be available at http://localhost:8080.
 
 ## API Documentation
 
-The API documentation is available in the `dchub-docs/api` directory. Key endpoints include:
+The API documentation is available in the `dialyzeease-docs/api` directory. Key endpoints include:
 
 ### Health Check
 ```
@@ -228,7 +228,7 @@ DELETE /api/users/:id
 
 ## Database Schema
 
-The database schema is documented in `dchub-docs/database/schema.md`. The main tables include:
+The database schema is documented in `dialyzeease-docs/database/schema.md`. The main tables include:
 
 - `users` - User accounts and authentication
 - `patients` - Patient profiles and medical information
@@ -243,15 +243,15 @@ The database schema is documented in `dchub-docs/database/schema.md`. The main t
 
 ```
 dialysis-connect-hub/
-├── dchub-web/         # React frontend
-├── dchub-api/         # Node.js backend
-├── dchub-scripts/     # DB + DevOps scripts
-├── dchub-docs/        # Documentation
-├── dchub-app/         # Mobile app (future)
-└── dchub-protocol/    # Protocol definitions (future)
+├── dialyzeease-web/         # React frontend
+├── dialyzeease-api/         # Node.js backend
+├── dialyzeease-scripts/     # DB + DevOps scripts
+├── dialyzeease-docs/        # Documentation
+├── dialyzeease-app/         # Mobile app (future)
+└── dialyzeease-protocol/    # Protocol definitions (future)
 ```
 
-### Frontend Structure (dchub-web)
+### Frontend Structure (dialyzeease-web)
 
 - `public/` - Static assets
 - `src/` - Frontend code
@@ -267,7 +267,7 @@ dialysis-connect-hub/
   - `App.tsx` - Main app component
   - `main.tsx` - Entry point
 
-### Backend Structure (dchub-api)
+### Backend Structure (dialyzeease-api)
 
 - `controllers/` - API controllers
 - `middleware/` - Express middleware
@@ -282,7 +282,7 @@ dialysis-connect-hub/
 ### Backend Deployment
 
 ```bash
-cd dchub-api
+cd dialyzeease-api
 npm run build
 npm run start:prod
 ```
@@ -290,7 +290,7 @@ npm run start:prod
 ### Frontend Deployment
 
 ```bash
-cd dchub-web
+cd dialyzeease-web
 npm run build
 ```
 
@@ -301,14 +301,14 @@ The built files will be in the `dist` directory, which can be deployed to any st
 ### Backend Tests
 
 ```bash
-cd dchub-api
+cd dialyzeease-api
 npm test
 ```
 
 ### Frontend Tests
 
 ```bash
-cd dchub-web
+cd dialyzeease-web
 npm test
 ```
 
@@ -326,4 +326,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-Project Link: [https://github.com/yourusername/DialysisConnectHub](https://github.com/yourusername/DialysisConnectHub)
+Project Link: [https://github.com/yourusername/DialyzeEase](https://github.com/yourusername/DialyzeEase)

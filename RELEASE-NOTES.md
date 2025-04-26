@@ -1,8 +1,8 @@
-# Release Notes - Dialysis Connect Hub v1.0.0
+# Release Notes - DialyzeEase v1.0.0
 
 ## Overview
 
-We're excited to announce the initial release of Dialysis Connect Hub, a comprehensive platform designed to connect dialysis patients with healthcare providers. This release includes a fully functional web application with both patient and healthcare provider portals, backed by a robust MySQL database and RESTful API.
+We're excited to announce the initial release of DialyzeEase, a comprehensive platform designed to connect dialysis patients with healthcare providers. This release includes a fully functional web application with both patient and healthcare provider portals, backed by a robust MySQL database and RESTful API.
 
 ## Key Features
 
@@ -41,7 +41,7 @@ Please refer to the [README.md](./README.md) file for detailed installation and 
 
 ## Known Issues
 
-- The mobile application (dchub-app) is still under development and will be included in a future release
+- The mobile application (dialyzeease-app) is still under development and will be included in a future release
 - Some advanced reporting features are planned for upcoming releases
 - Internationalization support is limited in this initial release
 
@@ -62,8 +62,8 @@ Please refer to the [README.md](./README.md) file for detailed installation and 
 
 ## Feedback
 
-We welcome your feedback and suggestions for improving Dialysis Connect Hub. Please submit issues and feature requests through our GitHub repository.
+We welcome your feedback and suggestions for improving DialyzeEase. Please submit issues and feature requests through our GitHub repository.
 
 ---
 
-Thank you for using Dialysis Connect Hub! We're committed to improving kidney care through technology.
+Thank you for using DialyzeEase! We're committed to improving kidney care through technology.
