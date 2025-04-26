@@ -65,9 +65,9 @@ Edit the `.env` file with your database credentials and other configuration:
 PORT=5000
 DB_HOST=localhost
 DB_PORT=3306
-DB_USER=dc_hub
-DB_PASSWORD=DC-Hu2
-DB_NAME=dc_hub
+DB_USER=dialyzeease
+DB_PASSWORD=D91lyz5_E1s5
+DB_NAME=dialyzeease
 JWT_SECRET=your_secure_secret_key_change_this
 NODE_ENV=development
 CLIENT_URL=http://localhost:8080
@@ -165,9 +165,9 @@ GET  /api/auth/profile  # Get current user profile
 | PORT | Port to run the server on | 5000 |
 | DB_HOST | MySQL/MariaDB host | localhost |
 | DB_PORT | MySQL/MariaDB port | 3306 |
-| DB_USER | MySQL/MariaDB username | dc_hub |
-| DB_PASSWORD | MySQL/MariaDB password | DC-Hu2 |
-| DB_NAME | MySQL/MariaDB database name | dc_hub |
+| DB_USER | MySQL/MariaDB username | dialyzeease |
+| DB_PASSWORD | MySQL/MariaDB password | D91lyz5_E1s5 |
+| DB_NAME | MySQL/MariaDB database name | dialyzeease |
 | JWT_SECRET | Secret for signing JWT tokens | (required) |
 | NODE_ENV | Environment (development/production) | development |
 | CLIENT_URL | Frontend application URL | http://localhost:8080 |

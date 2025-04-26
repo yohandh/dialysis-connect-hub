@@ -8,9 +8,9 @@ require('dotenv').config();
 const dbConfig = {
   host: process.env.DB_HOST || 'localhost',
   port: process.env.DB_PORT || 3306,
-  user: process.env.DB_USER || 'dc_hub',
-  password: process.env.DB_PASSWORD || 'DC-Hu2',
-  database: process.env.DB_NAME || 'dc_hub',
+  user: process.env.DB_USER || 'dialyzeease',
+  password: process.env.DB_PASSWORD || 'D91lyz5_E1s5',
+  database: process.env.DB_NAME || 'dialyzeease',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

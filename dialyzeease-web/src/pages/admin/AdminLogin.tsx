@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/components/ui/use-toast';
+import { toast, success, error, warning, info } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { loginUser } from '@/api/authApi';
 
@@ -19,10 +19,9 @@ const AdminLogin = () => {
     e.preventDefault();
     
     if (!email || !password) {
-      toast({
+      error({
         title: "Login Failed",
         description: "Please enter both email and password.",
-        variant: "destructive",
       });
       return;
     }
@@ -45,7 +44,7 @@ const AdminLogin = () => {
           role: roleId
         });
         
-        toast({
+        success({
           title: "Login Successful",
           description: `Welcome to the ${getRoleName(roleId)} Portal.`,
         });
@@ -53,18 +52,16 @@ const AdminLogin = () => {
         // Redirect based on role
         redirectBasedOnRole(roleId);
       } else {
-        toast({
+        error({
           title: "Login Failed",
           description: "Invalid credentials. Please check your email and password.",
-          variant: "destructive",
         });
       }
-    } catch (error: any) {
-      console.error('Login error:', error);
-      toast({
+    } catch (err: any) {
+      console.error('Login error:', err);
+      error({
         title: "Login Failed",
-        description: error.response?.data?.message || "Authentication failed. Please check your credentials.",
-        variant: "destructive",
+        description: err.response?.data?.message || "Authentication failed. Please check your credentials.",
       });
     } finally {
       setIsLoading(false);
@@ -105,7 +102,7 @@ const AdminLogin = () => {
   
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md shadow-lg border border-red-600">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
             <div className="bg-red-600 rounded-full p-3">
@@ -126,7 +123,7 @@ const AdminLogin = () => {
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="your.name@email.com"
+                placeholder="Enter your email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
@@ -142,6 +139,7 @@ const AdminLogin = () => {
               <Input 
                 id="password" 
                 type="password" 
+                placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}

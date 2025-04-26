@@ -1,3 +1,21 @@
+-- Local host
+
+-- CREATE USER 'dialyzeease'@'localhost' IDENTIFIED VIA mysql_native_password USING 'D91lyz5_E1s5';
+
+-- GRANT USAGE ON *.* TO 'dialyzeease'@'localhost' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
+
+-- GRANT ALL PRIVILEGES ON `dialyzeease`.* TO 'dialyzeease'@'localhost' WITH GRANT OPTION;
+
+-- Any host
+
+-- CREATE USER 'dialyzeease'@'%' IDENTIFIED VIA mysql_native_password USING 'D91lyz5_E1s5';
+
+-- GRANT USAGE ON *.* TO 'dialyzeease'@'%' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0;
+
+-- GRANT ALL PRIVILEGES ON `dialyzeease`.* TO 'dialyzeease'@'%' WITH GRANT OPTION;
+
+-- FLUSH PRIVILEGES;
+
 -- ROLES TABLE
 CREATE TABLE roles (
   id INT PRIMARY KEY AUTO_INCREMENT,

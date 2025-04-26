@@ -125,9 +125,9 @@ Edit the `.env` file with your database credentials and other configuration:
 PORT=5000
 DB_HOST=localhost
 DB_PORT=3306
-DB_USER=dc_hub
-DB_PASSWORD=DC-Hu2
-DB_NAME=dc_hub
+DB_USER=dialyzeease
+DB_PASSWORD=D91lyz5_E1s5
+DB_NAME=dialyzeease
 JWT_SECRET=your_jwt_secret_here
 NODE_ENV=development
 CLIENT_URL=http://localhost:8080

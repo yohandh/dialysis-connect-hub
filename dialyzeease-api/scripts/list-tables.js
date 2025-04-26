@@ -1,5 +1,5 @@
 /**
- * Script to list all tables in the dc_hub database
+ * Script to list all tables in the dialyzeease database
  */
 const { pool } = require('../config/db');
 

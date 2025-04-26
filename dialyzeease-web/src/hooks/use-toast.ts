@@ -5,14 +5,15 @@ import type {
   ToastProps,
 } from "@/components/ui/toast"
 
-const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_LIMIT = 5
+const TOAST_REMOVE_DELAY = 5000 // 5 seconds auto-dismiss
 
 type ToasterToast = ToastProps & {
   id: string
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  variant?: "default" | "success" | "error" | "warning" | "info"
 }
 
 const actionTypes = {
@@ -161,6 +162,11 @@ function toast({ ...props }: Toast) {
     },
   })
 
+  // Auto-dismiss after TOAST_REMOVE_DELAY
+  setTimeout(() => {
+    dismiss()
+  }, TOAST_REMOVE_DELAY)
+
   return {
     id: id,
     dismiss,
@@ -188,4 +194,10 @@ function useToast() {
   }
 }
 
-export { useToast, toast }
+// Helper functions for different toast types
+const success = (props: Omit<Toast, "variant">) => toast({ ...props, variant: "success" })
+const error = (props: Omit<Toast, "variant">) => toast({ ...props, variant: "error" })
+const warning = (props: Omit<Toast, "variant">) => toast({ ...props, variant: "warning" })
+const info = (props: Omit<Toast, "variant">) => toast({ ...props, variant: "info" })
+
+export { useToast, toast, success, error, warning, info }

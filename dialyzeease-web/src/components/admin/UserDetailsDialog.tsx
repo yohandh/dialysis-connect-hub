@@ -1,8 +1,9 @@
 import React from 'react';
+import { ROLES } from '@/constants/roles';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserById } from '@/api/userApi';
 import { format } from 'date-fns';
-import { UserCog, Calendar, Building2, MapPin, Phone, Mail, HeartPulse, AlertCircle, FileText, Award, Users } from 'lucide-react';
+import { UserCog, Calendar, Building2, MapPin, User, Mail, Phone, HeartPulse, AlertCircle, FileText, Award, Users } from 'lucide-react';
 
 import {
   Dialog,
@@ -35,10 +36,10 @@ interface UserDetailsDialogProps {
 
 const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, userId }) => {
   // Fetch user details
-  const { 
+  const {
     data: userData,
     isLoading,
-    error 
+    error
   } = useQuery({
     queryKey: ['user', userId],
     queryFn: () => userId ? fetchUserById(userId) : null,
@@ -58,15 +59,34 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
   };
 
   // Get role badge variant
-  const getRoleBadgeVariant = (roleId: number): "default" | "secondary" | "outline" | "destructive" => {
+
+  const getRoleBadgeVariant = (roleId: number): string => {
     switch (roleId) {
-      case 1001: return "destructive"; // Admin
-      case 1002: return "secondary";   // Staff
-      case 1003: return "outline";     // Patient
-      case 1004: return "default";     // Doctor
-      default: return "outline";
+      case ROLES.ADMIN.id:
+        return "bg-red-100 text-red-600";   // Admin - light red
+      case ROLES.STAFF.id:
+        return "bg-purple-100 text-purple-600"; // Staff - light purple
+      case ROLES.DOCTOR.id:
+        return "bg-blue-100 text-blue-600";  // Doctor - light blue
+      case ROLES.PATIENT.id:
+        return "bg-green-100 text-green-600"; // Patient - light green
+      default:
+        return "bg-gray-100 text-gray-600";   // Others - light gray
     }
   };
+
+  const getStatusBadgeVariant = (status: string): string => {
+    switch (status.toLowerCase()) {
+      case 'active':
+        return "bg-green-100 text-green-600";   // Active - light green
+      case 'inactive':
+        return "bg-gray-100 text-gray-600";   // Inactive - light gray
+      default:
+        return "bg-gray-100 text-gray-600";   // Default - light gray
+    }
+  };
+
+  const ucfirst = (str: string) => str ? str[0].toUpperCase() + str.slice(1) : '';
 
   if (isLoading) {
     return (
@@ -104,38 +124,34 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
         <DialogHeader>
           <DialogTitle className="text-xl">User Details</DialogTitle>
         </DialogHeader>
-
         <div className="flex flex-col md:flex-row items-start gap-6 py-4">
           {/* User Avatar & Basic Info */}
           <div className="flex flex-col items-center space-y-2 w-full md:w-1/3">
             <Avatar className="h-24 w-24">
               <AvatarFallback className="text-2xl">{getInitials(userObj.name)}</AvatarFallback>
             </Avatar>
-            
+
             <h2 className="text-xl font-semibold mt-4">{userObj.name}</h2>
-            
-            <Badge variant={getRoleBadgeVariant(userObj.roleId)} className="mt-1">
+
+            <Badge variant="outline" className={`mt-1 ${getRoleBadgeVariant(userObj.roleId)}`}>
               {userObj.roleName}
             </Badge>
-            
-            <Badge 
-              variant={userObj.status === 'active' ? 'default' : 'outline'}
-              className={userObj.status === 'active' ? 'bg-green-500 hover:bg-green-600 mt-1' : 'mt-1'}
-            >
+
+            <Badge variant="outline" className={`mt-1 ${getStatusBadgeVariant(userObj.status)}`}>
               {userObj.status}
             </Badge>
-
+            <Separator className="my-2" />
             <div className="w-full mt-4 space-y-3">
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
                 <p className="text-sm">{userObj.email}</p>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-muted-foreground" />
                 <p className="text-sm">{userObj.mobileNo}</p>
               </div>
-              
+
               {userObj.lastLogin && (
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -144,60 +160,66 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
               )}
             </div>
           </div>
-          
+
           {/* Tabs with User Details */}
           <div className="w-full md:w-2/3">
             <Tabs defaultValue="profile" className="w-full">
-              <TabsList className="grid grid-cols-3">
-                <TabsTrigger value="profile">Profile</TabsTrigger>
-                <TabsTrigger value="centers">Assigned Centers</TabsTrigger>
-                {userObj.roleId === 1004 && <TabsTrigger value="specialization">Specialization</TabsTrigger>}
-                {userObj.roleId === 1003 && <TabsTrigger value="medical">Medical Info</TabsTrigger>}
-                {userObj.roleId === 1001 && <TabsTrigger value="appointments">Appointments</TabsTrigger>}
-              </TabsList>
-              
+              {userObj.roleId !== ROLES.ADMIN.id ? (
+                <TabsList className="grid grid-cols-3">
+                  <TabsTrigger value="profile">Profile</TabsTrigger>
+                  <TabsTrigger value="centers">Assigned Centers</TabsTrigger>
+                  {userObj.roleId === ROLES.DOCTOR.id && <TabsTrigger value="specialization">Specialization</TabsTrigger>}
+                  {userObj.roleId === ROLES.PATIENT.id && <TabsTrigger value="medical">Medical Info</TabsTrigger>}
+                  {userObj.roleId === ROLES.STAFF.id && <TabsTrigger value="appointments">Appointments</TabsTrigger>}
+                </TabsList>
+              ) : null}
+
               {/* Profile Tab */}
               <TabsContent value="profile" className="space-y-4">
-                {/* Patient Information */}
-                {userObj.roleId === 1003 && patientObj && (
+                {/* Admin Information */}
+                {userObj.roleId === ROLES.ADMIN.id && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center">
-                        <Users className="h-5 w-5 mr-2" />
-                        Patient Information
+                      <UserCog className="h-5 w-5 mr-2" />
+                        Admin Information
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Gender</p>
-                        <p>{patientObj.gender}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Date of Birth</p>
-                        <p>{patientObj.dob ? format(new Date(patientObj.dob), 'PPP') : 'Not provided'}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Blood Group</p>
-                        <p>{patientObj.bloodGroup || 'Not provided'}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Insurance</p>
-                        <p>{patientObj.insuranceProvider || 'Not provided'}</p>
-                      </div>
-                      <div className="col-span-2 space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Address</p>
-                        <p>{patientObj.address || 'Not provided'}</p>
-                      </div>
-                      <div className="col-span-2 space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Emergency Contact</p>
-                        <p>{patientObj.emergencyContact || 'Not provided'} {patientObj.emergencyContactNo && `(${patientObj.emergencyContactNo})`}</p>
+                        <p className="text-sm font-medium text-muted-foreground">Name</p>
+                        <p>{userObj.name}</p>
                       </div>
                     </CardContent>
                   </Card>
                 )}
-                
+                {/* Staff Information */}
+                {userObj.roleId === ROLES.STAFF.id && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center">
+                        <UserCog className="h-5 w-5 mr-2" />
+                        Staff Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Name</p>
+                        <p>{userObj.name}</p>
+                      </div>                      
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Designation</p>
+                        <p>{staffObj.designation}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Gender</p>
+                        <p>{ucfirst(staffObj.gender)}</p>
+                      </div>                      
+                    </CardContent>
+                  </Card>
+                )}
                 {/* Doctor Information */}
-                {userObj.roleId === 1004 && doctorObj && (
+                {userObj.roleId === ROLES.DOCTOR.id && doctorObj && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center">
@@ -207,108 +229,140 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                     </CardHeader>
                     <CardContent className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Gender</p>
-                        <p>{doctorObj.gender}</p>
+                        <p className="text-sm font-medium text-muted-foreground">Name</p>
+                        <p>{userObj.name}</p>
+                      </div>                      
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Emergency Contact Number</p>
+                        <p>{doctorObj.emergencyContactNo || 'Not provided'}</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Specialization</p>
                         <p>{doctorObj.specialization}</p>
                       </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Gender</p>
+                        <p>{ucfirst(doctorObj.gender)}</p>
+                      </div>
                       <div className="col-span-2 space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Address</p>
                         <p>{doctorObj.address || 'Not provided'}</p>
+                      </div>                                         
+                    </CardContent>
+                  </Card>
+                )}
+                {/* Patient Information */}
+                {userObj.roleId === ROLES.PATIENT.id && patientObj && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center">
+                        <Users className="h-5 w-5 mr-2" />
+                        Patient Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Name</p>
+                        <p>{userObj.name}</p>
                       </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Blood Group</p>
+                        <p>{patientObj.bloodGroup || 'Not provided'}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Allergies</p>
+                        <div className="whitespace-pre-line">
+                          {patientObj.allergies ? patientObj.allergies.split('\n').map((line, i) => (
+                            <p key={i} className="text-sm">{line}</p>
+                          )) : 'Not provided'}
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Chronic Conditions</p>
+                        <div className="whitespace-pre-line">
+                          {patientObj.chronicConditions ? patientObj.chronicConditions.split('\n').map((line, i) => (
+                            <p key={i} className="text-sm">{line}</p>
+                          )) : 'Not provided'}
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Date of Birth</p>
+                        <p>{patientObj.dob ? format(new Date(patientObj.dob), 'PPP') : 'Not provided'}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Emergency Contact</p>
+                        <p>{patientObj.emergencyContact || 'Not provided'} {patientObj.emergencyContactNo && `(${patientObj.emergencyContactNo})`}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Insurance</p>
+                        <p>{patientObj.insuranceProvider || 'Not provided'}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Gender</p>
+                        <p>{ucfirst(patientObj.gender)}</p>
+                      </div>                
                       <div className="col-span-2 space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Emergency Contact Number</p>
-                        <p>{doctorObj.emergencyContactNo || 'Not provided'}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-                
-                {/* Staff Information */}
-                {userObj.roleId === 1001 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center">
-                        <UserCog className="h-5 w-5 mr-2" />
-                        Staff Information
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-muted-foreground">
-                      <p>Additional staff-specific information can be found in the Appointments tab.</p>
-                    </CardContent>
-                  </Card>
-                )}
-                
-                {/* Admin Information */}
-                {userObj.roleId === 1001 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center">
-                        <UserCog className="h-5 w-5 mr-2" />
-                        Admin Information
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-muted-foreground">
-                      <p>Administrator has full access to system functions.</p>
-                      <p className="mt-2">Contact this user for system-level assistance.</p>
+                        <p className="text-sm font-medium text-muted-foreground">Address</p>
+                        <p>{patientObj.address || 'Not provided'}</p>
+                      </div>                      
                     </CardContent>
                   </Card>
                 )}
               </TabsContent>
-              
-              {/* Centers Tab */}
-              <TabsContent value="centers">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg flex items-center">
-                      <Building2 className="h-5 w-5 mr-2" />
-                      Assigned Centers
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {userCenters.length > 0 ? (
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Center Name</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Assigned Date</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {userCenters.map((center) => (
-                            <TableRow key={center.id}>
-                              <TableCell>{center.centerName}</TableCell>
-                              <TableCell>
-                                <Badge variant="outline">{center.assignedRole}</Badge>
-                              </TableCell>
-                              <TableCell>
-                                <Badge 
-                                  variant={center.status === 'active' ? 'default' : 'outline'}
-                                  className={center.status === 'active' ? 'bg-green-500 hover:bg-green-600' : ''}
-                                >
-                                  {center.status}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>{format(new Date(center.assignedAt), 'PP')}</TableCell>
+
+              {/* Centers Tab - Not shown for Admin users */}
+              {userObj.roleId !== ROLES.ADMIN.id ? (
+                <TabsContent value="centers">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center">
+                        <Building2 className="h-5 w-5 mr-2" />
+                        Assigned Centers
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {userCenters.length > 0 ? (
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Center Name</TableHead>
+                              <TableHead>Role</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead>Assigned Date</TableHead>
                             </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    ) : (
-                      <div className="text-center py-4 text-muted-foreground">
-                        <p>This user is not assigned to any centers.</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-              
+                          </TableHeader>
+                          <TableBody>
+                            {userCenters.map((center) => (
+                              <TableRow key={center.id}>
+                                <TableCell>{center.centerName}</TableCell>
+                                <TableCell>
+                                  <Badge variant="outline">{center.assignedRole}</Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge
+                                    variant={center.status === 'active' ? 'default' : 'outline'}
+                                    className={center.status === 'active' ? 'bg-green-500 hover:bg-green-600' : ''}
+                                  >
+                                    {center.status}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>{format(new Date(center.assignedAt), 'PP')}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      ) : (
+                        <div className="text-center py-4 text-muted-foreground">
+                          <p>This user is not assigned to any centers.</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              ) : null}
+
               {/* Specialization Tab (For Doctors) */}
-              {userObj.roleId === 1004 && (
+              {userObj.roleId === ROLES.DOCTOR.id && userObj.roleId !== ROLES.ADMIN.id ? (
                 <TabsContent value="specialization">
                   <Card>
                     <CardHeader>
@@ -324,7 +378,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                             <h3 className="font-medium">Primary Specialization</h3>
                             <p className="mt-1">{doctorObj.specialization}</p>
                           </div>
-                          
+
                           <div>
                             <h3 className="font-medium">Practice Areas</h3>
                             <div className="flex flex-wrap gap-2 mt-2">
@@ -333,7 +387,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                               <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">Kidney Care</Badge>
                             </div>
                           </div>
-                          
+
                           <div>
                             <h3 className="font-medium">Certifications</h3>
                             <ul className="list-disc pl-5 mt-1 space-y-1">
@@ -350,10 +404,10 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                     </CardContent>
                   </Card>
                 </TabsContent>
-              )}
-              
+              ) : null}
+
               {/* Medical Tab (For Patients) */}
-              {userObj.roleId === 1003 && (
+              {userObj.roleId === ROLES.PATIENT.id && userObj.roleId !== ROLES.ADMIN.id ? (
                 <TabsContent value="medical">
                   <Card>
                     <CardHeader>
@@ -370,13 +424,13 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                               <p className="text-sm font-medium text-muted-foreground">Allergies</p>
                               <p>{patientObj.allergies || 'None reported'}</p>
                             </div>
-                            
+
                             <div className="space-y-1">
                               <p className="text-sm font-medium text-muted-foreground">Chronic Conditions</p>
                               <p>{patientObj.chronicConditions || 'None reported'}</p>
                             </div>
                           </div>
-                          
+
                           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                             <div className="flex">
                               <div className="flex-shrink-0">
@@ -398,10 +452,10 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                     </CardContent>
                   </Card>
                 </TabsContent>
-              )}
-              
+              ) : null}
+
               {/* Appointments Tab (For Staff) */}
-              {userObj.roleId === 1001 && (
+              {userObj.roleId === ROLES.STAFF.id && userObj.roleId !== ROLES.ADMIN.id ? (
                 <TabsContent value="appointments">
                   <Card>
                     <CardHeader>
@@ -418,20 +472,20 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                             <p className="text-2xl font-bold text-blue-900">142</p>
                             <p className="text-sm text-blue-600">All time</p>
                           </div>
-                          
+
                           <div className="bg-green-50 p-4 rounded-md">
                             <h3 className="font-medium text-green-800">Completed</h3>
                             <p className="text-2xl font-bold text-green-900">126</p>
                             <p className="text-sm text-green-600">88.7% completion rate</p>
                           </div>
-                          
+
                           <div className="bg-purple-50 p-4 rounded-md">
                             <h3 className="font-medium text-purple-800">Upcoming</h3>
                             <p className="text-2xl font-bold text-purple-900">8</p>
                             <p className="text-sm text-purple-600">Next 7 days</p>
                           </div>
                         </div>
-                        
+
                         <div className="border p-4 rounded-md">
                           <h3 className="font-medium mb-2">Assigned Centers & Shifts</h3>
                           {userCenters.length > 0 ? (
@@ -454,11 +508,11 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                     </CardContent>
                   </Card>
                 </TabsContent>
-              )}
+              ) : null}
             </Tabs>
           </div>
         </div>
-        
+
         <DialogFooter>
           <Button onClick={onClose}>Close</Button>
         </DialogFooter>
