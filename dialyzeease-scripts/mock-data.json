@@ -1,0 +1,601 @@
+{
+  "frontend": {
+    "users": [
+      {
+        "id": "user-001",
+        "email": "john.smith@example.com",
+        "name": "John Smith",
+        "role": "patient",
+        "createdAt": "2023-01-10T08:15:00Z",
+        "lastLogin": "2023-06-20T14:30:00Z"
+      },
+      {
+        "id": "user-002",
+        "email": "maria.rodriguez@example.com",
+        "name": "Maria Rodriguez",
+        "role": "patient",
+        "createdAt": "2023-02-15T10:20:00Z",
+        "lastLogin": "2023-06-18T09:45:00Z"
+      },
+      {
+        "id": "user-003",
+        "email": "robert.johnson@example.com",
+        "name": "Robert Johnson",
+        "role": "patient",
+        "createdAt": "2023-03-05T11:30:00Z",
+        "lastLogin": "2023-06-19T16:10:00Z"
+      },
+      {
+        "id": "user-004",
+        "email": "emily.chen@example.com",
+        "name": "Emily Chen",
+        "role": "patient",
+        "createdAt": "2023-03-20T09:40:00Z",
+        "lastLogin": "2023-06-17T13:25:00Z"
+      },
+      {
+        "id": "staff-001",
+        "email": "sarah.johnson@example.com",
+        "name": "Dr. Sarah Johnson",
+        "role": "staff",
+        "createdAt": "2022-11-15T08:00:00Z",
+        "lastLogin": "2023-06-20T08:30:00Z"
+      },
+      {
+        "id": "staff-002",
+        "email": "david.chen@example.com",
+        "name": "Dr. David Chen",
+        "role": "staff",
+        "createdAt": "2022-10-20T09:15:00Z",
+        "lastLogin": "2023-06-19T10:45:00Z"
+      },
+      {
+        "id": "admin-001",
+        "email": "admin@diacare.com",
+        "name": "Admin User",
+        "role": "admin",
+        "createdAt": "2022-01-01T00:00:00Z",
+        "lastLogin": "2023-06-20T07:15:00Z"
+      }
+    ],
+    "loginCredentials": [
+      {
+        "email": "admin@example.com",
+        "password": "admin123",
+        "role": "admin",
+        "name": "Michael Adams",
+        "userId": "user-007"
+      },
+      {
+        "email": "admin2@example.com",
+        "password": "admin123",
+        "role": "admin",
+        "name": "Jennifer Wilson",
+        "userId": "user-008"
+      },
+      {
+        "email": "staff@example.com",
+        "password": "staff123",
+        "role": "staff",
+        "name": "Sarah Johnson",
+        "userId": "user-005"
+      },
+      {
+        "email": "staff2@example.com",
+        "password": "staff123",
+        "role": "staff",
+        "name": "David Chen",
+        "userId": "user-006"
+      },
+      {
+        "email": "patient@example.com",
+        "password": "patient123",
+        "role": "patient",
+        "name": "John Smith",
+        "userId": "user-001"
+      },
+      {
+        "email": "patient2@example.com",
+        "password": "patient123",
+        "role": "patient",
+        "name": "Maria Rodriguez",
+        "userId": "user-002"
+      }
+    ],
+    "patients": [
+      {
+        "id": "patient-001",
+        "userId": "user-001",
+        "dateOfBirth": "1965-04-15",
+        "gender": "male",
+        "bloodType": "A+",
+        "height": 175,
+        "weight": 82,
+        "primaryNephrologist": "Dr. Sarah Johnson",
+        "diagnosisDate": "2020-03-10",
+        "ckdStage": 4,
+        "dialysisStartDate": "2021-09-15",
+        "accessType": "fistula",
+        "comorbidities": ["Diabetes Type 2", "Hypertension", "Coronary Artery Disease"],
+        "medications": [
+          { "name": "Lisinopril", "dosage": "10mg", "frequency": "once daily" },
+          { "name": "Metformin", "dosage": "500mg", "frequency": "twice daily" },
+          { "name": "Calcitriol", "dosage": "0.25mcg", "frequency": "once daily" }
+        ],
+        "allergies": ["Penicillin"],
+        "emergencyContact": {
+          "name": "Mary Smith",
+          "relationship": "Wife",
+          "phone": "555-234-5678"
+        },
+        "preferredCenter": "center-001"
+      },
+      {
+        "id": "patient-002",
+        "userId": "user-002",
+        "dateOfBirth": "1978-09-23",
+        "gender": "female",
+        "bloodType": "O+",
+        "height": 162,
+        "weight": 65,
+        "primaryNephrologist": "Dr. David Chen",
+        "diagnosisDate": "2019-11-05",
+        "ckdStage": 3,
+        "comorbidities": ["Polycystic Kidney Disease"],
+        "medications": [
+          { "name": "Losartan", "dosage": "50mg", "frequency": "once daily" },
+          { "name": "Sevelamer", "dosage": "800mg", "frequency": "with meals" }
+        ],
+        "allergies": ["Sulfa drugs"],
+        "emergencyContact": {
+          "name": "Carlos Rodriguez",
+          "relationship": "Husband",
+          "phone": "555-876-5432"
+        },
+        "preferredCenter": "center-001"
+      },
+      {
+        "id": "patient-003",
+        "userId": "user-003",
+        "dateOfBirth": "1952-01-30",
+        "gender": "male",
+        "bloodType": "B+",
+        "height": 180,
+        "weight": 79,
+        "primaryNephrologist": "Dr. Patricia Garcia",
+        "diagnosisDate": "2018-06-20",
+        "ckdStage": 5,
+        "dialysisStartDate": "2020-02-10",
+        "accessType": "catheter",
+        "comorbidities": ["Hypertension", "Gout"],
+        "medications": [
+          { "name": "Amlodipine", "dosage": "5mg", "frequency": "once daily" },
+          { "name": "Allopurinol", "dosage": "100mg", "frequency": "once daily" },
+          { "name": "Epoetin alfa", "dosage": "10,000 units", "frequency": "three times weekly" }
+        ],
+        "allergies": [],
+        "emergencyContact": {
+          "name": "Linda Johnson",
+          "relationship": "Daughter",
+          "phone": "555-345-6789"
+        },
+        "preferredCenter": "center-002"
+      },
+      {
+        "id": "patient-004",
+        "userId": "user-004",
+        "dateOfBirth": "1989-07-12",
+        "gender": "female",
+        "bloodType": "AB-",
+        "height": 165,
+        "weight": 58,
+        "primaryNephrologist": "Dr. Thomas Brown",
+        "diagnosisDate": "2021-01-15",
+        "ckdStage": 2,
+        "comorbidities": ["Lupus Nephritis"],
+        "medications": [
+          { "name": "Prednisone", "dosage": "5mg", "frequency": "once daily" },
+          { "name": "Hydroxychloroquine", "dosage": "200mg", "frequency": "twice daily" },
+          { "name": "Calcium carbonate", "dosage": "500mg", "frequency": "twice daily" }
+        ],
+        "allergies": ["Ibuprofen", "Aspirin"],
+        "emergencyContact": {
+          "name": "Wei Chen",
+          "relationship": "Brother",
+          "phone": "555-456-7890"
+        },
+        "preferredCenter": "center-003"
+      }
+    ],
+    "centers": [
+      {
+        "id": "center-001",
+        "name": "Metro Dialysis Center",
+        "address": {
+          "street": "123 Healthcare Blvd",
+          "city": "Metropolis",
+          "state": "NY",
+          "zipCode": "10001"
+        },
+        "phone": "555-111-2222",
+        "email": "contact@metrodialysis.example.com",
+        "capacity": 50,
+        "currentPatients": 42,
+        "type": "Hospital-based",
+        "centerHours": {
+          "monday": "6:00 AM - 9:00 PM",
+          "tuesday": "6:00 AM - 9:00 PM",
+          "wednesday": "6:00 AM - 9:00 PM",
+          "thursday": "6:00 AM - 9:00 PM",
+          "friday": "6:00 AM - 9:00 PM",
+          "saturday": "7:00 AM - 5:00 PM",
+          "sunday": "7:00 AM - 5:00 PM"
+        },
+        "nephrologists": ["Dr. Sarah Johnson", "Dr. David Chen", "Dr. Emma Williams"]
+      },
+      {
+        "id": "center-002",
+        "name": "Central Kidney Care",
+        "address": {
+          "street": "456 Medical Drive",
+          "city": "Centerville",
+          "state": "CA",
+          "zipCode": "90210"
+        },
+        "phone": "555-333-4444",
+        "email": "info@centralkidneycare.example.com",
+        "capacity": 40,
+        "currentPatients": 35,
+        "type": "Independent",
+        "centerHours": {
+          "monday": "7:00 AM - 8:00 PM",
+          "tuesday": "7:00 AM - 8:00 PM",
+          "wednesday": "7:00 AM - 8:00 PM",
+          "thursday": "7:00 AM - 8:00 PM",
+          "friday": "7:00 AM - 8:00 PM",
+          "saturday": "8:00 AM - 4:00 PM",
+          "sunday": "Closed"
+        },
+        "nephrologists": ["Dr. Robert Miller", "Dr. Patricia Garcia", "Dr. James Wilson"]
+      },
+      {
+        "id": "center-003",
+        "name": "Riverside Renal Center",
+        "address": {
+          "street": "789 River Road",
+          "city": "Riverside",
+          "state": "TX",
+          "zipCode": "77001"
+        },
+        "phone": "555-555-6666",
+        "email": "contact@riversiderenal.example.com",
+        "capacity": 35,
+        "currentPatients": 28,
+        "type": "Freestanding",
+        "centerHours": {
+          "monday": "6:30 AM - 7:30 PM",
+          "tuesday": "6:30 AM - 7:30 PM",
+          "wednesday": "6:30 AM - 7:30 PM",
+          "thursday": "6:30 AM - 7:30 PM",
+          "friday": "6:30 AM - 7:30 PM",
+          "saturday": "7:30 AM - 3:30 PM",
+          "sunday": "Closed"
+        },
+        "nephrologists": ["Dr. Thomas Brown", "Dr. Linda Martinez"]
+      },
+      {
+        "id": "center-004",
+        "name": "Highland Dialysis",
+        "address": {
+          "street": "101 Highland Ave",
+          "city": "Highland",
+          "state": "IL",
+          "zipCode": "60035"
+        },
+        "phone": "555-777-8888",
+        "email": "info@highlanddialysis.example.com",
+        "capacity": 25,
+        "currentPatients": 21,
+        "type": "Satellite",
+        "centerHours": {
+          "monday": "7:00 AM - 7:00 PM",
+          "tuesday": "7:00 AM - 7:00 PM",
+          "wednesday": "7:00 AM - 7:00 PM",
+          "thursday": "7:00 AM - 7:00 PM",
+          "friday": "7:00 AM - 7:00 PM",
+          "saturday": "8:00 AM - 3:00 PM",
+          "sunday": "Closed"
+        },
+        "nephrologists": ["Dr. Michael Johnson", "Dr. Susan Lee"]
+      },
+      {
+        "id": "center-005",
+        "name": "Eastside Kidney Center",
+        "address": {
+          "street": "202 East Main Street",
+          "city": "Eastville",
+          "state": "FL",
+          "zipCode": "33101"
+        },
+        "phone": "555-999-0000",
+        "email": "contact@eastsidekidney.example.com",
+        "capacity": 30,
+        "currentPatients": 26,
+        "type": "Hospital-based",
+        "centerHours": {
+          "monday": "6:00 AM - 8:00 PM",
+          "tuesday": "6:00 AM - 8:00 PM",
+          "wednesday": "6:00 AM - 8:00 PM",
+          "thursday": "6:00 AM - 8:00 PM",
+          "friday": "6:00 AM - 8:00 PM",
+          "saturday": "7:00 AM - 5:00 PM",
+          "sunday": "7:00 AM - 12:00 PM"
+        },
+        "nephrologists": ["Dr. Jennifer Adams", "Dr. Richard Taylor", "Dr. Elizabeth Clark"]
+      }
+    ],
+    "appointments": [
+      {
+        "id": "apt-001",
+        "patientId": "user-001",
+        "centerId": "center-001",
+        "date": "2023-06-01",
+        "startTime": "09:00",
+        "endTime": "12:00",
+        "status": "completed",
+        "type": "dialysis",
+        "notes": "Regular session, no complications"
+      },
+      {
+        "id": "apt-002",
+        "patientId": "user-002",
+        "centerId": "center-001",
+        "date": "2023-06-05",
+        "startTime": "13:00",
+        "endTime": "16:00",
+        "status": "booked",
+        "type": "dialysis"
+      },
+      {
+        "id": "apt-003",
+        "patientId": "user-003",
+        "centerId": "center-002",
+        "date": "2023-06-02",
+        "startTime": "10:00",
+        "endTime": "13:00",
+        "status": "canceled",
+        "type": "dialysis",
+        "notes": "Patient requested cancelation due to feeling unwell"
+      },
+      {
+        "id": "apt-004",
+        "patientId": "user-001",
+        "centerId": "center-001",
+        "date": "2023-06-08",
+        "startTime": "09:00",
+        "endTime": "12:00",
+        "status": "booked",
+        "type": "dialysis"
+      },
+      {
+        "id": "apt-005",
+        "patientId": "user-004",
+        "centerId": "center-003",
+        "date": "2023-06-03",
+        "startTime": "14:00",
+        "endTime": "15:00",
+        "status": "completed",
+        "type": "consultation",
+        "notes": "Discussed diet plan changes"
+      }
+    ]
+  },
+  "backend": {
+    "ckdRecords": [
+      {
+        "date": "2023-01-15",
+        "egfr": 42,
+        "creatinine": 1.8,
+        "calculatedStage": 3,
+        "doctorNotes": "Patient showing stable kidney function."
+      },
+      {
+        "date": "2023-03-20",
+        "egfr": 38,
+        "creatinine": 2.1,
+        "calculatedStage": 3,
+        "doctorNotes": "Slight decrease in kidney function. Monitoring closely."
+      },
+      {
+        "date": "2023-05-10",
+        "egfr": 35,
+        "creatinine": 2.3,
+        "calculatedStage": 3,
+        "doctorNotes": "Consider adjusting medication regimen."
+      }
+    ]
+  },
+  "education": {
+    "ckdStages": [
+      {
+        "stage": 1,
+        "egfrRange": "90 or higher",
+        "description": "Normal kidney function but urine findings or structural abnormalities or genetic trait point to kidney disease",
+        "recommendations": {
+          "diet": [
+            "Maintain a healthy diet with plenty of fruits and vegetables",
+            "Limit sodium intake to less than 2,300 mg per day",
+            "Stay hydrated with water"
+          ],
+          "lifestyle": [
+            "Regular exercise (at least 30 minutes, 5 days a week)",
+            "Maintain healthy weight",
+            "Avoid smoking",
+            "Limit alcohol consumption"
+          ],
+          "monitoring": [
+            "Annual check-up with your doctor",
+            "Regular blood pressure monitoring",
+            "Blood and urine tests as recommended by your doctor"
+          ]
+        }
+      },
+      {
+        "stage": 2,
+        "egfrRange": "60-89",
+        "description": "Mild reduction in kidney function, with other findings pointing to kidney disease",
+        "recommendations": {
+          "diet": [
+            "Limit sodium intake to less than 2,300 mg per day",
+            "Maintain adequate protein intake (discuss with your doctor)",
+            "Consider reducing phosphorus intake",
+            "Stay hydrated but don't overdo fluid intake"
+          ],
+          "lifestyle": [
+            "Regular exercise as tolerated",
+            "Maintain healthy weight",
+            "Avoid smoking and limit alcohol",
+            "Manage stress through relaxation techniques"
+          ],
+          "monitoring": [
+            "Regular check-ups with your nephrologist",
+            "Monitor blood pressure regularly",
+            "Blood and urine tests every 6-12 months",
+            "Keep track of any new symptoms"
+          ]
+        }
+      },
+      {
+        "stage": 3,
+        "egfrRange": "30-59",
+        "description": "Moderate reduction in kidney function",
+        "recommendations": {
+          "diet": [
+            "Work with a renal dietitian to develop a personalized meal plan",
+            "Limit sodium to less than 2,000 mg per day",
+            "Monitor protein intake (usually 0.8 g/kg body weight)",
+            "Limit phosphorus and potassium intake",
+            "Control fluid intake based on your doctor's recommendation"
+          ],
+          "lifestyle": [
+            "Exercise program approved by your doctor",
+            "Maintain healthy weight",
+            "Avoid smoking and limit alcohol",
+            "Get adequate sleep",
+            "Manage stress effectively"
+          ],
+          "monitoring": [
+            "Check-ups with your nephrologist every 3-6 months",
+            "Monitor blood pressure daily",
+            "Regular blood and urine tests",
+            "Keep a symptom diary",
+            "Medication review with your doctor"
+          ]
+        }
+      },
+      {
+        "stage": 4,
+        "egfrRange": "15-29",
+        "description": "Severe reduction in kidney function",
+        "recommendations": {
+          "diet": [
+            "Strict adherence to renal diet prescribed by your dietitian",
+            "Low sodium (less than 2,000 mg per day)",
+            "Controlled protein intake (usually 0.6-0.8 g/kg body weight)",
+            "Restricted phosphorus, potassium, and fluid intake",
+            "Possible calorie supplementation if experiencing poor appetite"
+          ],
+          "lifestyle": [
+            "Light to moderate exercise as tolerated and approved by your doctor",
+            "Conserve energy while staying active",
+            "Absolutely no smoking or excessive alcohol",
+            "Prioritize rest and stress management",
+            "Consider support groups"
+          ],
+          "monitoring": [
+            "Frequent check-ups with your nephrologist (every 2-3 months)",
+            "Daily monitoring of blood pressure, weight, and fluid intake/output",
+            "Regular comprehensive blood and urine tests",
+            "Discussion about future renal replacement therapy options",
+            "Medication adjustments as kidney function changes"
+          ]
+        }
+      },
+      {
+        "stage": 5,
+        "egfrRange": "Less than 15",
+        "description": "Kidney failure (dialysis or kidney transplant needed)",
+        "recommendations": {
+          "diet": [
+            "Very strict renal diet customized to your treatment method",
+            "Severely restricted sodium, potassium, and phosphorus",
+            "Protein intake adjusted based on dialysis treatment",
+            "Strict fluid restriction based on remaining kidney function and treatment",
+            "Possible nutritional supplements prescribed by your doctor"
+          ],
+          "lifestyle": [
+            "Activity as tolerated, with regular rest periods",
+            "Structured daily routine around dialysis schedule (if applicable)",
+            "Meticulous hygiene especially around access sites",
+            "No smoking or alcohol",
+            "Emotional support through counseling or support groups"
+          ],
+          "monitoring": [
+            "Very frequent medical visits (often weekly with dialysis)",
+            "Strict monitoring of all vital signs and symptoms",
+            "Careful tracking of medications and their effects",
+            "Dialysis adequacy testing",
+            "Transplant evaluation and waitlist status (if applicable)"
+          ]
+        }
+      }
+    ],
+    "educationalResources": [
+      {
+        "id": "edu-001",
+        "title": "Understanding Chronic Kidney Disease",
+        "type": "article",
+        "contentSummary": "A comprehensive overview of CKD, its causes, stages, and management strategies.",
+        "targetAudience": "newly diagnosed",
+        "readingTimeMinutes": 15,
+        "lastUpdated": "2023-01-10"
+      },
+      {
+        "id": "edu-002",
+        "title": "Renal Diet Basics",
+        "type": "video",
+        "contentSummary": "Nutritionist explains dietary recommendations for CKD patients at different stages.",
+        "targetAudience": "all patients",
+        "durationMinutes": 22,
+        "lastUpdated": "2023-02-15"
+      },
+      {
+        "id": "edu-003",
+        "title": "Preparing for Dialysis",
+        "type": "guide",
+        "contentSummary": "Step-by-step preparation guide for patients starting dialysis treatment.",
+        "targetAudience": "stage 4-5",
+        "readingTimeMinutes": 30,
+        "lastUpdated": "2023-03-20"
+      },
+      {
+        "id": "edu-004",
+        "title": "Medication Management for CKD",
+        "type": "interactive",
+        "contentSummary": "Interactive tool to help patients understand their medications and potential interactions.",
+        "targetAudience": "all patients",
+        "completionTimeMinutes": 25,
+        "lastUpdated": "2023-04-05"
+      },
+      {
+        "id": "edu-005",
+        "title": "Living Well with Kidney Disease",
+        "type": "webinar",
+        "contentSummary": "Recorded webinar featuring patients sharing their experiences and coping strategies.",
+        "targetAudience": "all patients",
+        "durationMinutes": 45,
+        "lastUpdated": "2023-05-12"
+      }
+    ]
+  }
+}

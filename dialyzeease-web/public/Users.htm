@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en-US" style="height: auto;"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">  
+        <title>Users</title>
+    <meta name="csrf-param" content="_csrf-backend">
+<meta name="csrf-token" content="Ya8LTl5mWq20H-OiSwIUkaoJ2-1gkcQSghaqX_fZHiUImDMeBBIswNN-j9t8NFXH5D69pSrCnkvddfk4n71NQA==">
+
+<link href="Users_files/css.css" rel="stylesheet">
+<link href="Users_files/all.min.css" rel="stylesheet">
+<link href="Users_files/bootstrap.css" rel="stylesheet">
+<link href="Users_files/adminlte.min.css" rel="stylesheet">
+<link href="Users_files/site.css" rel="stylesheet">
+<link href="Users_files/jquery.magnify.min.css" rel="stylesheet">
+<style>
+        /* Global table styles */
+        .table td, .table th {
+            vertical-align: middle !important;
+            padding: 5px 12px !important;
+        }
+        
+        .table-compact td, .table-compact th {
+            padding: 4px !important;
+        }
+
+        .table .btn {
+            font-size: 14px;
+            padding: 4px 12px;
+        }
+    </style>    </head>
+<body class="sidebar-mini" style="height: auto;">
+
+<div class="wrapper">
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+<!--        <li class="nav-item d-none d-sm-inline-block">-->
+<!--            <a href="--><!--" class="nav-link">Home</a>-->
+<!--        </li>-->
+<!--        <li class="nav-item d-none d-sm-inline-block">-->
+<!--            <a href="#" class="nav-link">Contact</a>-->
+<!--        </li>-->
+<!--        <li class="nav-item dropdown">-->
+<!--            <a id="dropdownSubMenu1" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="nav-link dropdown-toggle">Dropdown</a>-->
+<!--            <ul aria-labelledby="dropdownSubMenu1" class="dropdown-menu border-0 shadow">-->
+<!--                <li><a href="#" class="dropdown-item">Some action </a></li>-->
+<!--                <li><a href="#" class="dropdown-item">Some other action</a></li>-->
+<!--                <li>--><!--</li>-->
+<!---->
+<!--                <li class="dropdown-divider"></li>-->
+<!---->
+                <!-- Level two dropdown-->
+<!--                <li class="dropdown-submenu dropdown-hover">-->
+<!--                    <a id="dropdownSubMenu2" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">Hover for action</a>-->
+<!--                    <ul aria-labelledby="dropdownSubMenu2" class="dropdown-menu border-0 shadow">-->
+<!--                        <li>-->
+<!--                            <a tabindex="-1" href="#" class="dropdown-item">level 2</a>-->
+<!--                        </li>-->
+<!---->
+                        <!-- Level three dropdown-->
+<!--                        <li class="dropdown-submenu">-->
+<!--                            <a id="dropdownSubMenu3" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-item dropdown-toggle">level 2</a>-->
+<!--                            <ul aria-labelledby="dropdownSubMenu3" class="dropdown-menu border-0 shadow">-->
+<!--                                <li><a href="#" class="dropdown-item">3rd level</a></li>-->
+<!--                                <li><a href="#" class="dropdown-item">3rd level</a></li>-->
+<!--                            </ul>-->
+<!--                        </li>-->
+                        <!-- End Level three -->
+<!---->
+<!--                        <li><a href="#" class="dropdown-item">level 2</a></li>-->
+<!--                        <li><a href="#" class="dropdown-item">level 2</a></li>-->
+<!--                    </ul>-->
+<!--                </li>-->
+                <!-- End Level two -->
+<!--            </ul>-->
+<!--        </li>-->
+    </ul>
+
+    <!-- SEARCH FORM -->
+<!--    <form class="form-inline ml-3">-->
+<!--        <div class="input-group input-group-sm">-->
+<!--            <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">-->
+<!--            <div class="input-group-append">-->
+<!--                <button class="btn btn-navbar" type="submit">-->
+<!--                    <i class="fas fa-search"></i>-->
+<!--                </button>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </form>-->
+
+    <!-- Right navbar links -->
+    <ul class="navbar-nav ml-auto">
+        <!-- Messages Dropdown Menu -->
+<!--        <li class="nav-item dropdown">-->
+<!--            <a class="nav-link" data-toggle="dropdown" href="#">-->
+<!--                <i class="far fa-comments"></i>-->
+<!--                <span class="badge badge-danger navbar-badge">3</span>-->
+<!--            </a>-->
+<!--            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">-->
+<!--                <a href="#" class="dropdown-item">-->
+                    <!-- Message Start -->
+<!--                    <div class="media">-->
+<!--                        <img src="--><!--/img/user1-128x128.jpg" alt="User Avatar" class="img-size-50 mr-3 img-circle">-->
+<!--                        <div class="media-body">-->
+<!--                            <h3 class="dropdown-item-title">-->
+<!--                                Brad Diesel-->
+<!--                                <span class="float-right text-sm text-danger"><i class="fas fa-star"></i></span>-->
+<!--                            </h3>-->
+<!--                            <p class="text-sm">Call me whenever you can...</p>-->
+<!--                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <!-- Message End -->
+<!--                </a>-->
+<!--                <div class="dropdown-divider"></div>-->
+<!--                <a href="#" class="dropdown-item">-->
+                    <!-- Message Start -->
+<!--                    <div class="media">-->
+<!--                        <img src="--><!--/img/user8-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">-->
+<!--                        <div class="media-body">-->
+<!--                            <h3 class="dropdown-item-title">-->
+<!--                                John Pierce-->
+<!--                                <span class="float-right text-sm text-muted"><i class="fas fa-star"></i></span>-->
+<!--                            </h3>-->
+<!--                            <p class="text-sm">I got your message bro</p>-->
+<!--                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <!-- Message End -->
+<!--                </a>-->
+<!--                <div class="dropdown-divider"></div>-->
+<!--                <a href="#" class="dropdown-item">-->
+                    <!-- Message Start -->
+<!--                    <div class="media">-->
+<!--                        <img src="--><!--/img/user3-128x128.jpg" alt="User Avatar" class="img-size-50 img-circle mr-3">-->
+<!--                        <div class="media-body">-->
+<!--                            <h3 class="dropdown-item-title">-->
+<!--                                Nora Silvester-->
+<!--                                <span class="float-right text-sm text-warning"><i class="fas fa-star"></i></span>-->
+<!--                            </h3>-->
+<!--                            <p class="text-sm">The subject goes here</p>-->
+<!--                            <p class="text-sm text-muted"><i class="far fa-clock mr-1"></i> 4 Hours Ago</p>-->
+<!--                        </div>-->
+<!--                    </div>-->
+                    <!-- Message End -->
+<!--                </a>-->
+<!--                <div class="dropdown-divider"></div>-->
+<!--                <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>-->
+<!--            </div>-->
+<!--        </li>-->
+        <!-- Notifications Dropdown Menu -->
+<!--        <li class="nav-item dropdown">-->
+<!--            <a class="nav-link" data-toggle="dropdown" href="#">-->
+<!--                <i class="far fa-bell"></i>-->
+<!--                <span class="badge badge-warning navbar-badge">15</span>-->
+<!--            </a>-->
+<!--            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">-->
+<!--                <span class="dropdown-header">15 Notifications</span>-->
+<!--                <div class="dropdown-divider"></div>-->
+<!--                <a href="#" class="dropdown-item">-->
+<!--                    <i class="fas fa-envelope mr-2"></i> 4 new messages-->
+<!--                    <span class="float-right text-muted text-sm">3 mins</span>-->
+<!--                </a>-->
+<!--                <div class="dropdown-divider"></div>-->
+<!--                <a href="#" class="dropdown-item">-->
+<!--                    <i class="fas fa-users mr-2"></i> 8 friend requests-->
+<!--                    <span class="float-right text-muted text-sm">12 hours</span>-->
+<!--                </a>-->
+<!--                <div class="dropdown-divider"></div>-->
+<!--                <a href="#" class="dropdown-item">-->
+<!--                    <i class="fas fa-file mr-2"></i> 3 new reports-->
+<!--                    <span class="float-right text-muted text-sm">2 days</span>-->
+<!--                </a>-->
+<!--                <div class="dropdown-divider"></div>-->
+<!--                <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>-->
+<!--            </div>-->
+<!--        </li>-->
+        <li class="nav-item">
+            <a class="nav-link" href="http://dev.saf.hutch.lk:88/site/logout" data-method="post"><i class="fas fa-sign-out-alt"></i></a>        </li>
+        <li class="nav-item dropdown user-menu">
+            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                <img src="Users_files/data-entry-icon.jpg" class="user-image img-circle elevation-2" alt="User Image">
+                <span class="d-none d-md-inline">viranga</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                <!-- User image -->
+                <li class="user-header bg-primary">
+                    <img src="Users_files/data-entry-icon.jpg" class="img-circle elevation-2" alt="User Image">
+
+                    <p>
+                        viranga                        <small>viranganalaka@gmail.com</small>
+                    </p>
+                </li>
+                <!-- Menu Body -->
+
+                <!-- Menu Footer-->
+                <li class="user-footer">
+<!--                    <a href="#" class="btn btn-default btn-flat">Profile</a>-->
+                    <a class="btn btn-default btn-flat float-right" href="http://dev.saf.hutch.lk:88/site/logout" data-method="post">Sign out</a>                </li>
+            </ul>
+        </li>
+<!--        <li class="nav-item">-->
+<!--            <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i-->
+<!--                    class="fas fa-th-large"></i></a>-->
+<!--        </li>-->
+    </ul>
+</nav>    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    
+<aside class="main-sidebar sidebar-dark-primary elevation-4 sidebar-focused">
+    <!-- Brand Logo -->
+    <a href="http://dev.saf.hutch.lk:88/" class="brand-link d-flex">
+        <img src="Users_files/hutch-logo-150X51.jpg" alt="HUTCH" class="brand-image img-circle1" style="opacity: .8">
+        <span class="brand-text font-weight-dark">SAF Portal</span>
+    </a>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <!-- Sidebar user panel (optional) -->
+        <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="image">
+                <img src="Users_files/data-entry-icon.jpg" class="img-circle elevation-2" alt="User Image">
+            </div>
+            <div class="info">
+                <a href="#" class="">viranga</a>
+            </div>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false"><li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/site/index"><i class="nav-icon fas fa-circle"></i> <p>Dashboard  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/order/index"><i class="nav-icon fas fa-circle"></i> <p>Order  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/order-archive/index"><i class="nav-icon fas fa-circle"></i> <p>Accepted Orders  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/dashboard/verification"><i class="nav-icon fas fa-circle"></i> <p>Dashboard - Verification  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/dashboard/dataentry"><i class="nav-icon fas fa-circle"></i> <p>Dashboard - Data Entry  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/dashboard/qc"><i class="nav-icon fas fa-circle"></i> <p>Dashboard - QC  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/process-archive/verification"><i class="nav-icon fas fa-circle"></i> <p>Processed Verifications  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/process/data-entry"><i class="nav-icon fas fa-circle"></i> <p>Data Entry Main Queue  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/process/my-data-entry"><i class="nav-icon fas fa-circle"></i> <p>My Data Entry Queue  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/process-archive/data-entry"><i class="nav-icon fas fa-circle"></i> <p>Processed Data Entries  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/process/qc"><i class="nav-icon fas fa-circle"></i> <p>QC Main Queue  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/process/my-qc"><i class="nav-icon fas fa-circle"></i> <p>My QC Queue  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/process-archive/qc"><i class="nav-icon fas fa-circle"></i> <p>Accepted QCs  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/report/index"><i class="nav-icon fas fa-circle"></i> <p>Report  </p></a></li>
+<li class="nav-item has-treeview active menu-open"><a class="nav-link active" href="#"><i class="nav-icon fas fa-circle"></i> <p>Manage Users <i class="right fas fa-angle-left"></i> </p></a>
+<ul class="nav nav-treeview">
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/assignment/index"><i class="nav-icon fas fa-circle"></i> <p>Assign Roles  </p></a></li>
+<li class="nav-item"><a class="nav-link " href="http://dev.saf.hutch.lk:88/site/signup"><i class="nav-icon fas fa-circle"></i> <p>New User  </p></a></li>
+<li class="nav-item active"><a class="nav-link active" href="http://dev.saf.hutch.lk:88/site/user-index"><i class="nav-icon fas fa-circle"></i> <p>Users  </p></a></li>
+</ul>
+</li></ul>        </nav>
+        <!-- /.sidebar-menu -->
+    </div>
+    <!-- /.sidebar -->
+</aside>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper" style="min-height: 803.6px;">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-4">
+                    <h4 class="m-0 text-dark">
+                        Users                    </h4>
+                </div><!-- /.col -->
+                <div class="col-sm-4">
+                    <h5 class="m-0 text-dark">
+                                            </h5>
+                </div><!-- /.col -->
+                <div class="col-sm-4">
+                    <nav aria-label="breadcrumb"><ol id="w1" class="float-sm-right breadcrumb"><li class="breadcrumb-item"><a href="http://dev.saf.hutch.lk:88/">Home</a></li>
+<li class="breadcrumb-item active" aria-current="page">Users</li>
+</ol></nav>                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content-header -->
+
+    <!-- Main content -->
+    <div class="content">
+        <div class="user-index">
+        <div id="w0" class="grid-view"><div class="summary">Showing <b>1-20</b> of <b>1,060</b> items.</div>
+<table class="table table-striped table-bordered"><thead>
+<tr><th>#</th><th><a href="http://dev.saf.hutch.lk:88/site/user-index?sort=username" data-sort="username">Username</a></th><th><a href="http://dev.saf.hutch.lk:88/site/user-index?sort=email" data-sort="email">Email</a></th><th><a href="http://dev.saf.hutch.lk:88/site/user-index?sort=status" data-sort="status">Status</a></th><th class="action-column">&nbsp;</th></tr><tr id="w0-filters" class="filters"><td>&nbsp;</td><td><input type="text" class="form-control" name="User[username]"></td><td><input type="text" class="form-control" name="User[email]"></td><td><select class="form-control" name="User[status]">
+<option value="" selected="selected"></option>
+<option value="0">Inactive</option>
+<option value="10">Active</option>
+</select></td><td>&nbsp;</td></tr>
+</thead>
+<tbody>
+<tr data-key="1"><td>1</td><td>viranga</td><td><a href="mailto:viranganalaka@gmail.com">viranganalaka@gmail.com</a></td><td>Active</td><td> <a href="http://dev.saf.hutch.lk:88/site/de-activate?id=1" title="De-Activate" aria-label="De-Activate" data-confirm="Are you sure you want to De-Activate this user?" data-method="post" data-pjax="0"><span class="fa fa-window-close"></span></a> <a href="http://dev.saf.hutch.lk:88/site/change-password?id=1" title="Change Password" aria-label="Change Password" data-confirm="Are you sure you want to change this user Password?" data-method="post" data-pjax="0"><span class="fa fa-recycle"></span></a></td></tr>
+<tr data-key="2"><td>2</td><td>jeewaka</td><td><a href="mailto:jeewaka@globalwavenet.com">jeewaka@globalwavenet.com</a></td><td>Active</td><td> <a href="http://dev.saf.hutch.lk:88/site/de-activate?id=2" title="De-Activate" aria-label="De-Activate" data-confirm="Are you sure you want to De-Activate this user?" data-method="post" data-pjax="0"><span class="fa fa-window-close"></span></a> <a href="http://dev.saf.hutch.lk:88/site/change-password?id=2" title="Change Password" aria-label="Change Password" data-confirm="Are you sure you want to change this user Password?" data-method="post" data-pjax="0"><span class="fa fa-recycle"></span></a></td></tr>
+<tr data-key="3"><td>3</td><td>thilini</td><td><a href="mailto:thilini@globalwavenet.com">thilini@globalwavenet.com</a></td><td>Active</td><td> <a href="http://dev.saf.hutch.lk:88/site/de-activate?id=3" title="De-Activate" aria-label="De-Activate" data-confirm="Are you sure you want to De-Activate this user?" data-method="post" data-pjax="0"><span class="fa fa-window-close"></span></a> <a href="http://dev.saf.hutch.lk:88/site/change-password?id=3" title="Change Password" aria-label="Change Password" data-confirm="Are you sure you want to change this user Password?" data-method="post" data-pjax="0"><span class="fa fa-recycle"></span></a></td></tr>
+<tr data-key="4"><td>4</td><td>rumesh</td><td><a href="mailto:rumeshj@hutchison.lk">rumeshj@hutchison.lk</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=4" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="5"><td>5</td><td>hojitha</td><td><a href="mailto:hojithaw@hutchison.lk">hojithaw@hutchison.lk</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=5" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="6"><td>6</td><td>tld_sajintha</td><td><a href="mailto:viranganalaka+9@gmail.com">viranganalaka+9@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=6" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="7"><td>7</td><td>tgak_bandara</td><td><a href="mailto:viranganalaka+10@gmail.com">viranganalaka+10@gmail.com</a></td><td>Active</td><td> <a href="http://dev.saf.hutch.lk:88/site/de-activate?id=7" title="De-Activate" aria-label="De-Activate" data-confirm="Are you sure you want to De-Activate this user?" data-method="post" data-pjax="0"><span class="fa fa-window-close"></span></a> <a href="http://dev.saf.hutch.lk:88/site/change-password?id=7" title="Change Password" aria-label="Change Password" data-confirm="Are you sure you want to change this user Password?" data-method="post" data-pjax="0"><span class="fa fa-recycle"></span></a></td></tr>
+<tr data-key="8"><td>8</td><td>eams_perera</td><td><a href="mailto:viranganalaka+11@gmail.com">viranganalaka+11@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=8" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="9"><td>9</td><td>hrpp_peiris</td><td><a href="mailto:viranganalaka+12@gmail.com">viranganalaka+12@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=9" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="10"><td>10</td><td>an_welagedara</td><td><a href="mailto:viranganalaka+13@gmail.com">viranganalaka+13@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=10" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="11"><td>11</td><td>dil_karawita</td><td><a href="mailto:viranganalaka+1@gmail.com">viranganalaka+1@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=11" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="12"><td>12</td><td>utml_almeda</td><td><a href="mailto:viranganalaka+2@gmail.com">viranganalaka+2@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=12" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="13"><td>13</td><td>r_niroshini</td><td><a href="mailto:viranganalaka+3@gmail.com">viranganalaka+3@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=13" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="14"><td>14</td><td>rs_egodage</td><td><a href="mailto:viranganalaka+4@gmail.com">viranganalaka+4@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=14" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="15"><td>15</td><td>g_jenifar</td><td><a href="mailto:viranganalaka+5@gmail.com">viranganalaka+5@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=15" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="16"><td>16</td><td>hdc_sandamali</td><td><a href="mailto:viranganalaka+6@gmail.com">viranganalaka+6@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=16" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="17"><td>17</td><td>lank_nanayakkara</td><td><a href="mailto:viranganalaka+7@gmail.com">viranganalaka+7@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=17" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="18"><td>18</td><td>wpnm_silva</td><td><a href="mailto:viranganalaka+8@gmail.com">viranganalaka+8@gmail.com</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=18" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="32"><td>19</td><td>lushania</td><td><a href="mailto:lushania@ageis.lk">lushania@ageis.lk</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=32" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+<tr data-key="33"><td>20</td><td>malshanir</td><td><a href="mailto:malshanir@ageis.lk">malshanir@ageis.lk</a></td><td>Inactive</td><td><a href="http://dev.saf.hutch.lk:88/site/activate?id=33" title="Activate" aria-label="Activate" data-confirm="Are you sure you want to activate this user?" data-method="post" data-pjax="0"><span class="fa fa-check-square"></span></a>  </td></tr>
+</tbody></table>
+<ul class="pagination"><li class="prev disabled"><span>«</span></li>
+<li class="active"><a href="http://dev.saf.hutch.lk:88/site/user-index?page=1" data-page="0">1</a></li>
+<li><a href="http://dev.saf.hutch.lk:88/site/user-index?page=2" data-page="1">2</a></li>
+<li><a href="http://dev.saf.hutch.lk:88/site/user-index?page=3" data-page="2">3</a></li>
+<li><a href="http://dev.saf.hutch.lk:88/site/user-index?page=4" data-page="3">4</a></li>
+<li><a href="http://dev.saf.hutch.lk:88/site/user-index?page=5" data-page="4">5</a></li>
+<li><a href="http://dev.saf.hutch.lk:88/site/user-index?page=6" data-page="5">6</a></li>
+<li><a href="http://dev.saf.hutch.lk:88/site/user-index?page=7" data-page="6">7</a></li>
+<li><a href="http://dev.saf.hutch.lk:88/site/user-index?page=8" data-page="7">8</a></li>
+<li><a href="http://dev.saf.hutch.lk:88/site/user-index?page=9" data-page="8">9</a></li>
+<li><a href="http://dev.saf.hutch.lk:88/site/user-index?page=10" data-page="9">10</a></li>
+<li class="next"><a href="http://dev.saf.hutch.lk:88/site/user-index?page=2" data-page="1">»</a></li></ul></div></div>
+<!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+</div>    <!-- /.content-wrapper -->
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+    <div class="p-3">
+        <h5>Title</h5>
+        <p>Sidebar content</p>
+    </div>
+</aside>    <!-- /.control-sidebar -->
+
+    <!-- Main Footer -->
+    <footer class="main-footer">
+    <!-- To the right -->
+    <div class="float-right d-none d-sm-inline">
+
+    </div>
+    <!-- Default to the left -->
+    <strong>Copyright © 2025 <a href="https://www.globalwavenet.com/">Global Wavenet</a>.</strong> All rights reserved.
+</footer><div id="sidebar-overlay"></div></div>
+
+<div><div id="yii-debug-toolbar" class="yii-debug-toolbar yii-debug-toolbar_position_bottom yii-debug-toolbar_active" data-height="50" style="display: block;">
+    <div class="yii-debug-toolbar__resize-handle"></div>
+    <div class="yii-debug-toolbar__bar">
+        <div class="yii-debug-toolbar__block yii-debug-toolbar__title">
+            <a href="http://dev.saf.hutch.lk:88/debug/default/index">
+                <img width="30" height="30" alt="Yii" src="data:image/png;base64,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">
+            </a>
+        </div>
+
+        <div class="yii-debug-toolbar__block yii-debug-toolbar__ajax" style="display: none">
+            AJAX <span class="yii-debug-toolbar__label yii-debug-toolbar__ajax_counter">0</span>
+            <div class="yii-debug-toolbar__ajax_info">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>URL</th>
+                        <th>Time</th>
+                        <th>Profile</th>
+                    </tr>
+                    </thead>
+                    <tbody class="yii-debug-toolbar__ajax_requests"></tbody>
+                </table>
+            </div>
+        </div>
+
+                                    <div class="yii-debug-toolbar__block">
+    <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=config&amp;tag=68022fd692d04">
+        <span class="yii-debug-toolbar__label">2.0.52</span>
+        PHP
+        <span class="yii-debug-toolbar__label">7.3.33</span>
+    </a>
+</div>
+                                                
+<div class="yii-debug-toolbar__block">
+    <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=log&amp;tag=68022fd692d04" title="Logged 32 messages">Log
+        <span class="yii-debug-toolbar__label">32</span>
+    </a>
+        </div>
+                                                <div class="yii-debug-toolbar__block">
+    <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=profiling&amp;tag=68022fd692d04" title="Total request processing time was 1,453 ms">Time <span class="yii-debug-toolbar__label yii-debug-toolbar__label_info">1,453 ms</span></a>
+    <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=profiling&amp;tag=68022fd692d04" title="Peak memory consumption">Memory <span class="yii-debug-toolbar__label yii-debug-toolbar__label_info">9.811 MB</span></a>
+</div>
+                                                    <div class="yii-debug-toolbar__block">
+        <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=db&amp;tag=68022fd692d04" title="Executed 7 database queries which took 11 ms.">
+            DB            <span class="yii-debug-toolbar__label yii-debug-toolbar__label_info">7</span>
+                        <span class="yii-debug-toolbar__label">11 ms</span>
+        </a>
+    </div>
+                                                    <div class="yii-debug-toolbar__block">
+        <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=event&amp;tag=68022fd692d04">Events <span class="yii-debug-toolbar__label">89</span></a>
+    </div>
+                                                                        
+                                                                        
+                                                <div class="yii-debug-toolbar__block">
+    <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=router&amp;tag=68022fd692d04" title="Action: backend\controllers\SiteController::actionUserIndex()">Route <span class="yii-debug-toolbar__label">site/user-index</span></a>
+</div>
+                                                <div class="yii-debug-toolbar__block">
+    <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=request&amp;tag=68022fd692d04" title="Status code: 200 OK">Status <span class="yii-debug-toolbar__label yii-debug-toolbar__label_success">200</span></a>
+</div>
+                                                <div class="yii-debug-toolbar__block">
+    <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=user&amp;tag=68022fd692d04">
+                                    User <span class="yii-debug-toolbar__label yii-debug-toolbar__label_info">1</span>
+                                    </a>
+</div>
+                                                    <div class="yii-debug-toolbar__block">
+        <a href="http://dev.saf.hutch.lk:88/debug/default/view?panel=asset&amp;tag=68022fd692d04" title="Number of asset bundles loaded">Asset Bundles <span class="yii-debug-toolbar__label yii-debug-toolbar__label_info">10</span></a>
+    </div>
+                    
+        <div class="yii-debug-toolbar__block_last">
+
+        </div>
+        <a class="yii-debug-toolbar__external" href="#" target="_blank">
+            <span class="yii-debug-toolbar__external-icon"></span>
+        </a>
+
+        <span class="yii-debug-toolbar__toggle">
+            <span class="yii-debug-toolbar__toggle-icon"></span>
+        </span>
+    </div>
+
+    <div class="yii-debug-toolbar__view">
+        <iframe src="Users_files/a.htm" frameborder="0" title="Yii2 debug bar"></iframe>
+    </div>
+</div>
+</div><style>#yii-debug-toolbar-logo{position:fixed;right:31px;bottom:4px}@media print{.yii-debug-toolbar{display:none !important}}.yii-debug-toolbar{font:11px Verdana, Arial, sans-serif;text-align:left;width:96px;transition:width .3s ease;z-index:1000000}.yii-debug-toolbar.yii-debug-toolbar_active:not(.yii-debug-toolbar_animating) .yii-debug-toolbar__bar{overflow:visible;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.yii-debug-toolbar.yii-debug-toolbar_iframe_active:not(.yii-debug-toolbar_animating) .yii-debug-toolbar__resize-handle{display:block;height:4px;cursor:ns-resize;margin-bottom:0;z-index:1000001;position:absolute;left:0;right:0}.yii-debug-toolbar:not(.yii-debug-toolbar_active) .yii-debug-toolbar__bar,.yii-debug-toolbar.yii-debug-toolbar_animating .yii-debug-toolbar__bar{height:40px}.yii-debug-toolbar_active{width:100%}.yii-debug-toolbar_active .yii-debug-toolbar__toggle-icon{-webkit-transform:rotate(0);transform:rotate(0)}.yii-debug-toolbar_position_top{margin:0 0 20px 0;width:100%}.yii-debug-toolbar_position_bottom{position:fixed;right:0;bottom:0;margin:0}.yii-debug-toolbar_position_upper{position:fixed;right:0;top:0;margin:0}.yii-debug-toolbar_position_upper.yii-debug-toolbar_iframe_active{border-bottom:1px solid rgba(0,0,0,.11)}.yii-debug-toolbar_position_upper.yii-debug-toolbar_iframe_active .yii-debug-toolbar__toggle-icon{-webkit-transform:rotate(-90deg);transform:rotate(-90deg)}.yii-debug-toolbar__bar{position:relative;padding:0;font:11px Verdana, Arial, sans-serif;text-align:left;overflow:hidden;box-sizing:content-box;display:flex;flex-wrap:wrap;background:#fff;background:-moz-linear-gradient(top, #fff 0%, #f7f7f7 100%);background:-webkit-linear-gradient(top, #fff 0%, #f7f7f7 100%);background:linear-gradient(to bottom, #fff 0%, #f7f7f7 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f7f7f7', GradientType=0);border:1px solid rgba(0,0,0,0.11);direction:ltr}.yii-debug-toolbar__bar::after{content:'';display:table;clear:both}.yii-debug-toolbar__view{height:0;overflow:hidden;background:white}.yii-debug-toolbar__view iframe{margin:0;padding:10px 0 0;height:100%;width:100%;border:0}.yii-debug-toolbar_iframe_active .yii-debug-toolbar__view{height:100%}.yii-debug-toolbar_iframe_active .yii-debug-toolbar__toggle-icon{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.yii-debug-toolbar_iframe_active .yii-debug-toolbar__external{display:block}.yii-debug-toolbar_iframe_animating .yii-debug-toolbar__view{transition:height .3s ease}.yii-debug-toolbar__block{margin:0;border-right:1px solid rgba(0,0,0,0.11);border-bottom:1px solid rgba(0,0,0,0.11);padding:4px 8px;line-height:32px;white-space:nowrap}@media (max-width: 767.98px){.yii-debug-toolbar__block{flex-grow:1;text-align:center}}.yii-debug-toolbar__block a{display:inline-block;text-decoration:none;color:black}.yii-debug-toolbar__block img{vertical-align:middle;width:30px;height:30px}.yii-debug-toolbar__block_active,.yii-debug-toolbar__ajax:hover{background:#f7f7f7;background:-moz-linear-gradient(top, #f7f7f7 0%, #e0e0e0 100%);background:-webkit-linear-gradient(top, #f7f7f7 0%, #e0e0e0 100%);background:linear-gradient(to bottom, #f7f7f7 0%, #e0e0e0 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f7f7f7', endColorstr='#e0e0e0', GradientType=0)}.yii-debug-toolbar__label{display:inline-block;padding:2px 4px;font-size:12px;font-weight:normal;line-height:14px;white-space:nowrap;vertical-align:middle;max-width:100px;overflow-x:hidden;text-overflow:ellipsis;color:#ffffff;text-shadow:0 -1px 0 rgba(0,0,0,0.25);background-color:#737373;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px}.yii-debug-toolbar__label:empty{display:none}a.yii-debug-toolbar__label:hover,a.yii-debug-toolbar__label:focus{color:#ffffff;text-decoration:none;cursor:pointer}.yii-debug-toolbar__label_important,.yii-debug-toolbar__label_error{background-color:#b94a48}.yii-debug-toolbar__label_important[href]{background-color:#953b39}.yii-debug-toolbar__label_warning,.yii-debug-toolbar__badge_warning{background-color:#f89406}.yii-debug-toolbar__label_warning[href]{background-color:#c67605}.yii-debug-toolbar__label_success{background-color:#217822}.yii-debug-toolbar__label_success[href]{background-color:#356635}.yii-debug-toolbar__label_info{background-color:#0b72b8}.yii-debug-toolbar__label_info[href]{background-color:#2d6987}.yii-debug-toolbar__label_inverse,.yii-debug-toolbar__badge_inverse{background-color:#333333}.yii-debug-toolbar__label_inverse[href],.yii-debug-toolbar__badge_inverse[href]{background-color:#1a1a1a}.yii-debug-toolbar__title{background:#f7f7f7;background:-moz-linear-gradient(top, #f7f7f7 0%, #e0e0e0 100%);background:-webkit-linear-gradient(top, #f7f7f7 0%, #e0e0e0 100%);background:linear-gradient(to bottom, #f7f7f7 0%, #e0e0e0 100%);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f7f7f7', endColorstr='#e0e0e0', GradientType=0)}.yii-debug-toolbar__block_last{width:80px;height:40px;float:left}.yii-debug-toolbar__toggle,.yii-debug-toolbar__external{cursor:pointer;position:absolute;width:30px;height:30px;font-size:25px;font-weight:100;line-height:28px;color:#ffffff;text-align:center;opacity:0.5;filter:alpha(opacity=50);transition:opacity .3s ease}.yii-debug-toolbar__toggle:hover,.yii-debug-toolbar__toggle:focus,.yii-debug-toolbar__external:hover,.yii-debug-toolbar__external:focus{color:#ffffff;text-decoration:none;opacity:0.9;filter:alpha(opacity=90)}.yii-debug-toolbar__toggle-icon,.yii-debug-toolbar__external-icon{display:inline-block;background-position:50% 50%;background-repeat:no-repeat}.yii-debug-toolbar__toggle{right:10px;bottom:4px}.yii-debug-toolbar__toggle-icon{padding:7px 0;width:10px;height:16px;background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNSIgdmlld0JveD0iMCAwIDUwIDUwIj48cGF0aCBmaWxsPSIjNDQ0IiBkPSJNMTUuNTYzIDQwLjgzNmEuOTk3Ljk5NyAwIDAgMCAxLjQxNCAwbDE1LTE1YTEgMSAwIDAgMCAwLTEuNDE0bC0xNS0xNWExIDEgMCAwIDAtMS40MTQgMS40MTRMMjkuODU2IDI1LjEzIDE1LjU2MyAzOS40MmExIDEgMCAwIDAgMCAxLjQxNHoiLz48L3N2Zz4=");transition:-webkit-transform .3s ease-out;transition:transform .3s ease-out;-webkit-transform:rotate(180deg);transform:rotate(180deg)}.yii-debug-toolbar__external{display:none;right:50px;bottom:4px}.yii-debug-toolbar__external-icon{padding:8px 0;width:14px;height:14px;background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNSIgdmlld0JveD0iMCAwIDUwIDUwIj48cGF0aCBmaWxsPSIjNDQ0IiBkPSJNMzkuNjQyIDkuNzIyYTEuMDEgMS4wMSAwIDAgMC0uMzgyLS4wNzdIMjguMTAzYTEgMSAwIDAgMCAwIDJoOC43NDNMMjEuNyAyNi43OWExIDEgMCAwIDAgMS40MTQgMS40MTVMMzguMjYgMTMuMDZ2OC43NDNhMSAxIDAgMCAwIDIgMFYxMC42NDZhMS4wMDUgMS4wMDUgMCAwIDAtLjYxOC0uOTI0eiIvPjxwYXRoIGQ9Ik0zOS4yNiAyNy45ODVhMSAxIDAgMCAwLTEgMXYxMC42NmgtMjh2LTI4aDEwLjY4M2ExIDEgMCAwIDAgMC0ySDkuMjZhMSAxIDAgMCAwLTEgMXYzMGExIDEgMCAwIDAgMSAxaDMwYTEgMSAwIDAgMCAxLTF2LTExLjY2YTEgMSAwIDAgMC0xLTF6Ii8+PC9zdmc+")}.yii-debug-toolbar__switch-icon{margin-left:10px;padding:5px 10px;width:18px;height:18px;background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgdmlld0JveD0iMCAwIDUwIDUwIiB2ZXJzaW9uPSIxLjEiPjxwYXRoIGQ9Im00MS4xIDIzYy0wLjYgMC0xIDAuNC0xIDF2MTAuN2wtMjUuNi0wLjFjMCAwIDAtMiAwLTIuOCAwLTAuOC0wLjctMS0xLTAuNmwtMy41IDMuNWMtMC42IDAuNi0wLjYgMS4zIDAgMmwzLjQgMy40YzAuNCAwLjQgMS4xIDAuMiAxLTAuNmwwLTIuOWMwIDAgMjAuOCAwLjEgMjYuNiAwIDAuNiAwIDEtMC40IDEtMXYtMTEuN2MwLTAuNi0wLjQtMS0xLTF6TTkgMjYuOSA5IDI2LjkgOSAyNi45IDkgMjYuOSIvPjxwYXRoIGQ9Im05IDI2LjljMC42IDAgMS0wLjQgMS0xdi0xMC43bDI1LjYgMC4xYzAgMCAwIDIgMCAyLjggMCAwLjggMC43IDEgMSAwLjZsMy41LTMuNWMwLjYtMC42IDAuNi0xLjMgMC0ybC0zLjQtMy40Yy0wLjQtMC40LTEuMS0wLjItMSAwLjZsMCAyLjljMCAwLTIwLjgtMC4xLTI2LjYgMC0wLjYgMC0xIDAuNC0xIDF2MTEuN2MwIDAuNiAwLjQgMSAxIDF6Ii8+PC9zdmc+")}.yii-debug-toolbar__ajax{position:relative}.yii-debug-toolbar__ajax:hover .yii-debug-toolbar__ajax_info,.yii-debug-toolbar__ajax:focus .yii-debug-toolbar__ajax_info{visibility:visible}.yii-debug-toolbar__ajax a{color:#337ab7}.yii-debug-toolbar__ajax table{width:100%;table-layout:auto;border-spacing:0;border-collapse:collapse}.yii-debug-toolbar__ajax table td{padding:4px;font-size:12px;line-height:normal;vertical-align:top;border-top:1px solid #ddd}.yii-debug-toolbar__ajax table th{padding:4px;font-size:11px;line-height:normal;vertical-align:bottom;border-bottom:2px solid #ddd}.yii-debug-toolbar__ajax_info{visibility:hidden;transition:visibility .2s linear;background-color:white;box-shadow:inset 0 -10px 10px -10px #e1e1e1;position:absolute;bottom:40px;left:-1px;padding:10px;max-width:480px;max-height:480px;word-wrap:break-word;overflow:hidden;overflow-y:auto;box-sizing:border-box;border:1px solid rgba(0,0,0,0.11);z-index:1000001}.yii-debug-toolbar__ajax_request_status{color:white;padding:2px 5px}.yii-debug-toolbar__ajax_request_url{max-width:170px;overflow:hidden;text-overflow:ellipsis}
+</style><script>(function () {
+    'use strict';
+
+    var findToolbar = function () {
+            return document.querySelector('#yii-debug-toolbar');
+        },
+        ajax = function (url, settings) {
+            var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+            settings = settings || {};
+            xhr.open(settings.method || 'GET', url, true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            xhr.setRequestHeader('Accept', 'text/html');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200 && settings.success) {
+                        settings.success(xhr);
+                    } else if (xhr.status !== 200 && settings.error) {
+                        settings.error(xhr);
+                    }
+                }
+            };
+            xhr.send(settings.data || '');
+        },
+        url,
+        div,
+        toolbarEl = findToolbar(),
+        toolbarAnimatingClass = 'yii-debug-toolbar_animating',
+        barSelector = '.yii-debug-toolbar__bar',
+        viewSelector = '.yii-debug-toolbar__view',
+        blockSelector = '.yii-debug-toolbar__block',
+        toggleSelector = '.yii-debug-toolbar__toggle',
+        externalSelector = '.yii-debug-toolbar__external',
+
+        CACHE_KEY = 'yii-debug-toolbar',
+        ACTIVE_STATE = 'active',
+
+        animationTime = 300,
+
+        activeClass = 'yii-debug-toolbar_active',
+        iframeActiveClass = 'yii-debug-toolbar_iframe_active',
+        iframeAnimatingClass = 'yii-debug-toolbar_iframe_animating',
+        titleClass = 'yii-debug-toolbar__title',
+        blockClass = 'yii-debug-toolbar__block',
+        ignoreClickClass = 'yii-debug-toolbar__ignore_click',
+        blockActiveClass = 'yii-debug-toolbar__block_active',
+        requestStack = [];
+
+    if (toolbarEl) {
+        url = toolbarEl.getAttribute('data-url');
+
+        ajax(url, {
+            success: function (xhr) {
+                div = document.createElement('div');
+                div.innerHTML = xhr.responseText;
+
+                toolbarEl.parentNode && toolbarEl.parentNode.replaceChild(div, toolbarEl);
+
+                showToolbar(findToolbar());
+
+                var event;
+                if (typeof(Event) === 'function') {
+                    event = new Event('yii.debug.toolbar_attached', {'bubbles': true});
+                } else {
+                    event = document.createEvent('Event');
+                    event.initEvent('yii.debug.toolbar_attached', true, true);
+                }
+
+                div.dispatchEvent(event);
+            },
+            error: function (xhr) {
+                toolbarEl.innerText = xhr.responseText;
+            }
+        });
+    }
+
+    function showToolbar(toolbarEl) {
+        var barEl = toolbarEl.querySelector(barSelector),
+            viewEl = toolbarEl.querySelector(viewSelector),
+            toggleEl = toolbarEl.querySelector(toggleSelector),
+            externalEl = toolbarEl.querySelector(externalSelector),
+            blockEls = barEl.querySelectorAll(blockSelector),
+            blockLinksEls = document.querySelectorAll(blockSelector + ':not(.' + titleClass + ') a'),
+            iframeEl = viewEl.querySelector('iframe'),
+            iframeHeight = function () {
+                return (window.innerHeight * (toolbarEl.dataset.height / 100) - barEl.clientHeight) + 'px';
+            },
+            isIframeActive = function () {
+                return toolbarEl.classList.contains(iframeActiveClass);
+            },
+            resizeIframe = function(mouse) {
+                var availableHeight = window.innerHeight - barEl.clientHeight;
+                viewEl.style.height = Math.min(availableHeight, availableHeight - mouse.y) + "px";
+            },
+            showIframe = function (href) {
+                toolbarEl.classList.add(iframeAnimatingClass);
+                toolbarEl.classList.add(iframeActiveClass);
+
+                iframeEl.src = externalEl.href = href;
+                iframeEl.removeAttribute('tabindex');
+
+                viewEl.style.height = iframeHeight();
+                setTimeout(function () {
+                    toolbarEl.classList.remove(iframeAnimatingClass);
+                }, animationTime);
+            },
+            hideIframe = function () {
+                toolbarEl.classList.add(iframeAnimatingClass);
+                toolbarEl.classList.remove(iframeActiveClass);
+                iframeEl.setAttribute("tabindex", "-1");
+                removeActiveBlocksCls();
+
+                externalEl.href = '#';
+                viewEl.style.height = '';
+                setTimeout(function () {
+                    toolbarEl.classList.remove(iframeAnimatingClass);
+                }, animationTime);
+            },
+            removeActiveBlocksCls = function () {
+                [].forEach.call(blockEls, function (el) {
+                    el.classList.remove(blockActiveClass);
+                });
+            },
+            toggleToolbarClass = function (className) {
+                toolbarEl.classList.add(toolbarAnimatingClass);
+                if (toolbarEl.classList.contains(className)) {
+                    toolbarEl.classList.remove(className);
+                    [].forEach.call(blockLinksEls, function (el) {
+                        el.setAttribute('tabindex', "-1");
+                    });
+                } else {
+                    [].forEach.call(blockLinksEls, function (el) {
+                        el.removeAttribute('tabindex');
+                    });
+                    toolbarEl.classList.add(className);
+                }
+                setTimeout(function () {
+                    toolbarEl.classList.remove(toolbarAnimatingClass);
+                }, animationTime);
+            },
+            toggleStorageState = function (key, value) {
+                if (window.localStorage) {
+                    var item = localStorage.getItem(key);
+
+                    if (item) {
+                        localStorage.removeItem(key);
+                    } else {
+                        localStorage.setItem(key, value);
+                    }
+                }
+            },
+            restoreStorageState = function (key) {
+                if (window.localStorage) {
+                    return localStorage.getItem(key);
+                }
+            },
+            togglePosition = function () {
+                if (isIframeActive()) {
+                    hideIframe();
+                } else {
+                    toggleToolbarClass(activeClass);
+                    toggleStorageState(CACHE_KEY, ACTIVE_STATE);
+                }
+            };
+
+        if (restoreStorageState(CACHE_KEY) === ACTIVE_STATE) {
+            var transition = toolbarEl.style.transition;
+            toolbarEl.style.transition = 'none';
+            toolbarEl.classList.add(activeClass);
+            setTimeout(function () {
+                toolbarEl.style.transition = transition;
+            }, animationTime);
+        } else {
+            [].forEach.call(blockLinksEls, function (el) {
+                el.setAttribute('tabindex', "-1");
+            });
+        }
+
+        toolbarEl.style.display = 'block';
+
+        window.onresize = function () {
+            if (toolbarEl.classList.contains(iframeActiveClass)) {
+                viewEl.style.height = iframeHeight();
+            }
+        };
+
+        toolbarEl.addEventListener("mousedown", function(e) {
+            if (isIframeActive() && (e.y - toolbarEl.offsetTop < 4 /* 4px click zone */)) {
+                document.addEventListener("mousemove", resizeIframe, false);
+            }
+        }, false);
+
+        document.addEventListener("mouseup", function(){
+            if (isIframeActive()) {
+                document.removeEventListener("mousemove", resizeIframe, false);
+            }
+        }, false);
+
+        barEl.onclick = function (e) {
+            var target = e.target,
+                block = findAncestor(target, blockClass);
+
+            if (block
+                && !block.classList.contains(titleClass)
+                && !block.classList.contains(ignoreClickClass)
+                && e.which !== 2 && !e.ctrlKey // not mouse wheel and not ctrl+click
+            ) {
+                while (target !== this) {
+                    if (target.href) {
+                        removeActiveBlocksCls();
+                        block.classList.add(blockActiveClass);
+                        showIframe(target.href);
+                    }
+                    target = target.parentNode;
+                }
+
+                e.preventDefault();
+            }
+        };
+
+        toggleEl.onclick = togglePosition;
+    }
+
+    function findAncestor(el, cls) {
+        while ((el = el.parentElement) && !el.classList.contains(cls)) ;
+        return el;
+    }
+
+    function renderAjaxRequests() {
+        var requestCounter = document.getElementsByClassName('yii-debug-toolbar__ajax_counter');
+        if (!requestCounter.length) {
+            return;
+        }
+        var ajaxToolbarPanel = document.querySelector('.yii-debug-toolbar__ajax');
+        var tbodies = document.getElementsByClassName('yii-debug-toolbar__ajax_requests');
+        var state = 'ok';
+        if (tbodies.length) {
+            var tbody = tbodies[0];
+            var rows = document.createDocumentFragment();
+            if (requestStack.length) {
+                var firstItem = requestStack.length > 20 ? requestStack.length - 20 : 0;
+                for (var i = firstItem; i < requestStack.length; i++) {
+                    var request = requestStack[i];
+                    var row = document.createElement('tr');
+                    rows.appendChild(row);
+
+                    var methodCell = document.createElement('td');
+                    methodCell.innerHTML = request.method;
+                    row.appendChild(methodCell);
+
+                    var statusCodeCell = document.createElement('td');
+                    var statusCode = document.createElement('span');
+                    if (request.statusCode < 300) {
+                        statusCode.setAttribute('class', 'yii-debug-toolbar__ajax_request_status yii-debug-toolbar__label_success');
+                    } else if (request.statusCode < 400) {
+                        statusCode.setAttribute('class', 'yii-debug-toolbar__ajax_request_status yii-debug-toolbar__label_warning');
+                    } else {
+                        statusCode.setAttribute('class', 'yii-debug-toolbar__ajax_request_status yii-debug-toolbar__label_error');
+                    }
+                    statusCode.textContent = request.statusCode || '-';
+                    statusCodeCell.appendChild(statusCode);
+                    row.appendChild(statusCodeCell);
+
+                    var pathCell = document.createElement('td');
+                    pathCell.className = 'yii-debug-toolbar__ajax_request_url';
+                    pathCell.innerHTML = request.url;
+                    pathCell.setAttribute('title', request.url);
+                    row.appendChild(pathCell);
+
+                    var durationCell = document.createElement('td');
+                    durationCell.className = 'yii-debug-toolbar__ajax_request_duration';
+                    if (request.duration) {
+                        durationCell.innerText = request.duration + " ms";
+                    } else {
+                        durationCell.innerText = '-';
+                    }
+                    row.appendChild(durationCell);
+                    row.appendChild(document.createTextNode(' '));
+
+                    var profilerCell = document.createElement('td');
+                    if (request.profilerUrl) {
+                        var profilerLink = document.createElement('a');
+                        profilerLink.setAttribute('href', request.profilerUrl);
+                        profilerLink.innerText = request.profile;
+                        profilerCell.appendChild(profilerLink);
+                    } else {
+                        profilerCell.innerText = 'n/a';
+                    }
+                    row.appendChild(profilerCell);
+
+                    if (request.error) {
+                        if (state !== "loading" && i > requestStack.length - 4) {
+                            state = 'error';
+                        }
+                    } else if (request.loading) {
+                        state = 'loading'
+                    }
+                    row.className = 'yii-debug-toolbar__ajax_request';
+                }
+                while (tbody.firstChild) {
+                    tbody.removeChild(tbody.firstChild);
+                }
+                tbody.appendChild(rows);
+            }
+            ajaxToolbarPanel.style.display = 'block';
+        }
+        requestCounter[0].innerText = requestStack.length;
+        var className = 'yii-debug-toolbar__label yii-debug-toolbar__ajax_counter';
+        if (state === 'ok') {
+            className += ' yii-debug-toolbar__label_success';
+        } else if (state === 'error') {
+            className += ' yii-debug-toolbar__label_error';
+        }
+        requestCounter[0].className = className;
+    }
+
+    /**
+     * Should AJAX request to be logged in debug panel
+     *
+     * @param requestUrl
+     * @returns {boolean}
+     */
+    function shouldTrackRequest(requestUrl) {
+        if (!toolbarEl) {
+            return false;
+        }
+        var a = document.createElement('a');
+        a.href = requestUrl;
+        var skipAjaxRequestUrls = JSON.parse(toolbarEl.getAttribute('data-skip-urls'));
+        if (Array.isArray(skipAjaxRequestUrls) && skipAjaxRequestUrls.length && skipAjaxRequestUrls.includes(requestUrl)) {
+            return false;
+        }
+        return a.host === location.host;
+    }
+
+    var proxied = XMLHttpRequest.prototype.open;
+
+    XMLHttpRequest.prototype.open = function (method, url, async, user, pass) {
+        var self = this;
+
+        if (shouldTrackRequest(url)) {
+            var stackElement = {
+                loading: true,
+                error: false,
+                url: url,
+                method: method,
+                start: new Date()
+            };
+            requestStack.push(stackElement);
+            this.addEventListener('readystatechange', function () {
+                if (self.readyState === 4) {
+                    stackElement.duration = self.getResponseHeader('X-Debug-Duration') || new Date() - stackElement.start;
+                    stackElement.loading = false;
+                    stackElement.statusCode = self.status;
+                    stackElement.error = self.status < 200 || self.status >= 400;
+                    stackElement.profile = self.getResponseHeader('X-Debug-Tag');
+                    stackElement.profilerUrl = self.getResponseHeader('X-Debug-Link');
+                    renderAjaxRequests();
+                }
+            }, false);
+            renderAjaxRequests();
+        }
+        proxied.apply(this, Array.prototype.slice.call(arguments));
+    };
+
+    // catch fetch AJAX requests
+    if (window.fetch) {
+        var originalFetch = window.fetch;
+
+        window.fetch = function (input, init) {
+            var method;
+            var url;
+            if (typeof input === 'string') {
+                method = (init && init.method) || 'GET';
+                url = input;
+            } else if (window.URL && input instanceof URL) { // fix https://github.com/yiisoft/yii2-debug/issues/296
+                method = (init && init.method) || 'GET';
+                url = input.href;
+            } else if (window.Request && input instanceof Request) {
+                method = input.method;
+                url = input.url;
+            }
+            var promise = originalFetch(input, init);
+
+            if (shouldTrackRequest(url)) {
+                var stackElement = {
+                    loading: true,
+                    error: false,
+                    url: url,
+                    method: method,
+                    start: new Date()
+                };
+                requestStack.push(stackElement);
+                promise.then(function (response) {
+                    stackElement.duration = response.headers.get('X-Debug-Duration') || new Date() - stackElement.start;
+                    stackElement.loading = false;
+                    stackElement.statusCode = response.status;
+                    stackElement.error = response.status < 200 || response.status >= 400;
+                    stackElement.profile = response.headers.get('X-Debug-Tag');
+                    stackElement.profilerUrl = response.headers.get('X-Debug-Link');
+                    renderAjaxRequests();
+
+                    return response;
+                }).catch(function (error) {
+                    stackElement.loading = false;
+                    stackElement.error = true;
+                    renderAjaxRequests();
+
+                    throw error;
+                });
+                renderAjaxRequests();
+            }
+
+            return promise;
+        };
+    }
+
+})();
+</script><script src="Users_files/jquery.js"></script>
+<script src="Users_files/yii.js"></script>
+<script src="Users_files/yii.gridView.js"></script>
+<script src="Users_files/bootstrap.bundle.js"></script>
+<script src="Users_files/adminlte.min.js"></script>
+<script src="Users_files/Chart.min.js"></script>
+<script src="Users_files/jquery.magnify.min.js"></script>
+<script>jQuery(function ($) {
+jQuery('#w0').yiiGridView({"filterUrl":"\/site\/user-index","filterSelector":"#w0-filters input, #w0-filters select","filterOnFocusOut":true});
+});</script>
+
+</body></html>
