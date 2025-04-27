@@ -12,22 +12,21 @@ import {
 interface CenterUtilizationProps {
   data: Array<{
     center: string;
-    maxCapacity: number;
-    currentLoad: number;
+    "Max Capacity": number;
+    "Current Load": number;
   }>;
 }
-
 const CenterUtilizationChart = ({ data }: CenterUtilizationProps) => {
   return (
     <Card>
       <CardHeader>
         <CardTitle>Center Utilization</CardTitle>
-        <CardDescription>Current patient load vs. capacity</CardDescription>
+        <CardDescription>Current Patient Load vs. Capacity</CardDescription>
       </CardHeader>
       <CardContent className="h-80">
         <ResponsiveBar
           data={data}
-          keys={["currentLoad", "maxCapacity"]}
+          keys={["Current Load", "Max Capacity"]}
           indexBy="center"
           groupMode="grouped"
           margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
@@ -56,7 +55,7 @@ const CenterUtilizationChart = ({ data }: CenterUtilizationProps) => {
           legends={[
             {
               dataFrom: "keys",
-              anchor: "bottom-right",
+              anchor: "right",
               direction: "column",
               justify: false,
               translateX: 120,

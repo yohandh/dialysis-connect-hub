@@ -18,7 +18,18 @@ const badgeVariants = cva(
         // Added new variants for our color scheme
         success: "border-transparent bg-green-500 text-white hover:bg-green-600",
         info: "border-transparent bg-blue-500 text-white hover:bg-blue-600",
+        warning: "border-transparent bg-amber-500 text-white hover:bg-amber-600",
         purple: "border-transparent bg-purple-500 text-white hover:bg-purple-600",
+        // Education material types
+        diet: "border-transparent bg-indigo-900 text-white hover:bg-indigo-950",
+        lifestyle: "border-transparent bg-sky-100 text-sky-700 hover:bg-sky-200",
+        general: "border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200",
+        // CKD Stages
+        stage1: "border-transparent bg-green-500 text-white hover:bg-green-600",
+        stage2: "border-transparent bg-lime-500 text-white hover:bg-lime-600",
+        stage3: "border-transparent bg-yellow-500 text-white hover:bg-yellow-600",
+        stage4: "border-transparent bg-orange-500 text-white hover:bg-orange-600",
+        stage5: "border-transparent bg-red-500 text-white hover:bg-red-600",
       },
     },
     defaultVariants: {

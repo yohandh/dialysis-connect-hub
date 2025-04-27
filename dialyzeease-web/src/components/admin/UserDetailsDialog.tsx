@@ -2,8 +2,9 @@ import React from 'react';
 import { ROLES } from '@/constants/roles';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserById } from '@/api/userApi';
-import { format } from 'date-fns';
-import { UserCog, Calendar, Building2, MapPin, User, Mail, Phone, HeartPulse, AlertCircle, FileText, Award, Users } from 'lucide-react';
+import { fetchPatientAppointments, fetchPatientAppointmentStats, PatientAppointmentStats as PatientAppointmentStatsType, PatientAppointment } from '@/api/appointmentApi';
+import { format, addDays, parseISO } from 'date-fns';
+import { UserCog, Calendar, Building2, MapPin, User, Mail, Phone, HeartPulse, AlertCircle, FileText, Award, Users, Clock } from 'lucide-react';
 
 import {
   Dialog,
@@ -26,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { centerUsers } from '@/data/adminMockData';
+import { fetchUserCenters } from '@/api/centerApi';
 
 interface UserDetailsDialogProps {
   isOpen: boolean;
@@ -46,8 +47,12 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
     enabled: !!userId && isOpen,
   });
 
-  // Get assigned centers for this user
-  const userCenters = centerUsers.filter(cu => cu.userId === userId);
+  // Fetch assigned centers for this user
+  const { data: userCenters = [] } = useQuery<any[]>({
+    queryKey: ['userCenters', userId],
+    queryFn: () => fetchUserCenters(userId),
+    enabled: !!userId && isOpen,
+  });
 
   // Get initials for avatar
   const getInitials = (name: string = '') => {
@@ -120,7 +125,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">User Details</DialogTitle>
         </DialogHeader>
@@ -167,10 +172,10 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
               {userObj.roleId !== ROLES.ADMIN.id ? (
                 <TabsList className="grid grid-cols-3">
                   <TabsTrigger value="profile">Profile</TabsTrigger>
-                  <TabsTrigger value="centers">Assigned Centers</TabsTrigger>
-                  {userObj.roleId === ROLES.DOCTOR.id && <TabsTrigger value="specialization">Specialization</TabsTrigger>}
-                  {userObj.roleId === ROLES.PATIENT.id && <TabsTrigger value="medical">Medical Info</TabsTrigger>}
-                  {userObj.roleId === ROLES.STAFF.id && <TabsTrigger value="appointments">Appointments</TabsTrigger>}
+                  {userObj.roleId === ROLES.STAFF.id && <TabsTrigger value="centers">Assigned Centers</TabsTrigger>}
+                  {userObj.roleId === ROLES.DOCTOR.id && <TabsTrigger value="specialization">Specialization</TabsTrigger>}      
+                  {userObj.roleId === ROLES.PATIENT.id && <TabsTrigger value="medical">Medical Info</TabsTrigger>}            
+                  {userObj.roleId === ROLES.STAFF.id || userObj.roleId === ROLES.PATIENT.id && <TabsTrigger value="appointments">Appointments</TabsTrigger>}
                 </TabsList>
               ) : null}
 
@@ -181,7 +186,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center">
-                      <UserCog className="h-5 w-5 mr-2" />
+                        <UserCog className="h-5 w-5 mr-2" />
                         Admin Information
                       </CardTitle>
                     </CardHeader>
@@ -206,7 +211,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Name</p>
                         <p>{userObj.name}</p>
-                      </div>                      
+                      </div>
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Designation</p>
                         <p>{staffObj.designation}</p>
@@ -214,7 +219,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Gender</p>
                         <p>{ucfirst(staffObj.gender)}</p>
-                      </div>                      
+                      </div>
                     </CardContent>
                   </Card>
                 )}
@@ -231,7 +236,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Name</p>
                         <p>{userObj.name}</p>
-                      </div>                      
+                      </div>
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Emergency Contact Number</p>
                         <p>{doctorObj.emergencyContactNo || 'Not provided'}</p>
@@ -247,7 +252,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                       <div className="col-span-2 space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Address</p>
                         <p>{doctorObj.address || 'Not provided'}</p>
-                      </div>                                         
+                      </div>
                     </CardContent>
                   </Card>
                 )}
@@ -270,22 +275,6 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                         <p>{patientObj.bloodGroup || 'Not provided'}</p>
                       </div>
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Allergies</p>
-                        <div className="whitespace-pre-line">
-                          {patientObj.allergies ? patientObj.allergies.split('\n').map((line, i) => (
-                            <p key={i} className="text-sm">{line}</p>
-                          )) : 'Not provided'}
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-muted-foreground">Chronic Conditions</p>
-                        <div className="whitespace-pre-line">
-                          {patientObj.chronicConditions ? patientObj.chronicConditions.split('\n').map((line, i) => (
-                            <p key={i} className="text-sm">{line}</p>
-                          )) : 'Not provided'}
-                        </div>
-                      </div>
-                      <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Date of Birth</p>
                         <p>{patientObj.dob ? format(new Date(patientObj.dob), 'PPP') : 'Not provided'}</p>
                       </div>
@@ -300,18 +289,18 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                       <div className="space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Gender</p>
                         <p>{ucfirst(patientObj.gender)}</p>
-                      </div>                
+                      </div>
                       <div className="col-span-2 space-y-1">
                         <p className="text-sm font-medium text-muted-foreground">Address</p>
                         <p>{patientObj.address || 'Not provided'}</p>
-                      </div>                      
+                      </div>
                     </CardContent>
                   </Card>
                 )}
               </TabsContent>
 
               {/* Centers Tab - Not shown for Admin users */}
-              {userObj.roleId !== ROLES.ADMIN.id ? (
+              {userObj.roleId !== ROLES.ADMIN.id && userObj.roleId !== ROLES.PATIENT.id ? (
                 <TabsContent value="centers">
                   <Card>
                     <CardHeader>
@@ -326,7 +315,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                           <TableHeader>
                             <TableRow>
                               <TableHead>Center Name</TableHead>
-                              <TableHead>Role</TableHead>
+                              {/* <TableHead>Role</TableHead> */}
                               <TableHead>Status</TableHead>
                               <TableHead>Assigned Date</TableHead>
                             </TableRow>
@@ -335,15 +324,17 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                             {userCenters.map((center) => (
                               <TableRow key={center.id}>
                                 <TableCell>{center.centerName}</TableCell>
+                                {/* 
                                 <TableCell>
                                   <Badge variant="outline">{center.assignedRole}</Badge>
-                                </TableCell>
+                                </TableCell> 
+                                */}
                                 <TableCell>
                                   <Badge
                                     variant={center.status === 'active' ? 'default' : 'outline'}
                                     className={center.status === 'active' ? 'bg-green-500 hover:bg-green-600' : ''}
                                   >
-                                    {center.status}
+                                    {ucfirst(center.status)}
                                   </Badge>
                                 </TableCell>
                                 <TableCell>{format(new Date(center.assignedAt), 'PP')}</TableCell>
@@ -404,6 +395,79 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                     </CardContent>
                   </Card>
                 </TabsContent>
+              ) : null}              
+
+              {/* Appointments Tab (For Staff and Patients) */}
+              {userObj.roleId === ROLES.STAFF.id || userObj.roleId === ROLES.PATIENT.id ? (
+                <TabsContent value="appointments">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center">
+                        <Calendar className="h-5 w-5 mr-2" />
+                        {userObj.roleId === ROLES.STAFF.id ? "Appointment Management" : "Appointments"}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {userObj.roleId === ROLES.STAFF.id ? (
+                        // Staff view
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="bg-blue-50 p-4 rounded-md">
+                              <h3 className="font-medium text-blue-800">Total Managed</h3>
+                              <p className="text-2xl font-bold text-blue-900">142</p>
+                              <p className="text-sm text-blue-600">All time</p>
+                            </div>
+
+                            <div className="bg-green-50 p-4 rounded-md">
+                              <h3 className="font-medium text-green-800">Completed</h3>
+                              <p className="text-2xl font-bold text-green-900">126</p>
+                              <p className="text-sm text-green-600">88.7% completion rate</p>
+                            </div>
+
+                            <div className="bg-purple-50 p-4 rounded-md">
+                              <h3 className="font-medium text-purple-800">Upcoming</h3>
+                              <p className="text-2xl font-bold text-purple-900">8</p>
+                              <p className="text-sm text-purple-600">Next 7 days</p>
+                            </div>
+                          </div>
+
+                          <div className="border p-4 rounded-md">
+                            <h3 className="font-medium mb-2">Assigned Centers & Shifts</h3>
+                            {userCenters.length > 0 ? (
+                              <ul className="space-y-2">
+                                {userCenters.map((center) => (
+                                  <li key={center.id} className="flex items-start space-x-2">
+                                    <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                                    <div>
+                                      <p className="font-medium">{center.centerName}</p>
+                                      <p className="text-sm text-muted-foreground">Mon/Wed/Fri: Morning Shift</p>
+                                    </div>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-muted-foreground">Not assigned to any centers</p>
+                            )}
+                          </div>
+                        </div>
+                      ) : (
+                        // Patient view
+                        <div className="space-y-4">
+                          {/* Fetch patient appointment stats */}
+                          <PatientAppointmentStats patientId={userObj.id || 1006} />
+
+                          <div className="border rounded-md overflow-hidden">
+                            <div className="bg-muted p-3">
+                              <h3 className="font-medium">Upcoming Appointments</h3>
+                            </div>
+                            {/* Fetch patient upcoming appointments */}
+                            <PatientUpcomingAppointments patientId={userObj.id || 1006} />
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
               ) : null}
 
               {/* Medical Tab (For Patients) */}
@@ -421,13 +485,21 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                         <div className="space-y-4">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-1">
-                              <p className="text-sm font-medium text-muted-foreground">Allergies</p>
-                              <p>{patientObj.allergies || 'None reported'}</p>
+                            <p className="text-sm font-medium text-muted-foreground">Allergies</p>
+                            <div className="whitespace-pre-line">
+                              {patientObj.allergies ? patientObj.allergies.split('\n').map((line, i) => (
+                                <p key={i} className="text-sm">{line}</p>
+                              )) : 'Not provided'}
+                            </div>
                             </div>
 
                             <div className="space-y-1">
-                              <p className="text-sm font-medium text-muted-foreground">Chronic Conditions</p>
-                              <p>{patientObj.chronicConditions || 'None reported'}</p>
+                            <p className="text-sm font-medium text-muted-foreground">Chronic Conditions</p>
+                            <div className="whitespace-pre-line">
+                              {patientObj.chronicConditions ? patientObj.chronicConditions.split('\n').map((line, i) => (
+                                <p key={i} className="text-sm">{line}</p>
+                              )) : 'Not provided'}
+                            </div>
                             </div>
                           </div>
 
@@ -453,62 +525,6 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
                   </Card>
                 </TabsContent>
               ) : null}
-
-              {/* Appointments Tab (For Staff) */}
-              {userObj.roleId === ROLES.STAFF.id && userObj.roleId !== ROLES.ADMIN.id ? (
-                <TabsContent value="appointments">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg flex items-center">
-                        <Calendar className="h-5 w-5 mr-2" />
-                        Appointment Management
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="bg-blue-50 p-4 rounded-md">
-                            <h3 className="font-medium text-blue-800">Total Managed</h3>
-                            <p className="text-2xl font-bold text-blue-900">142</p>
-                            <p className="text-sm text-blue-600">All time</p>
-                          </div>
-
-                          <div className="bg-green-50 p-4 rounded-md">
-                            <h3 className="font-medium text-green-800">Completed</h3>
-                            <p className="text-2xl font-bold text-green-900">126</p>
-                            <p className="text-sm text-green-600">88.7% completion rate</p>
-                          </div>
-
-                          <div className="bg-purple-50 p-4 rounded-md">
-                            <h3 className="font-medium text-purple-800">Upcoming</h3>
-                            <p className="text-2xl font-bold text-purple-900">8</p>
-                            <p className="text-sm text-purple-600">Next 7 days</p>
-                          </div>
-                        </div>
-
-                        <div className="border p-4 rounded-md">
-                          <h3 className="font-medium mb-2">Assigned Centers & Shifts</h3>
-                          {userCenters.length > 0 ? (
-                            <ul className="space-y-2">
-                              {userCenters.map((center) => (
-                                <li key={center.id} className="flex items-start space-x-2">
-                                  <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                                  <div>
-                                    <p className="font-medium">{center.centerName}</p>
-                                    <p className="text-sm text-muted-foreground">Mon/Wed/Fri: Morning Shift</p>
-                                  </div>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-muted-foreground">Not assigned to any centers</p>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              ) : null}
             </Tabs>
           </div>
         </div>
@@ -518,6 +534,163 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+};
+
+// Component to display patient appointment statistics
+const PatientAppointmentStats = ({ patientId }: { patientId: number }) => {
+  const { data: stats, isLoading, error } = useQuery<PatientAppointmentStatsType>({
+    queryKey: ['patientAppointmentStats', patientId],
+    queryFn: () => fetchPatientAppointmentStats(patientId),
+    enabled: !!patientId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="bg-muted p-4 rounded-md animate-pulse h-24"></div>
+        ))}
+      </div>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-blue-50 p-4 rounded-md">
+          <h3 className="font-medium text-blue-800">Total Sessions</h3>
+          <p className="text-2xl font-bold text-blue-900">--</p>
+          <p className="text-sm text-blue-600">All time</p>
+        </div>
+        <div className="bg-green-50 p-4 rounded-md">
+          <h3 className="font-medium text-green-800">Completed</h3>
+          <p className="text-2xl font-bold text-green-900">--</p>
+          <p className="text-sm text-green-600">No data available</p>
+        </div>
+        <div className="bg-purple-50 p-4 rounded-md">
+          <h3 className="font-medium text-purple-800">Next Session</h3>
+          <p className="text-2xl font-bold text-purple-900">--</p>
+          <p className="text-sm text-purple-600">No upcoming sessions</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Format the next appointment date if available
+  const nextAppointmentDate = stats?.nextAppointment ? 
+    parseISO(stats.nextAppointment.sessionDate) : null;
+  const nextAppointmentTime = stats?.nextAppointment ? 
+    stats.nextAppointment.startTime : null;
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg-blue-50 p-4 rounded-md">
+        <h3 className="font-medium text-blue-800">Total Sessions</h3>
+        <p className="text-2xl font-bold text-blue-900">{stats?.totalAppointments || '--'}</p>
+        <p className="text-sm text-blue-600">All time</p>
+      </div>
+
+      <div className="bg-green-50 p-4 rounded-md">
+        <h3 className="font-medium text-green-800">Completed</h3>
+        <p className="text-2xl font-bold text-green-900">{stats?.completedAppointments || '--'}</p>
+        <p className="text-sm text-green-600">
+          {stats?.lastSessionDaysAgo ? 
+            `Last session: ${stats.lastSessionDaysAgo} days ago` : 
+            'No previous sessions'}
+        </p>
+      </div>
+
+      <div className="bg-purple-50 p-4 rounded-md">
+        <h3 className="font-medium text-purple-800">Next Session</h3>
+        <p className="text-2xl font-bold text-purple-900">
+          {nextAppointmentDate ? format(nextAppointmentDate, 'MMM d') : '--'}
+        </p>
+        <p className="text-sm text-purple-600">
+          {nextAppointmentTime || 'No upcoming sessions'}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// Component to display patient upcoming appointments
+const PatientUpcomingAppointments = ({ patientId }: { patientId: number }) => {
+  const { data: appointments, isLoading, error } = useQuery<PatientAppointment[]>({
+    queryKey: ['patientUpcomingAppointments', patientId],
+    queryFn: () => fetchPatientAppointments(patientId, { status: 'scheduled', limit: 5 }),
+    enabled: !!patientId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  if (isLoading) {
+    return (
+      <div className="p-4 text-center">
+        <div className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-primary rounded-full" aria-hidden="true"></div>
+        <p className="mt-2 text-sm text-muted-foreground">Loading appointments...</p>
+      </div>
+    );
+  }
+
+  if (error || !appointments || appointments.length === 0) {
+    return (
+      <div className="p-8 text-center">
+        <Calendar className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+        <p className="text-muted-foreground">No upcoming appointments found.</p>
+      </div>
+    );
+  }
+
+  // Helper function to get badge variant based on appointment status
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'scheduled':
+        return "bg-gray-50 text-gray-700 hover:bg-gray-50";
+      case 'confirmed':
+        return "bg-blue-50 text-blue-700 hover:bg-blue-50";
+      case 'completed':
+        return "bg-green-50 text-green-700 hover:bg-green-50";
+      case 'cancelled':
+        return "bg-red-50 text-red-700 hover:bg-red-50";
+      case 'no-show':
+        return "bg-amber-50 text-amber-700 hover:bg-amber-50";
+      default:
+        return "bg-gray-50 text-gray-700 hover:bg-gray-50";
+    }
+  };
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Date & Time</TableHead>
+          <TableHead>Center</TableHead>
+          <TableHead>Doctor</TableHead>
+          <TableHead>Status</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {appointments && appointments.map((appointment) => (
+          <TableRow key={appointment.id}>
+            <TableCell className="font-medium">
+              {format(parseISO(appointment.sessionDate), 'PPP')}
+              <div className="text-sm text-muted-foreground">{appointment.startTime}</div>
+            </TableCell>
+            <TableCell>{appointment.centerName}</TableCell>
+            <TableCell>{appointment.doctorName || 'Not assigned'}</TableCell>
+            <TableCell>
+              <Badge 
+                variant="outline" 
+                className={getStatusBadgeVariant(appointment.status)}
+              >
+                {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+              </Badge>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 };
 

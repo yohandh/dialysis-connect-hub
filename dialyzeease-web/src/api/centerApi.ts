@@ -260,6 +260,43 @@ export const deleteCenter = async (centerId: string): Promise<void> => {
   }
 };
 
+// Get centers assigned to a specific user
+export const fetchUserCenters = async (userId: number | null): Promise<any[]> => {
+  if (!userId) return [];
+  
+  try {
+    if (useMockApi()) {
+      await new Promise(resolve => setTimeout(resolve, API_DELAY));
+      
+      // Mock data for user centers
+      return [
+        {
+          id: 1,
+          userId: userId,
+          centerId: 1,
+          centerName: 'Colombo Dialysis Center',
+          assignedAt: '2024-01-15',
+          status: 'active'
+        },
+        {
+          id: 2,
+          userId: userId,
+          centerId: 3,
+          centerName: 'Kandy Kidney Care',
+          assignedAt: '2024-03-10',
+          status: 'active'
+        }
+      ];
+    } else {
+      const response = await apiCall<any[]>(`/users/${userId}/centers`);
+      return response;
+    }
+  } catch (error) {
+    console.error(`Failed to fetch centers for user ${userId}:`, error);
+    return [];
+  }
+};
+
 // For compatibility with existing imports
 export const fetchCenters = getAllCenters;
 export const fetchCenterById = getCenterDetails;

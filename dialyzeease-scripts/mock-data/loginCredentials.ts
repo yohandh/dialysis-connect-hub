@@ -12,7 +12,7 @@ export const loginCredentials: LoginCredential[] = [
     email: "admin@example.com",
     password: "admin123",
     role: "admin",
-    name: "Michael Adams",
+    name: "Suwan Ratnayake",
     userId: "user-007"
   },
   {

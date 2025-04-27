@@ -32,14 +32,16 @@ const AdminAccountSettings = () => {
     <PortalLayout
       portalName="Admin Portal"
       navLinks={navLinks}
-      userName="Michael Adams"
-      userRole="System Administrator"
-      userImage="https://randomuser.me/api/portraits/men/42.jpg"
+      userName="Suwan Ratnayake"
+      userRole="Administrator"
+      userImage="https://randomuser.me/api/portraits/women/42.jpg"
     >
       <div className="container mx-auto py-6">
+        {/* 
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Account Settings</h1>
-        </div>
+        </div> 
+        */}
         
         <Tabs defaultValue="profile">
           <TabsList className="grid w-full grid-cols-4 mb-8">
@@ -67,7 +69,7 @@ const AdminAccountSettings = () => {
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div className="flex items-center space-x-4 mb-6">
                       <Avatar className="h-20 w-20">
-                        <AvatarImage src="https://randomuser.me/api/portraits/men/42.jpg" alt="Michael Adams" />
+                        <AvatarImage src="https://randomuser.me/api/portraits/women/42.jpg" alt="Suwan Ratnayake" />
                         <AvatarFallback>MA</AvatarFallback>
                       </Avatar>
                       <div>
@@ -100,7 +102,7 @@ const AdminAccountSettings = () => {
                     
                     <div className="space-y-2">
                       <Label htmlFor="role">Role</Label>
-                      <Input id="role" defaultValue="System Administrator" disabled />
+                      <Input id="role" defaultValue="Administrator" disabled />
                     </div>
                     
                     <Button type="submit">Save Changes</Button>

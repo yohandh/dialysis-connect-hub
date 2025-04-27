@@ -33,12 +33,12 @@ interface RecentAppointmentsTableProps {
 }
 
 const RecentAppointmentsTable = ({ appointments }: RecentAppointmentsTableProps) => {
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeVariant = (status: string): "default" | "secondary" | "destructive" | "outline" | "success" | "info" | "warning" | "purple" => {
     switch (status) {
-      case "completed": return "outline";
-      case "booked": return "default";
-      case "canceled": return "destructive";
-      case "rescheduled": return "secondary";
+      case "Completed": return "success";
+      case "Booked": return "info";
+      case "Cancelled": return "destructive";
+      case "Rescheduled": return "warning";
       default: return "outline";
     }
   };
@@ -48,7 +48,7 @@ const RecentAppointmentsTable = ({ appointments }: RecentAppointmentsTableProps)
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
           <CardTitle>Recent Appointments</CardTitle>
-          <CardDescription>The latest dialysis appointments across all centers.</CardDescription>
+          <CardDescription>The Latest Dialysis Appointments (All Centers)</CardDescription>
         </div>
         <Button size="sm">
           <CalendarRange className="mr-2 h-4 w-4" />

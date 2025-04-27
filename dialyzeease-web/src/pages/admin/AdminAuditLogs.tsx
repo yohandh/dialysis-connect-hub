@@ -15,9 +15,9 @@ const AdminAuditLogs = () => {
         { name: "Education", path: "/admin/education" },
         { name: "Reports", path: "/admin/reports" },
       ]}
-      userName="Michael Adams"
-      userRole="System Administrator"
-      userImage="https://randomuser.me/api/portraits/men/42.jpg"
+      userName="Suwan Ratnayake"
+      userRole="Administrator"
+      userImage="https://randomuser.me/api/portraits/women/42.jpg"
     >
       <SystemAuditLogs />
     </PortalLayout>

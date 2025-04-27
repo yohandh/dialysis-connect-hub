@@ -166,9 +166,9 @@ const AdminAudit = () => {
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
         { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
-      userName="Michael Adams"
-      userRole="System Administrator"
-      userImage="https://randomuser.me/api/portraits/men/42.jpg"
+      userName="Suwan Ratnayake"
+      userRole="Administrator"
+      userImage="https://randomuser.me/api/portraits/women/42.jpg"
     >
       <div className="container mx-auto p-4 space-y-6">
         <div className="flex items-center justify-between">

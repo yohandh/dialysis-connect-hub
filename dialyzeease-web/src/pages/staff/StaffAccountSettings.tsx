@@ -35,9 +35,11 @@ const StaffAccountSettings = () => {
       userImage="https://randomuser.me/api/portraits/women/44.jpg"
     >
       <div className="container mx-auto py-6">
+        {/*
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">Account Settings</h1>
         </div>
+        */}
         
         <Tabs defaultValue="profile">
           <TabsList className="grid w-full grid-cols-4 mb-8">

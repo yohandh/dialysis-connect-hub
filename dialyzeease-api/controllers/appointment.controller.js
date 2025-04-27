@@ -49,7 +49,7 @@ const emailTemplates = {
             <li>Consider bringing something to keep you occupied during treatment (book, tablet, etc.).</li>
           </ul>
           
-          <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:+1234567890">123-456-7890</a> or reply to this email.</p>
+          <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:0112422335">0112422335</a> or reply to this email.</p>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
             <p style="color: #666;">Best regards,</p>
@@ -87,7 +87,7 @@ const emailTemplates = {
             <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
           </div>
           
-          <p>If you need to schedule a new appointment, please contact our scheduling department at <a href="tel:+1234567890">123-456-7890</a> or through our online portal.</p>
+          <p>If you need to schedule a new appointment, please contact our scheduling department at <a href="tel:0112422335">0112422335</a> or through our online portal.</p>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
             <p style="color: #666;">Best regards,</p>
@@ -173,7 +173,7 @@ const emailTemplates = {
             <li>Consider bringing something to keep you occupied during treatment (book, tablet, etc.).</li>
           </ul>
           
-          <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:+1234567890">123-456-7890</a> or reply to this email.</p>
+          <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:0112422335">0112422335</a> or reply to this email.</p>
           
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
             <p style="color: #666;">Best regards,</p>

@@ -28,7 +28,7 @@ export interface DialysisCenter {
 export const dialysisCenters: DialysisCenter[] = [
   {
     id: "center-001",
-    name: "Metro Dialysis Center",
+    name: "Asiri Surgical Hospital",
     address: {
       street: "123 Healthcare Blvd",
       city: "Metropolis",

@@ -1,10 +1,9 @@
-import React from 'react';
 import { 
-  CalendarIcon, 
   CircleUser, 
-  CircleDot, 
-  Building2, 
+  Hospital, 
   Users, 
+  UserPlus,
+  UserLock,
   BookOpen, 
   LayoutDashboard,
   FileBarChart2,
@@ -22,37 +21,38 @@ import QuickActionCards from '@/components/admin/dashboard/QuickActionCards';
 // Mock dashboard data
 const dashboardStats = [
   { 
-    name: "Total Patients", 
-    value: patients.length, 
-    icon: <CircleUser className="h-6 w-6" />,
-    detail: "+2 since last month"
-  },
-  { 
     name: "Dialysis Centers", 
     value: centers.length, 
-    icon: <Building2 className="h-6 w-6" />,
+    icon: <Hospital className="h-6 w-6" />,
     detail: "All centers operational"
+  },
+  { 
+    name: "Total Patients", 
+    value: patients.length, 
+    icon: <Users className="h-6 w-6 text-green-500" />,
+    detail: "+2 since last month"
+  },  
+  { 
+    name: "Doctors", 
+    value: doctors.length, 
+    icon: <Users className="h-6 w-6 text-blue-500" />,
+    detail: "2 specialists"
   },
   { 
     name: "Staff Members", 
     value: users.filter(u => u.roleId === 2).length, 
-    icon: <Users className="h-6 w-6" />,
+    icon: <Users className="h-6 w-6 text-purple-500" />,
     detail: "4 in training"
-  },
-  { 
-    name: "Doctors", 
-    value: doctors.length, 
-    icon: <CircleDot className="h-6 w-6" />,
-    detail: "2 specialists"
-  },
+  }  
 ];
 
 const recentAppointments = [
-  { id: 1, patient: "John Smith", center: "Metro Dialysis Center", date: "2023-05-20", time: "10:00 AM", status: "completed" },
-  { id: 2, patient: "Maria Rodriguez", center: "Central Kidney Care", date: "2023-05-20", time: "2:30 PM", status: "completed" },
-  { id: 3, patient: "Robert Johnson", center: "Riverside Renal Center", date: "2023-05-21", time: "9:15 AM", status: "booked" },
-  { id: 4, patient: "Emily Chen", center: "Highland Dialysis", date: "2023-05-21", time: "11:45 AM", status: "booked" },
-  { id: 5, patient: "Michael Brown", center: "Metro Dialysis Center", date: "2023-05-21", time: "3:00 PM", status: "rescheduled" },
+  { id: 1, patient: "Amal Perera", center: "Asiri Surgical Hospital", date: "2025-05-05", time: "09:00 AM", status: "Booked" },
+  { id: 2, patient: "Sanduni Wickramasinghe", center: "The National Institute For Nephrology Dialysis & Transplantation (NINDT)", date: "2025-05-07", time: "10:00 AM", status: "Rescheduled" },
+  { id: 3, patient: "Supun Perera", center: "Lanka Hospital", date: "2023-05-28", time: "3:00 PM", status: "Completed" },
+  { id: 4, patient: "Nimal Silva", center: "Kings Hospital", date: "2023-05-21", time: "7:00 AM", status: "Cancelled" },
+  
+  { id: 5, patient: "Dilshan Perera", center: "Nawaloka Hospital", date: "2023-05-21", time: "3:00 PM", status: "Completed" },
 ];
 
 const patientStatusData = [
@@ -63,11 +63,12 @@ const patientStatusData = [
 ];
 
 const centerUtilizationData = [
-  { center: "Metro", maxCapacity: 50, currentLoad: 42 },
-  { center: "Central", maxCapacity: 40, currentLoad: 35 },
-  { center: "Riverside", maxCapacity: 35, currentLoad: 28 },
-  { center: "Highland", maxCapacity: 25, currentLoad: 21 },
-  { center: "Eastside", maxCapacity: 30, currentLoad: 26 },
+  { center: "NINDT", "Max Capacity": 40, "Current Load": 35 },
+  { center: "Surgical", "Max Capacity": 40, "Current Load": 30 },
+  { center: "Central", "Max Capacity": 50, "Current Load": 35 },
+  { center: "Nawaloka", "Max Capacity": 35, "Current Load": 25 },
+  { center: "Kings", "Max Capacity": 25, "Current Load": 20 },
+  { center: "Lanka", "Max Capacity": 30, "Current Load": 15 },  
 ];
 
 const AdminDashboard = () => {
@@ -77,15 +78,15 @@ const AdminDashboard = () => {
       navLinks={[
         { name: "Dashboard", path: "/admin/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
         { name: "Users", path: "/admin/users", icon: <Users className="h-5 w-5" /> },
-        { name: "Centers", path: "/admin/centers", icon: <Building2 className="h-5 w-5" /> },
+        { name: "Centers", path: "/admin/centers", icon: <Hospital className="h-5 w-5" /> },
         { name: "Notifications", path: "/admin/notifications", icon: <Bell className="h-5 w-5" /> },
         { name: "Audit", path: "/admin/audit", icon: <ClipboardList className="h-5 w-5" /> },
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
         { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
-      userName="Michael Adams"
-      userRole="System Administrator"
-      userImage="https://randomuser.me/api/portraits/men/42.jpg"
+      userName="Suwan Ratnayake"
+      userRole="Administrator"
+      userImage="https://randomuser.me/api/portraits/women/42.jpg"
     >
       <div className="space-y-6">
         <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
@@ -106,7 +107,7 @@ const AdminDashboard = () => {
         <RecentAppointmentsTable appointments={recentAppointments} />
 
         {/* Quick Actions */}
-        <QuickActionCards />
+        {/* <QuickActionCards /> */}
       </div>
     </PortalLayout>
   );

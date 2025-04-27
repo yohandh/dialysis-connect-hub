@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import { Plus, LayoutDashboard, Building2, Users, FileBarChart2, BookOpen, Bell, ClipboardList } from "lucide-react";
 import PortalLayout from "@/components/layouts/PortalLayout";
 import CenterTable from "@/components/admin/centers/CenterTable";
@@ -69,7 +70,7 @@ const AdminCenters = () => {
       toast({
         title: "Error",
         description: `Failed to create center: ${error.message}`,
-        variant: "destructive",
+        variant: "error",
       });
     },
   });
@@ -89,7 +90,7 @@ const AdminCenters = () => {
       toast({
         title: "Error",
         description: `Failed to update center: ${error.message}`,
-        variant: "destructive",
+        variant: "error",
       });
     },
   });
@@ -108,7 +109,7 @@ const AdminCenters = () => {
       toast({
         title: "Error",
         description: `Failed to delete center: ${error.message}`,
-        variant: "destructive",
+        variant: "error",
       });
     },
   });
@@ -127,7 +128,7 @@ const AdminCenters = () => {
       toast({
         title: "Error",
         description: `Failed to activate center: ${error.message}`,
-        variant: "destructive",
+        variant: "error",
       });
     },
   });
@@ -146,7 +147,7 @@ const AdminCenters = () => {
       toast({
         title: "Error",
         description: `Failed to deactivate center: ${error.message}`,
-        variant: "destructive",
+        variant: "error",
       });
     },
   });
@@ -186,7 +187,7 @@ const AdminCenters = () => {
 
   // Handle dialog open for editing
   const handleEditCenter = (centerId: number) => {
-    const center = centers.find(c => c.id === centerId);
+    const center = centers.find(c => c.id === Number(centerId));
     if (center) {
       console.log('Center data from API:', center);
       
@@ -242,7 +243,7 @@ const AdminCenters = () => {
         contactNo: center.contactNo || '',
         email: center.email || '',
         totalCapacity: center.totalCapacity || 10,
-        manageById: center.manageById,
+        manageById: Number(center.manageById),
         centerHours,
         type: center.type || 'Independent'
       });
@@ -278,23 +279,46 @@ const AdminCenters = () => {
 
   // Handle center deletion (hard delete)
   const handleDeleteCenter = (centerId: number) => {
-    if (window.confirm("Are you sure you want to permanently delete this center? This action cannot be undone.")) {
-      deleteMutation.mutate(centerId.toString());
-    }
+    const center = centers.find(c => c.id === Number(centerId));
+    toast({
+      title: "Delete center",
+      description: `Are you sure you want to delete ${center?.name || 'this center'}? This action cannot be undone.`,
+      variant: "error",
+      action: (
+        <ToastAction altText="Confirm deletion" onClick={() => deleteMutation.mutate(Number(centerId))}>
+          Confirm
+        </ToastAction>
+      ),
+    });
   };
 
   // Handle center activation/deactivation
   const handleToggleActive = (centerId: number, isActive: boolean) => {
+    const center = centers.find(c => c.id === Number(centerId));
     if (isActive) {
       // Deactivate center
-      if (window.confirm("Are you sure you want to deactivate this center? This will make it unavailable for new appointments.")) {
-        deactivateMutation.mutate(centerId.toString());
-      }
+      toast({
+        title: "Deactivate center",
+        description: `Are you sure you want to deactivate ${center?.name || 'this center'}? This will make it unavailable for new appointments.`,
+        variant: "warning",
+        action: (
+          <ToastAction altText="Confirm deactivation" onClick={() => deactivateMutation.mutate(Number(centerId))}>
+            Confirm
+          </ToastAction>
+        ),
+      });
     } else {
       // Activate center
-      if (window.confirm("Are you sure you want to activate this center? This will make it available for new appointments.")) {
-        activateMutation.mutate(centerId.toString());
-      }
+      toast({
+        title: "Activate center",
+        description: `Are you sure you want to activate ${center?.name || 'this center'}? This will make it available for new appointments.`,
+        variant: "success",
+        action: (
+          <ToastAction altText="Confirm activation" onClick={() => activateMutation.mutate(Number(centerId))}>
+            Confirm
+          </ToastAction>
+        ),
+      });
     }
   };
 
@@ -370,9 +394,9 @@ const AdminCenters = () => {
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
         { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
-      userName="Michael Adams"
-      userRole="System Administrator"
-      userImage="https://randomuser.me/api/portraits/men/42.jpg"
+      userName="Suwan Ratnayake"
+      userRole="Administrator"
+      userImage="https://randomuser.me/api/portraits/women/42.jpg"
     >
       <div className="space-y-6">
         <div className="flex items-center justify-between">

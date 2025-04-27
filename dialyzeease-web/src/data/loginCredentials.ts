@@ -9,10 +9,10 @@ interface LoginCredential {
 
 export const loginCredentials: LoginCredential[] = [
   {
-    email: "admin@example.com",
-    password: "admin123",
+    email: "admin@dialyzeease.org",
+    password: "example.com",
     role: "admin",
-    name: "Michael Adams",
+    name: "Suwan Ratnayake",
     userId: "user-007"
   },
   {
@@ -23,8 +23,8 @@ export const loginCredentials: LoginCredential[] = [
     userId: "user-008"
   },
   {
-    email: "staff@example.com",
-    password: "staff123",
+    email: "staff@dialyzeease.org",
+    password: "example.com",
     role: "staff",
     name: "Sarah Johnson",
     userId: "user-005"
@@ -37,8 +37,8 @@ export const loginCredentials: LoginCredential[] = [
     userId: "user-006"
   },
   {
-    email: "patient@example.com",
-    password: "patient123",
+    email: "patient@dialyzeease.org",
+    password: "example.com",
     role: "patient",
     name: "John Smith",
     userId: "user-001"

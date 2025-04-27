@@ -28,7 +28,7 @@ const StaffLogin = () => {
       toast({
         title: "Login Failed",
         description: "Invalid email or password for staff access.",
-        variant: "destructive",
+        variant: "error",
       });
     }
   };
@@ -56,7 +56,7 @@ const StaffLogin = () => {
               <Input 
                 id="email" 
                 type="email" 
-                placeholder="staff@example.com" 
+                placeholder="staff@dialyzeease.org" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />

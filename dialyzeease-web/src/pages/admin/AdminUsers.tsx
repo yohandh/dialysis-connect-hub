@@ -80,7 +80,7 @@ const AdminUsers = () => {
           toast({
             title: "Authentication Required",
             description: "Please log in to view users.",
-            variant: "destructive",
+            variant: "error",
           });
           
           // Redirect to login page after a short delay
@@ -202,9 +202,9 @@ const AdminUsers = () => {
           { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
           { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
         ]}
-        userName="Michael Adams"
-        userRole="System Administrator"
-        userImage="https://randomuser.me/api/portraits/men/42.jpg"
+        userName="Suwan Ratnayake"
+        userRole="Administrator"
+        userImage="https://randomuser.me/api/portraits/women/42.jpg"
       >
         <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)]">
           <h2 className="text-2xl font-bold">Error loading users</h2>
@@ -229,9 +229,9 @@ const AdminUsers = () => {
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
         { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
-      userName="Michael Adams"
-      userRole="System Administrator"
-      userImage="https://randomuser.me/api/portraits/men/42.jpg"
+      userName="Suwan Ratnayake"
+      userRole="Administrator"
+      userImage="https://randomuser.me/api/portraits/women/42.jpg"
     >
       <div className="flex flex-col space-y-6">
         <div className="flex justify-between items-center">
@@ -397,7 +397,7 @@ const AdminUsers = () => {
                               variant="outline"
                               className={
                                 user.status === "Active" ? "bg-green-100 text-green-600 border-green-200" :
-                                user.status === "Inactive" ? "bg-gray-100 text-gray-600 border-gray-200" : ''
+                                user.status === "Inactive" ? "bg-amber-100 text-amber-600 border-amber-200" : ''
                               }
                             >
                               {formatStatus(user.status)}

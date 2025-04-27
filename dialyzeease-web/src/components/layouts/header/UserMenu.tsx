@@ -60,11 +60,13 @@ const UserMenu = ({ userName, userRole, userImage }: UserMenuProps) => {
           <p className="text-sm font-medium">{userName}</p>
           <p className="text-xs text-gray-500">{userRole}</p>
         </div>
+        {/* 
         <DropdownMenuSeparator className="md:hidden" />
         <DropdownMenuItem onClick={handleAccountSettings}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Account Settings</span>
-        </DropdownMenuItem>
+        </DropdownMenuItem> 
+        */}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />

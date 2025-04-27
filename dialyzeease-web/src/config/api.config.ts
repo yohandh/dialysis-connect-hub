@@ -7,7 +7,7 @@ export const API_BASE_URL = process.env.NODE_ENV === 'production'
 
 // Whether to use mock API data instead of real API calls
 // Set to true to use mock data, false to use the real database connection
-let USE_MOCK_API = true;
+let USE_MOCK_API = false;
 
 // Authentication tokens from environment variables
 const MOCK_AUTH_TOKEN = import.meta.env.VITE_MOCK_AUTH_TOKEN || 'dev-auth-token-12345';

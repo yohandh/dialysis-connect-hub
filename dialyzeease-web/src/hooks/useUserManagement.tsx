@@ -69,7 +69,7 @@ export function useUserManagement() {
         toast({
           title: "Error",
           description: `Failed to create user: ${error.message}`,
-          variant: "destructive",
+          variant: "error",
         });
       }
       // Error will be returned to the component for form-level handling
@@ -94,7 +94,7 @@ export function useUserManagement() {
         toast({
           title: "Error",
           description: `Failed to update user: ${error.message}`,
-          variant: "destructive",
+          variant: "error",
         });
       }
       // Error will be returned to the component for form-level handling
@@ -115,7 +115,7 @@ export function useUserManagement() {
       toast({
         title: "Error",
         description: `Failed to delete user: ${error.message}`,
-        variant: "destructive",
+        variant: "error",
       });
     }
   });
@@ -134,7 +134,7 @@ export function useUserManagement() {
       toast({
         title: "Error",
         description: `Failed to deactivate user: ${error.message}`,
-        variant: "destructive",
+        variant: "error",
       });
     }
   });
@@ -153,7 +153,7 @@ export function useUserManagement() {
       toast({
         title: "Error",
         description: `Failed to activate user: ${error.message}`,
-        variant: "destructive",
+        variant: "error",
       });
     }
   });
@@ -176,7 +176,7 @@ export function useUserManagement() {
         toast({
           title: "Error",
           description: "Failed to load user data. Please try again.",
-          variant: "destructive",
+          variant: "error",
         });
       });
     }, 100);
@@ -201,6 +201,7 @@ export function useUserManagement() {
         toast({
           title: "Deactivate user",
           description: `Are you sure you want to deactivate ${user.name}?`,
+          variant: "warning",
           action: (
             <ToastAction altText="Confirm deactivation" onClick={() => deactivateUserMutation(user.id)}>
               Confirm
@@ -212,6 +213,7 @@ export function useUserManagement() {
         toast({
           title: "Activate user",
           description: `Are you sure you want to activate ${user.name}?`,
+          variant: "success",
           action: (
             <ToastAction altText="Confirm activation" onClick={() => activateUserMutation(user.id)}>
               Confirm
@@ -223,7 +225,7 @@ export function useUserManagement() {
         toast({
           title: "Delete user",
           description: `Are you sure you want to delete ${user.name}? This action cannot be undone.`,
-          variant: "destructive",
+          variant: "error",
           action: (
             <ToastAction altText="Confirm deletion" onClick={() => deleteUserMutation(user.id)}>
               Confirm

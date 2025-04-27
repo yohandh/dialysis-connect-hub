@@ -36,67 +36,31 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Book, Edit, FileText, Plus, Trash, LayoutDashboard, Building2, Users, BookOpen, FileBarChart2, Bell, ClipboardList } from "lucide-react";
+import { Book, Edit, FileText, Plus, Trash, LayoutDashboard, Building2, Users, BookOpen, FileBarChart2, Bell, ClipboardList, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ToastAction } from "@/components/ui/toast";
 import PortalLayout from "@/components/layouts/PortalLayout";
 import { EducationMaterial, CkdStage } from '@/types/adminTypes';
+import { 
+  fetchEducationMaterials, 
+  fetchCkdStages, 
+  createEducationMaterial, 
+  updateEducationMaterial, 
+  deleteEducationMaterial 
+} from '@/api/educationApi';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-// Mock data for education materials
-const educationMaterials: EducationMaterial[] = [
-  {
-    id: 1,
-    ckdStage: 1,
-    langCode: 'en',
-    type: 'diet',
-    title: 'Diet Recommendations for CKD Stage 1',
-    content: 'Limit protein intake to 0.8g per kg body weight. Reduce sodium intake to less than 2,300mg per day...'
-  },
-  {
-    id: 2,
-    ckdStage: 2,
-    langCode: 'en',
-    type: 'lifestyle',
-    title: 'Exercise Guidelines for CKD Stage 2',
-    content: 'Aim for 30 minutes of moderate exercise 5 days per week. Avoid high-intensity workouts...'
-  },
-  {
-    id: 3,
-    ckdStage: 3,
-    langCode: 'en',
-    type: 'general',
-    title: 'Understanding CKD Stage 3',
-    content: 'At stage 3, your kidneys are moderately damaged and not working as well as they should...'
-  },
-  {
-    id: 4,
-    ckdStage: 4,
-    langCode: 'es',
-    type: 'diet',
-    title: 'Recomendaciones Dietéticas para ERC Etapa 4',
-    content: 'Limite la ingesta de proteínas a 0.6g por kg de peso corporal. Reduzca el potasio y el fósforo...'
-  },
-  {
-    id: 5,
-    ckdStage: 5,
-    langCode: 'en',
-    type: 'general',
-    title: 'Preparing for Dialysis - Stage 5 CKD',
-    content: 'Stage 5 CKD means your kidneys are working at less than 15% capacity. Preparation for dialysis...'
-  },
-];
-
-// Mock data for CKD stages
-const ckdStages: CkdStage[] = [
-  { id: 1, stageNumber: 1, minEgfr: 90, maxEgfr: 999, description: 'Kidney damage with normal kidney function' },
-  { id: 2, stageNumber: 2, minEgfr: 60, maxEgfr: 89, description: 'Kidney damage with mild loss of kidney function' },
-  { id: 3, stageNumber: 3, minEgfr: 30, maxEgfr: 59, description: 'Mild to severe loss of kidney function' },
-  { id: 4, stageNumber: 4, minEgfr: 15, maxEgfr: 29, description: 'Severe loss of kidney function' },
-  { id: 5, stageNumber: 5, minEgfr: 0, maxEgfr: 15, description: 'Kidney failure' },
-];
+const ucfirst = (str: string) => str ? str[0].toUpperCase() + str.slice(1) : '';
 
 // Schema for education material form validation
 const educationFormSchema = z.object({
@@ -113,10 +77,23 @@ type EducationFormValues = z.infer<typeof educationFormSchema>;
 
 const AdminEducation = () => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentMaterial, setCurrentMaterial] = useState<number | null>(null);
   const [previewMaterial, setPreviewMaterial] = useState<EducationMaterial | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  
+  // Fetch education materials
+  const { data: educationMaterials = [], isLoading: isLoadingMaterials } = useQuery({
+    queryKey: ['educationMaterials'],
+    queryFn: fetchEducationMaterials,
+  });
+  
+  // Fetch CKD stages
+  const { data: ckdStages = [], isLoading: isLoadingStages } = useQuery({
+    queryKey: ['ckdStages'],
+    queryFn: fetchCkdStages,
+  });
   
   // Initialize form
   const form = useForm<EducationFormValues>({
@@ -146,6 +123,20 @@ const AdminEducation = () => {
     }
   };
 
+  // Handle delete material
+  const handleDeleteMaterial = (materialId: number) => {
+    toast({
+      title: "Delete material",
+      description: `Are you sure you want to delete this educational material? This action cannot be undone.`,
+      variant: "error",
+      action: (
+        <ToastAction altText="Confirm deletion" onClick={() => deleteMutation.mutate(materialId)}>
+          Confirm
+        </ToastAction>
+      ),
+    });
+  };
+
   // Handle dialog open for new material
   const handleNewMaterial = () => {
     form.reset({
@@ -168,22 +159,86 @@ const AdminEducation = () => {
     }
   };
 
-  // Form submission handler
-  const onSubmit = (data: EducationFormValues) => {
-    if (currentMaterial) {
-      // Update existing material
-      toast({
-        title: "Material updated",
-        description: "The education material has been updated successfully.",
-      });
-    } else {
-      // Create new material
+  // Create material mutation
+  const createMutation = useMutation({
+    mutationFn: createEducationMaterial,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['educationMaterials'] });
       toast({
         title: "Material added",
         description: "The new education material has been added successfully.",
+        variant: "success",
       });
+      setIsDialogOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to add material: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: "error",
+      });
+    },
+  });
+
+  // Update material mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number, data: Omit<EducationMaterial, 'id'> }) => 
+      updateEducationMaterial(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['educationMaterials'] });
+      toast({
+        title: "Material updated",
+        description: "The education material has been updated successfully.",
+        variant: "success",
+      });
+      setIsDialogOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to update material: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: "error",
+      });
+    },
+  });
+
+  // Delete material mutation
+  const deleteMutation = useMutation({
+    mutationFn: deleteEducationMaterial,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['educationMaterials'] });
+      toast({
+        title: "Success",
+        description: "Educational material has been deleted successfully.",
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to delete material: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        variant: "error",
+      });
+    },
+  });
+
+  // Form submission handler
+  const onSubmit = (data: EducationFormValues) => {
+    const materialData = {
+      title: data.title,
+      content: data.content,
+      ckdStage: data.ckdStage,
+      langCode: data.langCode,
+      type: data.type
+    };
+    
+    if (currentMaterial) {
+      // Update existing material
+      updateMutation.mutate({ id: currentMaterial, data: materialData });
+    } else {
+      // Create new material
+      createMutation.mutate(materialData);
     }
-    setIsDialogOpen(false);
   };
 
   // Get stage label
@@ -193,12 +248,24 @@ const AdminEducation = () => {
   };
 
   // Get material type badge variant
-  const getTypeBadgeVariant = (type: string): "default" | "secondary" | "outline" => {
+  const getTypeBadgeVariant = (type: string): "diet" | "lifestyle" | "general" => {
     switch (type) {
-      case "diet": return "default";
-      case "lifestyle": return "secondary";
-      case "general": return "outline";
-      default: return "default";
+      case "diet": return "diet";
+      case "lifestyle": return "lifestyle";
+      case "general": return "general";
+      default: return "general";
+    }
+  };
+
+  // Get CKD stage badge variant
+  const getStageBadgeVariant = (stageNumber: number): "stage1" | "stage2" | "stage3" | "stage4" | "stage5" => {
+    switch (stageNumber) {
+      case 1: return "stage1";
+      case 2: return "stage2";
+      case 3: return "stage3";
+      case 4: return "stage4";
+      case 5: return "stage5";
+      default: return "stage1";
     }
   };
 
@@ -228,9 +295,9 @@ const AdminEducation = () => {
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
         { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
-      userName="Michael Adams"
-      userRole="System Administrator"
-      userImage="https://randomuser.me/api/portraits/men/42.jpg"
+      userName="Suwan Ratnayake"
+      userRole="Administrator"
+      userImage="https://randomuser.me/api/portraits/women/42.jpg"
     >
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -241,21 +308,25 @@ const AdminEducation = () => {
           </Button>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {ckdStages.map((stage) => (
-            <Card key={stage.id}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Stage {stage.stageNumber} Materials</CardTitle>
-                <Book className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{educationMaterials.filter(m => m.ckdStage === stage.stageNumber).length}</div>
-                <p className="text-xs text-muted-foreground">
-                  eGFR: {stage.minEgfr}-{stage.maxEgfr === 999 ? '∞' : stage.maxEgfr} mL/min
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+        <div className="flex flex-row gap-4 overflow-x-auto pb-2">
+          {isLoadingStages ? (
+            <div className="flex justify-center w-full py-4">Loading CKD stages...</div>
+          ) : (
+            ckdStages.map((stage) => (
+              <Card key={stage.id} className="min-w-[180px] flex-1">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Stage {stage.stageNumber} Materials</CardTitle>
+                  <Book className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{educationMaterials.filter(m => m.ckdStage === stage.stageNumber).length}</div>
+                  <p className="text-xs text-muted-foreground">
+                    eGFR: {stage.minEgfr}-{stage.maxEgfr === 999 ? '∞' : stage.maxEgfr} mL/min
+                  </p>
+                </CardContent>
+              </Card>
+            ))
+          )}
         </div>
 
         <Card>
@@ -263,54 +334,74 @@ const AdminEducation = () => {
             <CardTitle>All Education Materials</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Title</TableHead>
-                  <TableHead>CKD Stage</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Language</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {educationMaterials.map((material) => (
+            {isLoadingMaterials ? (
+              <div className="flex justify-center py-8">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                  <p className="text-sm text-muted-foreground">Loading education materials...</p>
+                </div>
+              </div>
+            ) : educationMaterials.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <Book className="h-12 w-12 text-muted-foreground opacity-30 mb-2" />
+                <h3 className="font-medium text-lg">No education materials found</h3>
+                <p className="text-sm text-muted-foreground mt-1">Add your first education material to get started</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>CKD Stage</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Language</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {educationMaterials.map((material) => (
                   <TableRow key={material.id}>
                     <TableCell className="font-medium">{material.title}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">
+                      <Badge variant={getStageBadgeVariant(material.ckdStage)}>
                         {getStageName(material.ckdStage)}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge variant={getTypeBadgeVariant(material.type)}>
-                        {material.type}
+                        {ucfirst(material.type)}
                       </Badge>
                     </TableCell>
                     <TableCell>{getLanguageName(material.langCode)}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button 
-                        size="sm" 
-                        variant="ghost"
-                        onClick={() => handlePreview(material.id)}
-                      >
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="ghost"
-                        onClick={() => handleEditMaterial(material.id)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost">
-                        <Trash className="h-4 w-4" />
-                      </Button>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 px-2">
+                            Actions <ChevronDown className="ml-2 h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[160px]">
+                          <DropdownMenuItem onClick={() => handlePreview(material.id)}>
+                            View Material
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditMaterial(material.id)}>
+                            Edit Material
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="h-px bg-muted p-0 my-1" />
+                          <DropdownMenuItem 
+                            onClick={() => handleDeleteMaterial(material.id)}
+                            className="text-red-500"
+                          >
+                            Delete Material
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
 
@@ -350,7 +441,7 @@ const AdminEducation = () => {
                       <FormItem>
                         <FormLabel>CKD Stage</FormLabel>
                         <Select 
-                          defaultValue={field.value.toString()} 
+                          value={field.value ? field.value.toString() : "1"} 
                           onValueChange={(value) => field.onChange(parseInt(value))}
                         >
                           <FormControl>
@@ -378,7 +469,7 @@ const AdminEducation = () => {
                       <FormItem>
                         <FormLabel>Type</FormLabel>
                         <Select 
-                          defaultValue={field.value} 
+                          value={field.value || "en"} 
                           onValueChange={field.onChange}
                         >
                           <FormControl>
@@ -404,7 +495,7 @@ const AdminEducation = () => {
                       <FormItem>
                         <FormLabel>Language</FormLabel>
                         <Select 
-                          defaultValue={field.value} 
+                          value={field.value || "en"} 
                           onValueChange={field.onChange}
                         >
                           <FormControl>

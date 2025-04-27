@@ -17,6 +17,7 @@ const sessionRoutes = require('./routes/session.routes');
 const scheduleSessionRoutes = require('./routes/schedule-session.routes');
 const notificationRoutes = require('./routes/notification.routes');
 const auditRoutes = require('./routes/audit.routes');
+const educationRoutes = require('./routes/education.routes');
 
 // Import controllers for direct route registration
 const userController = require('./controllers/user.controller');
@@ -67,6 +68,7 @@ app.use('/api', sessionRoutes);
 app.use('/api', scheduleSessionRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/audit-logs', auditRoutes);
+app.use('/api/education', educationRoutes);
 
 // Test endpoint
 app.get('/api/test', (req, res) => {
@@ -96,7 +98,8 @@ app.get('/api', (req, res) => {
       scheduleSessions: '/api/centers/:centerId/schedule-sessions',
       roles: '/api/roles',
       notifications: '/api/notifications',
-      auditLogs: '/api/audit-logs'
+      auditLogs: '/api/audit-logs',
+      education: '/api/education'
     }
   });
 });

@@ -75,7 +75,7 @@ const auditLogData = [
   { id: 1, action: "create", tableName: "appointments", recordId: 2051, changedBy: "Sarah Johnson", date: "2023-05-20 14:32:45" },
   { id: 2, action: "update", tableName: "patients", recordId: 103, changedBy: "David Chen", date: "2023-05-20 13:15:22" },
   { id: 3, action: "update", tableName: "ckd_records", recordId: 455, changedBy: "Dr. Thomas Brown", date: "2023-05-20 11:05:17" },
-  { id: 4, action: "delete", tableName: "appointments", recordId: 2048, changedBy: "Michael Adams", date: "2023-05-19 16:44:30" },
+  { id: 4, action: "delete", tableName: "appointments", recordId: 2048, changedBy: "Suwan Ratnayake", date: "2023-05-19 16:44:30" },
   { id: 5, action: "create", tableName: "education_materials", recordId: 24, changedBy: "Jennifer Wilson", date: "2023-05-19 09:22:11" },
 ];
 
@@ -92,9 +92,9 @@ const AdminReports = () => {
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
         { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
-      userName="Michael Adams"
-      userRole="System Administrator"
-      userImage="https://randomuser.me/api/portraits/men/42.jpg"
+      userName="Suwan Ratnayake"
+      userRole="Administrator"
+      userImage="https://randomuser.me/api/portraits/women/42.jpg"
     >
       <div className="space-y-6">
         <div className="flex justify-between items-center">
@@ -119,7 +119,7 @@ const AdminReports = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Center Utilization</CardTitle>
-                  <CardDescription>Current patient load vs. capacity</CardDescription>
+                  <CardDescription>Current Patient Load vs. Capacity</CardDescription>
                 </CardHeader>
                 <CardContent className="h-80">
                   <ResponsiveBar
@@ -161,7 +161,7 @@ const AdminReports = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Centers Overview</CardTitle>
-                  <CardDescription>Detailed capacity information</CardDescription>
+                  <CardDescription>Detailed Capacity Information</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>

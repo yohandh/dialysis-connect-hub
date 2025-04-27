@@ -555,7 +555,7 @@ export function UserFormDialog({
                         <FormItem>
                           <FormLabel>Mobile Number</FormLabel>
                           <FormControl>
-                            <Input placeholder="94-77-727-8824" {...field} />
+                            <Input placeholder="0777278824" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

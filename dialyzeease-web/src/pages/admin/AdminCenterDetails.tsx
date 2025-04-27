@@ -133,9 +133,9 @@ const AdminCenterDetails = () => {
           { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
           { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
         ]}
-        userName="Michael Adams"
-        userRole="System Administrator"
-        userImage="https://randomuser.me/api/portraits/men/42.jpg"
+        userName="Suwan Ratnayake"
+        userRole="Administrator"
+        userImage="https://randomuser.me/api/portraits/women/42.jpg"
       >
         <div className="flex justify-center items-center h-64">
           Loading center details...
@@ -157,9 +157,9 @@ const AdminCenterDetails = () => {
           { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
           { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
         ]}
-        userName="Michael Adams"
-        userRole="System Administrator"
-        userImage="https://randomuser.me/api/portraits/men/42.jpg"
+        userName="Suwan Ratnayake"
+        userRole="Administrator"
+        userImage="https://randomuser.me/api/portraits/women/42.jpg"
       >
         <div className="flex flex-col items-center justify-center h-64">
           <h2 className="text-xl font-bold mb-4">Center not found</h2>
@@ -186,9 +186,9 @@ const AdminCenterDetails = () => {
         { name: "Education", path: "/admin/education", icon: <BookOpen className="h-5 w-5" /> },
         { name: "Reports", path: "/admin/reports", icon: <FileBarChart2 className="h-5 w-5" /> },
       ]}
-      userName="Michael Adams"
-      userRole="System Administrator"
-      userImage="https://randomuser.me/api/portraits/men/42.jpg"
+      userName="Suwan Ratnayake"
+      userRole="Administrator"
+      userImage="https://randomuser.me/api/portraits/women/42.jpg"
     >
       <div className="space-y-6">
         <div className="flex items-center justify-between">
