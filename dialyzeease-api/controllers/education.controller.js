@@ -82,7 +82,7 @@ exports.createMaterial = (req, res) => {
   }
 
   // Validate type
-  const validTypes = ['diet', 'lifestyle', 'general'];
+  const validTypes = ['diet', 'lifestyle', 'monitoring', 'general'];
   if (!validTypes.includes(req.body.type)) {
     res.status(400).send({
       message: `Invalid type. Must be one of: ${validTypes.join(', ')}`
@@ -139,7 +139,7 @@ exports.updateMaterial = (req, res) => {
   }
 
   // Validate type
-  const validTypes = ['diet', 'lifestyle', 'general'];
+  const validTypes = ['diet', 'lifestyle', 'monitoring', 'general'];
   if (!validTypes.includes(req.body.type)) {
     res.status(400).send({
       message: `Invalid type. Must be one of: ${validTypes.join(', ')}`

@@ -68,7 +68,7 @@ const educationFormSchema = z.object({
   content: z.string().min(20, { message: "Content must be at least 20 characters." }),
   ckdStage: z.coerce.number().min(1, { message: "Please select a CKD stage" }),
   langCode: z.string().min(2, { message: "Please select a language" }),
-  type: z.enum(['diet', 'lifestyle', 'general'], { 
+  type: z.enum(['diet', 'lifestyle', 'monitoring', 'general'], { 
     required_error: "Please select a content type" 
   }),
 });
@@ -248,10 +248,11 @@ const AdminEducation = () => {
   };
 
   // Get material type badge variant
-  const getTypeBadgeVariant = (type: string): "diet" | "lifestyle" | "general" => {
+  const getTypeBadgeVariant = (type: string): "diet" | "lifestyle" | "monitoring" | "general" => {
     switch (type) {
       case "diet": return "diet";
       case "lifestyle": return "lifestyle";
+      case "monitoring": return "monitoring";
       case "general": return "general";
       default: return "general";
     }
@@ -441,7 +442,7 @@ const AdminEducation = () => {
                       <FormItem>
                         <FormLabel>CKD Stage</FormLabel>
                         <Select 
-                          value={field.value ? field.value.toString() : "1"} 
+                          value={String(field.value || 1)} 
                           onValueChange={(value) => field.onChange(parseInt(value))}
                         >
                           <FormControl>
@@ -469,7 +470,7 @@ const AdminEducation = () => {
                       <FormItem>
                         <FormLabel>Type</FormLabel>
                         <Select 
-                          value={field.value || "en"} 
+                          value={String(field.value || "en")} 
                           onValueChange={field.onChange}
                         >
                           <FormControl>
@@ -480,6 +481,7 @@ const AdminEducation = () => {
                           <SelectContent>
                             <SelectItem value="diet">Diet</SelectItem>
                             <SelectItem value="lifestyle">Lifestyle</SelectItem>
+                            <SelectItem value="monitoring">Monitoring</SelectItem>
                             <SelectItem value="general">General</SelectItem>
                           </SelectContent>
                         </Select>
@@ -495,7 +497,7 @@ const AdminEducation = () => {
                       <FormItem>
                         <FormLabel>Language</FormLabel>
                         <Select 
-                          value={field.value || "en"} 
+                          value={String(field.value || "en")} 
                           onValueChange={field.onChange}
                         >
                           <FormControl>

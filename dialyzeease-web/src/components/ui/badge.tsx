@@ -21,9 +21,10 @@ const badgeVariants = cva(
         warning: "border-transparent bg-amber-500 text-white hover:bg-amber-600",
         purple: "border-transparent bg-purple-500 text-white hover:bg-purple-600",
         // Education material types
-        diet: "border-transparent bg-indigo-900 text-white hover:bg-indigo-950",
-        lifestyle: "border-transparent bg-sky-100 text-sky-700 hover:bg-sky-200",
+        diet: "border-transparent bg-green-100 text-green-700 hover:bg-green-200",
+        lifestyle: "border-transparent bg-blue-100 text-blue-700 hover:bg-blue-200",
         general: "border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200",
+        monitoring: "border-transparent bg-purple-100 text-purple-700 hover:bg-purple-200",
         // CKD Stages
         stage1: "border-transparent bg-green-500 text-white hover:bg-green-600",
         stage2: "border-transparent bg-lime-500 text-white hover:bg-lime-600",

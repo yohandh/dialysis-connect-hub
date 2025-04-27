@@ -8,7 +8,18 @@ const EducationMaterial = {
       const [rows] = await pool.query(
         'SELECT * FROM education_materials ORDER BY ckd_stage ASC, title ASC'
       );
-      result(null, rows);
+      
+      // Transform database column names to frontend property names
+      const transformedRows = rows.map(row => ({
+        id: row.id,
+        ckdStage: Number(row.ckd_stage), // Convert to number and rename from ckd_stage to ckdStage
+        langCode: row.lang_code,         // Rename from lang_code to langCode
+        type: row.type,
+        title: row.title,
+        content: row.content
+      }));
+      
+      result(null, transformedRows);
     } catch (err) {
       console.error('Error retrieving education materials:', err);
       result(err, null);
@@ -22,7 +33,18 @@ const EducationMaterial = {
         'SELECT * FROM education_materials WHERE ckd_stage = ? ORDER BY title ASC',
         [ckdStage]
       );
-      result(null, rows);
+      
+      // Transform database column names to frontend property names
+      const transformedRows = rows.map(row => ({
+        id: row.id,
+        ckdStage: Number(row.ckd_stage), // Convert to number and rename
+        langCode: row.lang_code,         // Rename
+        type: row.type,
+        title: row.title,
+        content: row.content
+      }));
+      
+      result(null, transformedRows);
     } catch (err) {
       console.error('Error retrieving education materials by stage:', err);
       result(err, null);
@@ -42,8 +64,18 @@ const EducationMaterial = {
         result({ kind: 'not_found' }, null);
         return;
       }
+      
+      // Transform database column names to frontend property names
+      const transformedRow = {
+        id: rows[0].id,
+        ckdStage: Number(rows[0].ckd_stage), // Convert to number and rename
+        langCode: rows[0].lang_code,         // Rename
+        type: rows[0].type,
+        title: rows[0].title,
+        content: rows[0].content
+      };
 
-      result(null, rows[0]);
+      result(null, transformedRow);
     } catch (err) {
       console.error('Error retrieving education material by ID:', err);
       result(err, null);

@@ -260,10 +260,12 @@ CREATE TABLE education_materials (
   id INT PRIMARY KEY AUTO_INCREMENT,
   ckd_stage INT,
   lang_code VARCHAR(8) DEFAULT 'en',
-  type ENUM('diet', 'lifestyle', 'general'),
+  type ENUM('diet', 'lifestyle', 'monitoring', 'general'),
   title VARCHAR(255),
   content TEXT
 );
+
+-- ALTER TABLE `education_materials` CHANGE `type` `type` ENUM('diet','lifestyle','monitoring','general') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL; 
 
 -- NOTIFICATIONS
 CREATE TABLE notifications (
