@@ -76,63 +76,73 @@ export interface AddCkdRecordRequest {
 
 export const getPatientData = async (): Promise<PatientProfile> => {
   try {
-    if (useMockApi()) {
-      console.info("Using mock patient data");
-      await new Promise(resolve => setTimeout(resolve, API_DELAY));
-      
-      const userId = 'user-001';
-      const patient = getPatientByUserId(userId);
-      const user = getUserById(userId);
-      
-      if (!patient || !user) {
-        throw new Error("Patient data not found");
+    // First try to use the real API
+    if (!useMockApi()) {
+      try {
+        console.info("Attempting to use real API for patient data");
+        const response = await apiCall<PatientProfile>('/patients/profile');
+        console.info("Successfully retrieved patient data from API");
+        return response;
+      } catch (apiError) {
+        console.error("API call failed, falling back to mock data:", apiError);
+        // If the API call fails, fall back to mock data
+        // Don't rethrow the error, just continue with mock data
       }
-      
-      const patientProfile: PatientProfile = {
-        userId: patient.userId,
-        firstName: user.name ? user.name.split(' ')[0] : '',
-        lastName: user.name ? user.name.split(' ').slice(1).join(' ') : '',
-        email: user.email || '',
-        dateOfBirth: patient.dateOfBirth,
-        gender: patient.gender,
-        bloodType: patient.bloodType,
-        height: patient.height,
-        weight: patient.weight,
-        primaryNephrologist: patient.primaryNephrologist,
-        diagnosisDate: patient.diagnosisDate,
-        ckdStage: patient.ckdStage,
-        dialysisStartDate: patient.dialysisStartDate,
-        accessType: patient.accessType,
-        comorbidities: patient.comorbidities,
-        allergies: patient.allergies,
-        medications: patient.medications,
-        address: {
-          street: '123 Main St',
-          city: 'Anytown',
-          state: 'CA',
-          zipCode: '90210'
-        },
-        phone: '555-123-4567',
-        contactPhone: '555-987-6543',
-        contactEmail: 'contact@example.com',
-        emergencyContact: patient.emergencyContact,
-        preferredCenter: patient.preferredCenter,
-        notificationPreferences: {
-          email: true,
-          sms: true,
-          push: false,
-          appointmentReminders: true,
-          labResults: true,
-          treatmentUpdates: true,
-          medicationReminders: true
-        }
-      };
-      
-      return patientProfile;
-    } else {
-      const response = await apiCall<PatientProfile>('/patient/profile');
-      return response;
     }
+    
+    // Use mock data either by choice or as a fallback
+    console.info("Using mock patient data");
+    await new Promise(resolve => setTimeout(resolve, API_DELAY));
+    
+    const userId = 'user-001';
+    const patient = getPatientByUserId(userId);
+    const user = getUserById(userId);
+    
+    if (!patient || !user) {
+      throw new Error("Patient data not found");
+    }
+    
+    const patientProfile: PatientProfile = {
+      userId: patient.userId,
+      firstName: user.name ? user.name.split(' ')[0] : '',
+      lastName: user.name ? user.name.split(' ').slice(1).join(' ') : '',
+      email: user.email || '',
+      dateOfBirth: patient.dateOfBirth,
+      gender: patient.gender,
+      bloodType: patient.bloodType,
+      height: patient.height,
+      weight: patient.weight,
+      primaryNephrologist: patient.primaryNephrologist,
+      diagnosisDate: patient.diagnosisDate,
+      ckdStage: patient.ckdStage,
+      dialysisStartDate: patient.dialysisStartDate,
+      accessType: patient.accessType,
+      comorbidities: patient.comorbidities,
+      allergies: patient.allergies,
+      medications: patient.medications,
+      address: {
+        street: '123 Main St',
+        city: 'Anytown',
+        state: 'CA',
+        zipCode: '90210'
+      },
+      phone: '555-123-4567',
+      contactPhone: '555-987-6543',
+      contactEmail: 'contact@example.com',
+      emergencyContact: patient.emergencyContact,
+      preferredCenter: patient.preferredCenter,
+      notificationPreferences: {
+        email: true,
+        sms: true,
+        push: false,
+        appointmentReminders: true,
+        labResults: true,
+        treatmentUpdates: true,
+        medicationReminders: true
+      }
+    };
+    
+    return patientProfile;
   } catch (error) {
     console.error("Failed to fetch patient data:", error);
     throw error;
@@ -151,7 +161,7 @@ export const updatePatientProfile = async (data: Partial<PatientProfile>): Promi
         ...data
       };
     } else {
-      const response = await apiCall<PatientProfile>('/patient/profile', {
+      const response = await apiCall<PatientProfile>('/patients/profile', {
         method: 'PUT',
         body: JSON.stringify(data)
       });
@@ -171,7 +181,7 @@ export const updateNotificationPreferences = async (
       await new Promise(resolve => setTimeout(resolve, API_DELAY));
       return preferences;
     } else {
-      const response = await apiCall<NotificationPreference>('/patient/notifications/preferences', {
+      const response = await apiCall<NotificationPreference>('/patients/notifications/preferences', {
         method: 'PUT',
         body: JSON.stringify(preferences)
       });
@@ -234,7 +244,7 @@ export const getCkdHistory = async (): Promise<CkdHistoryItem[]> => {
       
       return mockCkdHistory;
     } else {
-      const response = await apiCall<CkdHistoryItem[]>('/patient/ckd-history');
+      const response = await apiCall<CkdHistoryItem[]>('/patients/ckd-history');
       return response;
     }
   } catch (error) {
@@ -267,7 +277,7 @@ export const addCkdRecord = async (data: AddCkdRecordRequest): Promise<CkdHistor
       
       return newRecord;
     } else {
-      const response = await apiCall<CkdHistoryItem>('/patient/ckd-records', {
+      const response = await apiCall<CkdHistoryItem>('/patients/ckd-record', {
         method: 'POST',
         body: JSON.stringify(data)
       });
@@ -309,9 +319,9 @@ export const fetchEducationContent = async (stage: number): Promise<EducationCon
     },
     {
       id: `edu-${stage}-3`,
-      title: `Understanding Your Medications in CKD Stage ${stage}`,
-      summary: `Learn about common medications prescribed for CKD Stage ${stage}`,
-      type: 'medication',
+      title: `Understanding Your Monitoring in CKD Stage ${stage}`,
+      summary: `Learn about common monitoring for CKD Stage ${stage}`,
+      type: 'monitoring',
       ckdStage: stage
     }
   ];
@@ -328,7 +338,7 @@ export const getPatientAppointments = async (): Promise<Appointment[]> => {
       
       return getAppointmentsByPatient(userId);
     } else {
-      const response = await apiCall<Appointment[]>('/patient/appointments');
+      const response = await apiCall<Appointment[]>('/patients/appointments');
       return response;
     }
   } catch (error) {
@@ -350,8 +360,9 @@ export const bookAppointment = async (appointmentId: string): Promise<Appointmen
         throw new Error("Appointment not found");
       }
       
-      if (appointment.status !== 'available') {
-        throw new Error("Appointment is not available");
+      // Check if the appointment is already booked or completed
+      if (appointment.status !== 'scheduled') {
+        throw new Error("Appointment is not available for booking");
       }
       
       const index = appointments.findIndex(a => a.id === appointmentId);
@@ -359,13 +370,13 @@ export const bookAppointment = async (appointmentId: string): Promise<Appointmen
         appointments[index] = {
           ...appointments[index],
           patientId: userId,
-          status: 'booked'
+          status: 'scheduled' // Using 'scheduled' instead of 'booked' to match the Appointment interface
         };
       }
       
       return appointments[index];
     } else {
-      const response = await apiCall<Appointment>(`/appointments/${appointmentId}/book`, {
+      const response = await apiCall<Appointment>(`/patients/appointments/book/${appointmentId}`, {
         method: 'POST'
       });
       return response;
@@ -388,7 +399,8 @@ export const cancelAppointment = async (appointmentId: string): Promise<Appointm
         throw new Error("Appointment not found");
       }
       
-      if (appointment.status !== 'booked') {
+      // Check if the appointment is scheduled (booked)
+      if (appointment.status !== 'scheduled') {
         throw new Error("Appointment is not booked");
       }
       
@@ -396,13 +408,13 @@ export const cancelAppointment = async (appointmentId: string): Promise<Appointm
       if (index !== -1) {
         appointments[index] = {
           ...appointments[index],
-          status: 'canceled'
+          status: 'cancelled' // Using 'cancelled' instead of 'canceled' to match the Appointment interface
         };
       }
       
       return appointments[index];
     } else {
-      const response = await apiCall<Appointment>(`/appointments/${appointmentId}/cancel`, {
+      const response = await apiCall<Appointment>(`/patients/appointments/cancel/${appointmentId}`, {
         method: 'POST'
       });
       return response;

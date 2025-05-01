@@ -25,6 +25,7 @@ const HealthMetricsCard: React.FC<HealthMetricsCardProps> = ({ ckdHistory, patie
               <span className="font-medium text-medical-blue">Latest Creatinine</span>
               <span>{ckdHistory[0].creatinine} mg/dL <span className="text-xs text-muted-foreground">({ckdHistory[0].date})</span></span>
             </div>
+            {/* 
             <div className="flex justify-between items-center pb-2 border-b border-blue-100">
               <span className="font-medium text-medical-blue">Blood Pressure</span>
               <span>120/80 mmHg <span className="text-xs text-muted-foreground">(May 25, 2023)</span></span>
@@ -32,7 +33,8 @@ const HealthMetricsCard: React.FC<HealthMetricsCardProps> = ({ ckdHistory, patie
             <div className="flex justify-between items-center pb-2">
               <span className="font-medium text-medical-blue">Weight</span>
               <span>{patient?.weight} kg <span className="text-xs text-muted-foreground">(May 25, 2023)</span></span>
-            </div>
+            </div> 
+            */}
           </div>
         ) : (
           <div className="text-center py-4">

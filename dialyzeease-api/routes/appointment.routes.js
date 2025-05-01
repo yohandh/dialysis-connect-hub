@@ -5,15 +5,6 @@ const { body } = require('express-validator');
 const appointmentController = require('../controllers/appointment.controller');
 const authMiddleware = require('../middleware/auth.middleware');
 
-// Get all appointments
-router.get('/', authMiddleware, appointmentController.getAllAppointments);
-
-// Get appointment by ID
-router.get('/:id', authMiddleware, appointmentController.getAppointmentById);
-
-// Get appointment details with related information
-router.get('/:id/details', authMiddleware, appointmentController.getAppointmentDetails);
-
 // Get appointments by center
 router.get('/center/:centerId', authMiddleware, appointmentController.getAppointmentsByCenter);
 
@@ -22,6 +13,15 @@ router.get('/patient/:patientId', authMiddleware, appointmentController.getAppoi
 
 // Get available appointments
 router.get('/status/available', authMiddleware, appointmentController.getAvailableAppointments);
+
+// Get appointment details with related information
+router.get('/:id/details', authMiddleware, appointmentController.getAppointmentDetails);
+
+// Get appointment by ID
+router.get('/:id', authMiddleware, appointmentController.getAppointmentById);
+
+// Get all appointments
+router.get('/', authMiddleware, appointmentController.getAllAppointments);
 
 // Create appointment slot
 router.post('/', [
@@ -52,8 +52,15 @@ router.delete('/:id', authMiddleware, appointmentController.deleteAppointmentSlo
 // Book an appointment
 router.post('/:id/book', [
   authMiddleware,
-  body('patientId').notEmpty().withMessage('Patient ID is required')
+  body('patientId').notEmpty().withMessage('Patient ID is required'),
 ], appointmentController.bookAppointment);
+
+// Book an appointment using slot ID
+router.post('/slot-booking', [
+  authMiddleware,
+  body('slotId').notEmpty().withMessage('Slot ID is required'),
+  body('patientId').notEmpty().withMessage('Patient ID is required'),
+], appointmentController.bookAppointmentBySlotId);
 
 // Cancel an appointment
 router.post('/:id/cancel', authMiddleware, appointmentController.cancelAppointment);

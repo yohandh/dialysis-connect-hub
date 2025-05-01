@@ -6,32 +6,32 @@
         "email": "john.smith@example.com",
         "name": "John Smith",
         "role": "patient",
-        "createdAt": "2023-01-10T08:15:00Z",
-        "lastLogin": "2023-06-20T14:30:00Z"
+        "createdAt": "2025-01-10T08:15:00Z",
+        "lastLogin": "2025-06-20T14:30:00Z"
       },
       {
         "id": "user-002",
         "email": "maria.rodriguez@example.com",
         "name": "Maria Rodriguez",
         "role": "patient",
-        "createdAt": "2023-02-15T10:20:00Z",
-        "lastLogin": "2023-06-18T09:45:00Z"
+        "createdAt": "2025-02-15T10:20:00Z",
+        "lastLogin": "2025-06-18T09:45:00Z"
       },
       {
         "id": "user-003",
         "email": "robert.johnson@example.com",
         "name": "Robert Johnson",
         "role": "patient",
-        "createdAt": "2023-03-05T11:30:00Z",
-        "lastLogin": "2023-06-19T16:10:00Z"
+        "createdAt": "2025-03-05T11:30:00Z",
+        "lastLogin": "2025-06-19T16:10:00Z"
       },
       {
         "id": "user-004",
         "email": "emily.chen@example.com",
         "name": "Emily Chen",
         "role": "patient",
-        "createdAt": "2023-03-20T09:40:00Z",
-        "lastLogin": "2023-06-17T13:25:00Z"
+        "createdAt": "2025-03-20T09:40:00Z",
+        "lastLogin": "2025-06-17T13:25:00Z"
       },
       {
         "id": "staff-001",
@@ -39,7 +39,7 @@
         "name": "Dr. Sarah Johnson",
         "role": "staff",
         "createdAt": "2022-11-15T08:00:00Z",
-        "lastLogin": "2023-06-20T08:30:00Z"
+        "lastLogin": "2025-06-20T08:30:00Z"
       },
       {
         "id": "staff-002",
@@ -47,7 +47,7 @@
         "name": "Dr. David Chen",
         "role": "staff",
         "createdAt": "2022-10-20T09:15:00Z",
-        "lastLogin": "2023-06-19T10:45:00Z"
+        "lastLogin": "2025-06-19T10:45:00Z"
       },
       {
         "id": "admin-001",
@@ -55,7 +55,7 @@
         "name": "Admin User",
         "role": "admin",
         "createdAt": "2022-01-01T00:00:00Z",
-        "lastLogin": "2023-06-20T07:15:00Z"
+        "lastLogin": "2025-06-20T07:15:00Z"
       }
     ],
     "loginCredentials": [
@@ -339,7 +339,7 @@
         "id": "apt-001",
         "patientId": "user-001",
         "centerId": "center-001",
-        "date": "2023-06-01",
+        "date": "2025-06-01",
         "startTime": "09:00",
         "endTime": "12:00",
         "status": "completed",
@@ -350,7 +350,7 @@
         "id": "apt-002",
         "patientId": "user-002",
         "centerId": "center-001",
-        "date": "2023-06-05",
+        "date": "2025-06-05",
         "startTime": "13:00",
         "endTime": "16:00",
         "status": "booked",
@@ -360,7 +360,7 @@
         "id": "apt-003",
         "patientId": "user-003",
         "centerId": "center-002",
-        "date": "2023-06-02",
+        "date": "2025-06-02",
         "startTime": "10:00",
         "endTime": "13:00",
         "status": "canceled",
@@ -371,7 +371,7 @@
         "id": "apt-004",
         "patientId": "user-001",
         "centerId": "center-001",
-        "date": "2023-06-08",
+        "date": "2025-06-08",
         "startTime": "09:00",
         "endTime": "12:00",
         "status": "booked",
@@ -381,7 +381,7 @@
         "id": "apt-005",
         "patientId": "user-004",
         "centerId": "center-003",
-        "date": "2023-06-03",
+        "date": "2025-06-03",
         "startTime": "14:00",
         "endTime": "15:00",
         "status": "completed",
@@ -393,21 +393,21 @@
   "backend": {
     "ckdRecords": [
       {
-        "date": "2023-01-15",
+        "date": "2025-01-15",
         "egfr": 42,
         "creatinine": 1.8,
         "calculatedStage": 3,
         "doctorNotes": "Patient showing stable kidney function."
       },
       {
-        "date": "2023-03-20",
+        "date": "2025-03-20",
         "egfr": 38,
         "creatinine": 2.1,
         "calculatedStage": 3,
         "doctorNotes": "Slight decrease in kidney function. Monitoring closely."
       },
       {
-        "date": "2023-05-10",
+        "date": "2025-05-10",
         "egfr": 35,
         "creatinine": 2.3,
         "calculatedStage": 3,
@@ -558,7 +558,7 @@
         "contentSummary": "A comprehensive overview of CKD, its causes, stages, and management strategies.",
         "targetAudience": "newly diagnosed",
         "readingTimeMinutes": 15,
-        "lastUpdated": "2023-01-10"
+        "lastUpdated": "2025-01-10"
       },
       {
         "id": "edu-002",
@@ -567,7 +567,7 @@
         "contentSummary": "Nutritionist explains dietary recommendations for CKD patients at different stages.",
         "targetAudience": "all patients",
         "durationMinutes": 22,
-        "lastUpdated": "2023-02-15"
+        "lastUpdated": "2025-02-15"
       },
       {
         "id": "edu-003",
@@ -576,7 +576,7 @@
         "contentSummary": "Step-by-step preparation guide for patients starting dialysis treatment.",
         "targetAudience": "stage 4-5",
         "readingTimeMinutes": 30,
-        "lastUpdated": "2023-03-20"
+        "lastUpdated": "2025-03-20"
       },
       {
         "id": "edu-004",
@@ -585,7 +585,7 @@
         "contentSummary": "Interactive tool to help patients understand their medications and potential interactions.",
         "targetAudience": "all patients",
         "completionTimeMinutes": 25,
-        "lastUpdated": "2023-04-05"
+        "lastUpdated": "2025-04-05"
       },
       {
         "id": "edu-005",
@@ -594,7 +594,7 @@
         "contentSummary": "Recorded webinar featuring patients sharing their experiences and coping strategies.",
         "targetAudience": "all patients",
         "durationMinutes": 45,
-        "lastUpdated": "2023-05-12"
+        "lastUpdated": "2025-05-12"
       }
     ]
   }

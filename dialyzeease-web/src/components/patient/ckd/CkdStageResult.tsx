@@ -2,10 +2,10 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { CKDStage } from '@/data/ckdData';
+import CkdStageBadge from '@/components/CkdStageBadge';
 
 interface CkdStageResultProps {
   stage: number;
@@ -26,9 +26,7 @@ const CkdStageResult: React.FC<CkdStageResultProps> = ({ stage, stageInfo }) => 
         <CardHeader className="border-b border-blue-100">
           <CardTitle className="flex items-center justify-between text-medical-blue">
             <span>CKD Stage {stageInfo.stage}: {stageInfo.name}</span>
-            <Badge className="bg-medical-blue/10 text-medical-blue border-medical-blue text-xs px-3 py-1 rounded-full font-medium">
-              Stage {stageInfo.stage}
-            </Badge>
+            <CkdStageBadge stage={stageInfo.stage} />
           </CardTitle>
           <CardDescription>
             eGFR Range: {stageInfo.egfrRange} mL/min/1.73m²

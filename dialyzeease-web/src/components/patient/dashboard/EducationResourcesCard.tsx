@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import EducationTypeBadge from '@/components/EducationTypeBadge';
 
 export interface EducationContent {
   id: string;
@@ -31,9 +31,7 @@ const EducationResourcesCard: React.FC<EducationResourcesCardProps> = ({ educati
                 <h3 className="font-medium mb-1 text-medical-blue">{content.title}</h3>
                 <p className="text-sm text-muted-foreground mb-2">{content.description}</p>
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className="capitalize border-medical-blue text-medical-blue">
-                    {content.category}
-                  </Badge>
+                  <EducationTypeBadge type={content.category} />
                   <Button variant="ghost" size="sm" asChild className="text-medical-blue hover:bg-medical-blue/10">
                     <Link to={`/patient/education/${content.id}`}>
                       Read More

@@ -113,7 +113,7 @@ const PatientDashboard = () => {
   
   // Get the next appointment
   const nextAppointment = appointments && appointments.length > 0 
-    ? appointments.find(apt => apt.status === 'booked') 
+    ? appointments.find(apt => apt.status === 'scheduled' || apt.status === 'booked') 
     : null;
   
   // Handle API errors by showing toast notifications
@@ -154,7 +154,7 @@ const PatientDashboard = () => {
             </Button>
           </div>
           
-          <DashboardAlert />
+          <DashboardAlert nextAppointment={nextAppointment} />
           
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <AppointmentCard nextAppointment={nextAppointment} />

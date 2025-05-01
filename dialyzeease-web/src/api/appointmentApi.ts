@@ -136,15 +136,42 @@ export const getAppointmentSlotsByCenter = async (centerId: string) => {
 // Get appointment slots by patient
 export const getAppointmentSlotsByPatient = async (patientId: string) => {
   try {
+    console.log(`Fetching appointments for patient ID: ${patientId}`);
+    // Get the auth token from localStorage
+    const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+    
     const response = await axios.get(`/api/appointments/patient/${patientId}`, {
       headers: {
-        'Authorization': 'Bearer mock-auth-token-for-testing'
+        'Authorization': `Bearer ${token || 'mock-auth-token-for-testing'}`
       }
     });
+    console.log('Appointments data received:', response.data);
     return response.data;
   } catch (error: any) {
     console.error(`Error fetching appointment slots for patient ${patientId}:`, error.response?.data || error.message);
-    throw error;
+    // If API call fails, try a direct fetch to the full URL as a fallback
+    try {
+      console.log('Trying direct fetch as fallback...');
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+      const fallbackResponse = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/appointments/patient/${patientId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token || 'mock-auth-token-for-testing'}`
+        }
+      });
+      
+      if (!fallbackResponse.ok) {
+        throw new Error(`API Error: ${fallbackResponse.status} ${fallbackResponse.statusText}`);
+      }
+      
+      const data = await fallbackResponse.json();
+      console.log('Fallback fetch successful:', data);
+      return data;
+    } catch (fallbackError) {
+      console.error('Fallback fetch also failed:', fallbackError);
+      throw error; // Throw the original error
+    }
   }
 };
 

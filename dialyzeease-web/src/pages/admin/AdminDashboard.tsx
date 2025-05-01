@@ -49,10 +49,10 @@ const dashboardStats = [
 const recentAppointments = [
   { id: 1, patient: "Amal Perera", center: "Asiri Surgical Hospital", date: "2025-05-05", time: "09:00 AM", status: "Booked" },
   { id: 2, patient: "Sanduni Wickramasinghe", center: "The National Institute For Nephrology Dialysis & Transplantation (NINDT)", date: "2025-05-07", time: "10:00 AM", status: "Rescheduled" },
-  { id: 3, patient: "Supun Perera", center: "Lanka Hospital", date: "2023-05-28", time: "3:00 PM", status: "Completed" },
-  { id: 4, patient: "Nimal Silva", center: "Kings Hospital", date: "2023-05-21", time: "7:00 AM", status: "Cancelled" },
+  { id: 3, patient: "Supun Perera", center: "Lanka Hospital", date: "2025-05-28", time: "3:00 PM", status: "Completed" },
+  { id: 4, patient: "Nimal Silva", center: "Kings Hospital", date: "2025-05-21", time: "7:00 AM", status: "Cancelled" },
   
-  { id: 5, patient: "Dilshan Perera", center: "Nawaloka Hospital", date: "2023-05-21", time: "3:00 PM", status: "Completed" },
+  { id: 5, patient: "Dilshan Perera", center: "Nawaloka Hospital", date: "2025-05-21", time: "3:00 PM", status: "Completed" },
 ];
 
 const patientStatusData = [

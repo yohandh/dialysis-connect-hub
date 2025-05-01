@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ckdStages } from '@/data/ckdData';
+import CkdStageBadge from '@/components/CkdStageBadge';
 
 interface CkdStagesInfoProps {
   currentStage: number;
@@ -31,9 +32,12 @@ const CkdStagesInfo: React.FC<CkdStagesInfoProps> = ({ currentStage }) => {
           {ckdStages.map(stage => (
             <TabsContent key={stage.stage} value={stage.stage.toString()} className="pt-4">
               <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-medium text-medical-blue">{stage.name}</h3>
-                  <p className="text-muted-foreground">eGFR: {stage.egfrRange} mL/min/1.73m²</p>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-medium text-medical-blue">{stage.name}</h3>
+                    <p className="text-muted-foreground">eGFR: {stage.egfrRange} mL/min/1.73m²</p>
+                  </div>
+                  <CkdStageBadge stage={stage.stage} />
                 </div>
                 
                 <div>

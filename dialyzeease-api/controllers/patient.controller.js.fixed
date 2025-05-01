@@ -168,50 +168,8 @@ exports.getPatientProfile = async (req, res) => {
         relationship: patient.emergency_contact_relation || '',
         phone: patient.emergency_contact_no || ''
       },
-      allergies: (() => {
-        try {
-          // Try to parse as JSON first
-          if (patient.allergies) {
-            if (typeof patient.allergies === 'string') {
-              try {
-                return JSON.parse(patient.allergies);
-              } catch (e) {
-                // If it's not valid JSON, treat it as a string and convert to array
-                console.log('Converting allergies string to array:', patient.allergies);
-                return patient.allergies.split('\n').filter(item => item.trim() !== '');
-              }
-            } else if (Array.isArray(patient.allergies)) {
-              return patient.allergies;
-            }
-          }
-          return [];
-        } catch (e) {
-          console.error('Error parsing allergies:', e);
-          return [];
-        }
-      })(),
-      chronicConditions: (() => {
-        try {
-          // Try to parse as JSON first
-          if (patient.chronic_conditions) {
-            if (typeof patient.chronic_conditions === 'string') {
-              try {
-                return JSON.parse(patient.chronic_conditions);
-              } catch (e) {
-                // If it's not valid JSON, treat it as a string and convert to array
-                console.log('Converting chronic conditions string to array:', patient.chronic_conditions);
-                return patient.chronic_conditions.split('\n').filter(item => item.trim() !== '');
-              }
-            } else if (Array.isArray(patient.chronic_conditions)) {
-              return patient.chronic_conditions;
-            }
-          }
-          return [];
-        } catch (e) {
-          console.error('Error parsing chronic conditions:', e);
-          return [];
-        }
-      })(),
+      allergies: patient.allergies ? JSON.parse(patient.allergies) : [],
+      chronicConditions: patient.chronic_conditions ? JSON.parse(patient.chronic_conditions) : [],
       insuranceProvider: patient.insurance_provider
     };
     

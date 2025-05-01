@@ -73,7 +73,7 @@ const mockDialysisSessions: DialogysisSession[] = [
     notes: "Patient tolerated session well",
     complications: [],
     staffId: "staff-001",
-    date: "2023-06-01"
+    date: "2025-06-01"
   },
   {
     id: "session-002",
@@ -99,7 +99,7 @@ const mockDialysisSessions: DialogysisSession[] = [
     notes: "Patient experienced mild cramping at 2-hour mark",
     complications: ["Cramping"],
     staffId: "staff-001",
-    date: "2023-06-08"
+    date: "2025-06-08"
   }
 ];
 
@@ -107,7 +107,7 @@ const mockCkdMeasurements: CkdMeasurement[] = [
   {
     id: "ckd-001",
     patientId: "user-001",
-    date: "2023-05-01",
+    date: "2025-05-01",
     eGFR: 42,
     creatinine: 1.8,
     calculatedStage: 3,
@@ -117,7 +117,7 @@ const mockCkdMeasurements: CkdMeasurement[] = [
   {
     id: "ckd-002",
     patientId: "user-001",
-    date: "2023-05-15",
+    date: "2025-05-15",
     eGFR: 38,
     creatinine: 2.1,
     calculatedStage: 3,
@@ -160,30 +160,29 @@ export const getAssignedCenters = async (staffId: string): Promise<DialysisCente
 // 2. Get all patients
 export const getAllPatients = async (): Promise<PatientRecord[]> => {
   try {
-    if (useMockApi()) {
-      await new Promise(resolve => setTimeout(resolve, API_DELAY));
-      // Enrich patient data
-      const enrichedPatients = patients.map(patient => {
-        const user = users.find(u => String(u.id) === patient.userId);
-        if (user) {
-          const normalizedUser = normalizeUser(user);
-          return {
-            ...patient,
-            firstName: normalizedUser.firstName,
-            lastName: normalizedUser.lastName,
-            email: normalizedUser.email
-          };
-        }
-        return patient;
-      });
-      return enrichedPatients;
-    } else {
-      return await apiCall<PatientRecord[]>('/staff/patients');
-    }
+    // Always use real API data for patient dropdown in admin interface
+    console.log('Fetching real patient data from API');
+    return await apiCall<PatientRecord[]>('/staff/patients');
   } catch (error) {
     console.error("Failed to fetch patients:", error);
-    // Fallback to mock data
-    return patients;
+    // Only fallback to mock data if there's an error
+    console.warn("Falling back to mock patient data due to API error");
+    
+    // Enrich mock patient data for fallback
+    const enrichedPatients = patients.map(patient => {
+      const user = users.find(u => String(u.id) === patient.userId);
+      if (user) {
+        const normalizedUser = normalizeUser(user);
+        return {
+          ...patient,
+          firstName: normalizedUser.firstName,
+          lastName: normalizedUser.lastName,
+          email: normalizedUser.email
+        };
+      }
+      return patient;
+    });
+    return enrichedPatients;
   }
 };
 
@@ -358,10 +357,26 @@ export const bookAppointmentForPatient = async (appointmentId: string, patientId
       appointments[index] = updatedAppointment;
       return updatedAppointment;
     } else {
-      return await apiCall<Appointment>(`/appointments/${appointmentId}/book`, {
-        method: 'POST',
-        body: JSON.stringify({ patientId })
-      });
+      console.log(`Booking appointment with ID: ${appointmentId}`);
+      
+      // Check if the appointmentId is a slot ID (format: slot-centerId-sessionId-date)
+      if (appointmentId.startsWith('slot-')) {
+        // Use the new slot-booking endpoint
+        console.log(`Using slot-booking endpoint with slotId: ${appointmentId}`);
+        return await apiCall<Appointment>(`/appointments/slot-booking`, {
+          method: 'POST',
+          body: JSON.stringify({ 
+            slotId: appointmentId,
+            patientId 
+          })
+        });
+      } else {
+        // Use the regular appointment ID endpoint
+        return await apiCall<Appointment>(`/appointments/${appointmentId}/book`, {
+          method: 'POST',
+          body: JSON.stringify({ patientId })
+        });
+      }
     }
   } catch (error) {
     console.error(`Failed to book appointment ${appointmentId} for patient ${patientId}:`, error);
@@ -527,34 +542,9 @@ export const getPatientName = (patientId: string): string => {
 // Helper function to get all available timeslots for a specific date and center
 export const getAvailableTimeSlots = async (centerId: string, date: string): Promise<Appointment[]> => {
   try {
-    if (useMockApi()) {
-      await new Promise(resolve => setTimeout(resolve, API_DELAY));
-      
-      console.log(`Fetching schedule sessions for center ${centerId} and date ${date}`);
-      
-      // Get schedule sessions from the schedule_sessions table
-      const scheduleSessions = getScheduleSessionsByCenterAndDate(centerId, date);
-      console.log(`Found ${scheduleSessions.length} schedule sessions`);
-      
-      // Convert schedule sessions to appointments format
-      const availableSlots = convertScheduleSessionsToAppointments(scheduleSessions);
-      console.log(`Converted to ${availableSlots.length} available slots`);
-      
-      // If no schedule sessions are found, fall back to the appointments data
-      if (availableSlots.length === 0) {
-        console.log(`No schedule sessions found, falling back to appointments data`);
-        return appointments.filter(apt => 
-          apt.centerId === centerId && 
-          apt.date === date && 
-          apt.status === 'scheduled' && 
-          apt.patientId === null
-        );
-      }
-      
-      return availableSlots;
-    } else {
-      return await apiCall<Appointment[]>(`/centers/${centerId}/available-slots?date=${date}`);
-    }
+    // Force using real API data for available slots
+    console.log(`Fetching available slots from API for center ${centerId} and date ${date}`);
+    return await apiCall<Appointment[]>(`/centers/${centerId}/available-slots?date=${date}`);
   } catch (error) {
     console.error(`Failed to fetch available time slots:`, error);
     return [];

@@ -72,11 +72,11 @@ const monthlyAppointmentsData = [
 
 // Mock audit log data
 const auditLogData = [
-  { id: 1, action: "create", tableName: "appointments", recordId: 2051, changedBy: "Sarah Johnson", date: "2023-05-20 14:32:45" },
-  { id: 2, action: "update", tableName: "patients", recordId: 103, changedBy: "David Chen", date: "2023-05-20 13:15:22" },
-  { id: 3, action: "update", tableName: "ckd_records", recordId: 455, changedBy: "Dr. Thomas Brown", date: "2023-05-20 11:05:17" },
-  { id: 4, action: "delete", tableName: "appointments", recordId: 2048, changedBy: "Suwan Ratnayake", date: "2023-05-19 16:44:30" },
-  { id: 5, action: "create", tableName: "education_materials", recordId: 24, changedBy: "Jennifer Wilson", date: "2023-05-19 09:22:11" },
+  { id: 1, action: "create", tableName: "appointments", recordId: 2051, changedBy: "Sarah Johnson", date: "2025-05-20 14:32:45" },
+  { id: 2, action: "update", tableName: "patients", recordId: 103, changedBy: "David Chen", date: "2025-05-20 13:15:22" },
+  { id: 3, action: "update", tableName: "ckd_records", recordId: 455, changedBy: "Dr. Thomas Brown", date: "2025-05-20 11:05:17" },
+  { id: 4, action: "delete", tableName: "appointments", recordId: 2048, changedBy: "Suwan Ratnayake", date: "2025-05-19 16:44:30" },
+  { id: 5, action: "create", tableName: "education_materials", recordId: 24, changedBy: "Jennifer Wilson", date: "2025-05-19 09:22:11" },
 ];
 
 const AdminReports = () => {

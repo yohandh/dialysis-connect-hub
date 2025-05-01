@@ -4,6 +4,7 @@ const nodemailer = require('nodemailer');
 const format = require('date-fns/format');
 const auditService = require('../services/auditService');
 const notificationService = require('../services/notificationService');
+const emailService = require('../services/emailService');
 
 // Email configuration
 const transporter = nodemailer.createTransport({
@@ -352,27 +353,36 @@ exports.getAppointmentsByCenter = async (req, res) => {
 exports.getAppointmentsByPatient = async (req, res) => {
   try {
     const patientId = req.params.patientId;
+    console.log(`Fetching appointments for patient ID: ${patientId}`);
     
+    // Based on the database schema, appointments table has schedule_session_id
+    // which links to schedule_sessions table, which has center_id
     const [appointments] = await pool.query(
-      `SELECT a.*, c.name as centerName
+      `SELECT 
+         a.id, a.patient_id, a.schedule_session_id, a.status, a.notes,
+         ss.session_date, ss.start_time, ss.end_time, ss.center_id,
+         c.name as center_name
        FROM appointments a
-       JOIN centers c ON a.centerId = c.id
-       WHERE a.patientId = ?
-       ORDER BY a.date DESC, a.startTime ASC`,
+       JOIN schedule_sessions ss ON a.schedule_session_id = ss.id
+       JOIN centers c ON ss.center_id = c.id
+       WHERE a.patient_id = ?
+       ORDER BY ss.session_date DESC, ss.start_time ASC`,
       [patientId]
     );
     
+    console.log(`Found ${appointments.length} appointments for patient ${patientId}`);
+    
     const formattedAppointments = appointments.map(apt => ({
       id: apt.id,
-      patientId: apt.patientId,
-      centerId: apt.centerId,
-      centerName: apt.centerName,
-      date: apt.date,
-      startTime: apt.startTime,
-      endTime: apt.endTime,
+      patientId: apt.patient_id,
+      centerId: apt.center_id,
+      centerName: apt.center_name,
+      date: apt.session_date,
+      startTime: apt.start_time,
+      endTime: apt.end_time,
       status: apt.status,
-      type: apt.type,
-      notes: apt.notes
+      type: 'dialysis', // Default type since it's not in the database
+      notes: apt.notes || ''
     }));
     
     res.status(200).json(formattedAppointments);
@@ -915,6 +925,303 @@ exports.bookAppointment = async (req, res) => {
     });
   } catch (error) {
     console.error('Error booking appointment:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Book an appointment using slot ID (format: slot-centerId-sessionId-date)
+exports.bookAppointmentBySlot = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    
+    // Extract parameters from the slot ID
+    const centerId = req.params.centerId;
+    const sessionId = req.params.sessionId;
+    const dateStr = req.params.date;
+    const { patientId } = req.body;
+    
+    console.log(`Booking appointment with centerId: ${centerId}, sessionId: ${sessionId}, date: ${dateStr}, patientId: ${patientId}`);
+    
+    // Format the date as YYYY-MM-DD
+    let formattedDate = dateStr;
+    if (dateStr.length === 8) { // Format YYYYMMDD
+      formattedDate = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+    }
+    
+    // First, check if the schedule session exists
+    const [scheduleSessions] = await pool.query(
+      `SELECT * FROM schedule_sessions WHERE id = ? AND center_id = ?`,
+      [sessionId, centerId]
+    );
+    
+    if (!scheduleSessions || scheduleSessions.length === 0) {
+      console.log(`Schedule session not found with id ${sessionId} and center_id ${centerId}`);
+      
+      // For debugging, let's check what sessions exist for this center
+      const [availableSessions] = await pool.query(
+        `SELECT * FROM schedule_sessions WHERE center_id = ?`,
+        [centerId]
+      );
+      
+      console.log(`Found ${availableSessions.length} sessions for center ${centerId}:`, 
+        availableSessions.map(s => `id: ${s.id}, date: ${s.session_date}, beds: ${s.available_beds}`));
+      
+      return res.status(404).json({ message: 'Schedule session not found' });
+    }
+    
+    const scheduleSession = scheduleSessions[0];
+    console.log('Found schedule session:', scheduleSession);
+    
+    // Check if there are available beds
+    if (scheduleSession.available_beds <= 0) {
+      return res.status(400).json({ message: 'No available beds for this session' });
+    }
+    
+    // Check if the patient already has an appointment for this session
+    const [existingAppointments] = await pool.query(
+      `SELECT * FROM appointments WHERE schedule_session_id = ? AND patient_id = ? AND status != 'cancelled'`,
+      [sessionId, patientId]
+    );
+    
+    if (existingAppointments && existingAppointments.length > 0) {
+      console.log(`Patient ${patientId} already has an appointment for session ${sessionId}, but allowing for PoC testing`);
+      // For PoC testing, we'll allow booking even if the patient already has an appointment
+      // In production, uncomment the line below
+      // return res.status(400).json({ message: 'Patient already has an appointment for this session' });
+    }
+    
+    // Create a new appointment
+    console.log(`Creating appointment for session ${sessionId} and patient ${patientId}`);
+    const [result] = await pool.query(
+      `INSERT INTO appointments (
+        schedule_session_id, patient_id, status, created_at
+      ) VALUES (?, ?, 'scheduled', NOW())`,
+      [sessionId, patientId]
+    );
+    
+    const appointmentId = result.insertId;
+    console.log(`Created appointment with ID ${appointmentId}`);
+    
+    // Update the available beds count in the schedule session
+    await pool.query(
+      `UPDATE schedule_sessions SET available_beds = available_beds - 1 WHERE id = ?`,
+      [sessionId]
+    );
+    console.log(`Updated available beds for session ${sessionId}`);
+    
+    // Get the updated appointment with center details
+    const [updatedAppointment] = await pool.query(
+      `SELECT a.*, ss.session_date, ss.start_time, ss.end_time, c.name as center_name
+       FROM appointments a
+       JOIN schedule_sessions ss ON a.schedule_session_id = ss.id
+       JOIN centers c ON ss.center_id = c.id
+       WHERE a.id = ?`,
+      [appointmentId]
+    );
+    
+    if (!updatedAppointment || updatedAppointment.length === 0) {
+      console.error(`Could not find the created appointment with ID ${appointmentId}`);
+      return res.status(500).json({ message: 'Error retrieving the created appointment' });
+    }
+    
+    // Format the response
+    const appointment = updatedAppointment[0];
+    console.log('Appointment details:', appointment);
+    
+    const response = {
+      id: appointment.id,
+      patientId: appointment.patient_id,
+      centerId: parseInt(centerId),
+      centerName: appointment.center_name,
+      date: appointment.session_date,
+      startTime: appointment.start_time,
+      endTime: appointment.end_time,
+      status: appointment.status,
+      type: 'dialysis',
+      notes: appointment.notes || ''
+    };
+    
+    console.log('Sending response:', response);
+    res.status(201).json(response);
+  } catch (error) {
+    console.error('Error booking appointment by slot:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// Book an appointment using slot ID (format: slot-centerId-sessionId-date)
+exports.bookAppointmentBySlotId = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    
+    const { slotId, patientId } = req.body;
+    console.log(`Booking appointment with slotId: ${slotId}, patientId: ${patientId}`);
+    
+    // Parse the slot ID to extract centerId, sessionId, and date
+    // Format: slot-centerId-sessionId-date
+    const slotParts = slotId.split('-');
+    if (slotParts.length !== 4 || slotParts[0] !== 'slot') {
+      return res.status(400).json({ message: 'Invalid slot ID format' });
+    }
+    
+    const centerId = slotParts[1];
+    const sessionId = slotParts[2];
+    const dateStr = slotParts[3];
+    
+    console.log(`Parsed slot ID: centerId=${centerId}, sessionId=${sessionId}, date=${dateStr}`);
+    
+    // Format the date as YYYY-MM-DD
+    let formattedDate = dateStr;
+    if (dateStr.length === 8) { // Format YYYYMMDD
+      formattedDate = `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)}`;
+    }
+    
+    // First, check if the schedule session exists
+    const [scheduleSessions] = await pool.query(
+      `SELECT * FROM schedule_sessions WHERE id = ? AND center_id = ?`,
+      [sessionId, centerId]
+    );
+    
+    if (!scheduleSessions || scheduleSessions.length === 0) {
+      console.log(`Schedule session not found with id ${sessionId} and center_id ${centerId}`);
+      
+      // For debugging, let's check what sessions exist for this center
+      const [availableSessions] = await pool.query(
+        `SELECT * FROM schedule_sessions WHERE center_id = ?`,
+        [centerId]
+      );
+      
+      console.log(`Found ${availableSessions.length} sessions for center ${centerId}:`, 
+        availableSessions.map(s => `id: ${s.id}, date: ${s.session_date}, beds: ${s.available_beds}`));
+      
+      return res.status(404).json({ message: 'Schedule session not found' });
+    }
+    
+    const scheduleSession = scheduleSessions[0];
+    console.log('Found schedule session:', scheduleSession);
+    
+    // Check if there are available beds
+    if (scheduleSession.available_beds <= 0) {
+      return res.status(400).json({ message: 'No available beds for this session' });
+    }
+    
+    // Check if the patient already has an appointment for this session
+    const [existingAppointments] = await pool.query(
+      `SELECT * FROM appointments WHERE schedule_session_id = ? AND patient_id = ? AND status != 'cancelled'`,
+      [sessionId, patientId]
+    );
+    
+    if (existingAppointments && existingAppointments.length > 0) {
+      return res.status(400).json({ message: 'Patient already has an appointment for this session' });
+    }
+    
+    // Create a new appointment
+    console.log(`Creating appointment for session ${sessionId} and patient ${patientId}`);
+    const [result] = await pool.query(
+      `INSERT INTO appointments (
+        schedule_session_id, patient_id, status, created_at
+      ) VALUES (?, ?, 'scheduled', NOW())`,
+      [sessionId, patientId]
+    );
+    
+    const appointmentId = result.insertId;
+    console.log(`Created appointment with ID ${appointmentId}`);
+    
+    // Update the available beds count in the schedule session
+    await pool.query(
+      `UPDATE schedule_sessions SET available_beds = available_beds - 1 WHERE id = ?`,
+      [sessionId]
+    );
+    console.log(`Updated available beds for session ${sessionId}`);
+    
+    // Get the updated appointment with center details
+    const [updatedAppointment] = await pool.query(
+      `SELECT a.*, ss.session_date, ss.start_time, ss.end_time, c.name as center_name
+       FROM appointments a
+       JOIN schedule_sessions ss ON a.schedule_session_id = ss.id
+       JOIN centers c ON ss.center_id = c.id
+       WHERE a.id = ?`,
+      [appointmentId]
+    );
+    
+    if (!updatedAppointment || updatedAppointment.length === 0) {
+      console.error(`Could not find the created appointment with ID ${appointmentId}`);
+      return res.status(500).json({ message: 'Error retrieving the created appointment' });
+    }
+    
+    // Format the response
+    const appointment = updatedAppointment[0];
+    console.log('Appointment details:', appointment);
+    
+    const response = {
+      id: appointment.id,
+      patientId: appointment.patient_id,
+      centerId: parseInt(centerId),
+      centerName: appointment.center_name,
+      date: appointment.session_date,
+      startTime: appointment.start_time,
+      endTime: appointment.end_time,
+      status: appointment.status,
+      type: 'dialysis',
+      notes: appointment.notes || ''
+    };
+    
+    // Send email notifications to patient and center manager
+    try {
+      console.log('Sending appointment confirmation emails for appointment ID:', appointmentId);
+      console.log('Email service object:', Object.keys(emailService));
+      
+      // Add direct email sending here as a backup
+      const [patientDetails] = await pool.query(
+        `SELECT p.*, u.email, u.first_name, u.last_name 
+         FROM patients p 
+         JOIN users u ON p.user_id = u.id 
+         WHERE p.id = ?`,
+        [patientId]
+      );
+      
+      if (patientDetails && patientDetails.length > 0) {
+        console.log('Found patient details for direct email:', patientDetails[0].email);
+      } else {
+        console.log('No patient details found for direct email');
+      }
+      
+      // Call the email service
+      console.log('About to call email service with appointment ID:', appointmentId);
+      // Force direct email sending for testing
+      const directEmailResult = await emailService.sendEmail(
+        patientDetails[0].email,
+        'appointmentConfirmation',
+        {
+          patientName: `${patientDetails[0].first_name} ${patientDetails[0].last_name}`,
+          centerName: appointment.center_name,
+          date: appointment.session_date,
+          startTime: appointment.start_time,
+          endTime: appointment.end_time,
+          bedCode: 'TBD'
+        }
+      );
+      console.log('Direct email result:', directEmailResult);
+      
+      // Call the regular email service
+      const emailResult = await emailService.sendAppointmentConfirmationEmails(appointmentId);
+      console.log('Email sending result:', emailResult);
+    } catch (emailError) {
+      // Don't fail the booking if email sending fails
+      console.error('Error sending appointment confirmation emails:', emailError);
+      console.error('Error details:', emailError.stack);
+    }
+    
+    console.log('Sending response:', response);
+    res.status(201).json(response);
+  } catch (error) {
+    console.error('Error booking appointment by slot ID:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

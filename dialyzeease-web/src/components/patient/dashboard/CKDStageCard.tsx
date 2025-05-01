@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Activity } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { CKDStage } from '@/data/ckdData';
+import CkdStageBadge from '@/components/CkdStageBadge';
 
 interface CKDStageCardProps {
   patientCkdStage: number;
@@ -23,9 +24,7 @@ const CKDStageCard: React.FC<CKDStageCardProps> = ({ patientCkdStage, ckdStageIn
         <div className="flex flex-col space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">Current Stage:</span>
-            <span className={`bg-amber-500/20 text-amber-700 text-xs px-2 py-0.5 rounded-full font-medium`}>
-              Stage {patientCkdStage}
-            </span>
+            <CkdStageBadge stage={patientCkdStage} />
           </div>
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">eGFR Range:</span>

@@ -9,7 +9,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isToday, i
 import PatientPortalLayout from '@/components/layouts/PatientPortalLayout';
 import AppointmentStatusBadge from '@/components/AppointmentStatusBadge';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { fetchAppointmentsByPatient, cancelAppointment } from '@/api/appointmentApi';
+import { fetchAppointmentsByPatient, cancelAppointment, getAppointmentSlotsByPatient } from '@/api/appointmentApi';
 import { toast } from '@/components/ui/use-toast';
 import {
   AlertDialog,
@@ -27,10 +27,69 @@ const PatientCalendar = () => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [cancelingAppointmentId, setCancelingAppointmentId] = useState<string | null>(null);
   
+  // Get the current user data from localStorage
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Try multiple possible storage keys for user ID
+    const userIdFromStorage = localStorage.getItem('userId') || 
+                             localStorage.getItem('user_id');
+    
+    // If we found a user ID, use it
+    if (userIdFromStorage) {
+      console.log('Found user ID in localStorage:', userIdFromStorage);
+      setUserId(userIdFromStorage);
+      return;
+    }
+    
+    // Try to get user ID from auth data
+    const authData = localStorage.getItem('auth');
+    if (authData) {
+      try {
+        const parsedAuthData = JSON.parse(authData);
+        if (parsedAuthData.userId || parsedAuthData.user?.id) {
+          const id = parsedAuthData.userId || parsedAuthData.user?.id;
+          console.log('Found user ID in auth data:', id);
+          setUserId(id);
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing auth data:', error);
+      }
+    }
+    
+    // If we still don't have a user ID, use a default for testing
+    console.warn('No user ID found in storage, using default ID for testing');
+    setUserId('1006'); // Default test user ID
+  }, []);
+  
   // Fetch appointments
   const { data: appointments, isLoading, refetch } = useQuery({
-    queryKey: ['patientAppointments'],
-    queryFn: () => fetchAppointmentsByPatient('user-001') // In a real app, this would be the current user's ID
+    queryKey: ['patientAppointments', userId],
+    queryFn: async () => {
+      // If we have a userId, use it to fetch appointments from the API
+      if (userId) {
+        try {
+          console.log(`Attempting to fetch appointments for user ID: ${userId}`);
+          // Use the getAppointmentSlotsByPatient function to get real data
+          const response = await getAppointmentSlotsByPatient(userId);
+          console.log('Appointment data received:', response);
+          return response;
+        } catch (error) {
+          console.error('Error fetching patient appointments:', error);
+          // Fallback to the mock data function if API call fails
+          console.log('Falling back to mock data with ID:', userId);
+          return fetchAppointmentsByPatient(userId);
+        }
+      } else {
+        // Fallback to mock data if no userId is available
+        console.warn('No user ID set yet, using mock data');
+        return fetchAppointmentsByPatient('user-001');
+      }
+    },
+    enabled: !!userId, // Only run the query if we have a userId
+    retry: 2,          // Retry failed requests twice
+    refetchOnWindowFocus: false // Don't refetch when window regains focus
   });
   
   // Mutation for canceling an appointment
@@ -47,12 +106,18 @@ const PatientCalendar = () => {
       toast({
         title: "Error",
         description: "Failed to cancel appointment. Please try again.",
-        variant: "destructive"
+        variant: "error" // Changed from "destructive" to "error" to fix type error
       });
     }
   });
   
   const handleCancelAppointment = (appointmentId: string) => {
+    // Show loading toast
+    toast({
+      title: "Cancelling appointment...",
+      description: "Please wait while we process your request."
+    });
+    
     cancelAppointmentMutation.mutate(appointmentId);
     setCancelingAppointmentId(null);
   };
@@ -99,6 +164,10 @@ const PatientCalendar = () => {
       return <div className="text-center py-10">Loading calendar...</div>;
     }
     
+    if (appointments.length === 0) {
+      return <div className="text-center py-10">No appointments found. <Link to="/patient/book" className="text-medical-blue hover:underline">Book an appointment</Link></div>;
+    }
+    
     const monthStart = startOfMonth(currentMonth);
     const monthEnd = endOfMonth(monthStart);
     const startDate = monthStart;
@@ -113,9 +182,26 @@ const PatientCalendar = () => {
       // Get the day of the week (0 = Sunday, 6 = Saturday)
       const dayOfWeek = getDay(day);
       
+      // Get appointments for this month
+      const monthAppointments = appointments.filter(appointment => {
+        // Handle different date formats that might come from the API
+        const appointmentDate = new Date(
+          appointment.date || 
+          appointment.sessionDate || 
+          appointment.schedule_session?.session_date ||
+          ''
+        );
+        return isSameMonth(appointmentDate, currentMonth);
+      });
+      
       // Find appointments for this day
-      const dayAppointments = appointments.filter(appointment => {
-        const appointmentDate = new Date(appointment.date);
+      const dayAppointments = monthAppointments.filter(appointment => {
+        const appointmentDate = new Date(
+          appointment.date || 
+          appointment.sessionDate || 
+          appointment.schedule_session?.session_date ||
+          ''
+        );
         return format(appointmentDate, 'yyyy-MM-dd') === format(day, 'yyyy-MM-dd');
       });
       
@@ -235,11 +321,21 @@ const PatientCalendar = () => {
               monthAppointments.map((appointment) => (
                 <div key={appointment.id} className="flex justify-between items-center pb-4 border-b last:border-0 last:pb-0">
                   <div>
-                    <div className="font-medium capitalize">{appointment.type}</div>
+                    <div className="font-medium capitalize">{appointment.type || 'Dialysis'}</div>
                     <div className="text-sm text-muted-foreground">
-                      {format(new Date(appointment.date), 'EEEE, MMMM d, yyyy')} at {appointment.startTime}
+                      {format(
+                        new Date(
+                          appointment.date || 
+                          appointment.sessionDate || 
+                          appointment.schedule_session?.session_date ||
+                          ''
+                        ), 
+                        'EEEE, MMMM d, yyyy'
+                      )} at {appointment.startTime || appointment.schedule_session?.start_time}
                     </div>
-                    <div className="text-sm">Center ID: {appointment.centerId}</div>
+                    <div className="text-sm">
+                      {appointment.centerName || appointment.center?.name || `Center ID: ${appointment.centerId || appointment.center_id}`}
+                    </div>
                   </div>
                   <div className="flex items-center space-x-2">
                     <AppointmentStatusBadge status={appointment.status} />

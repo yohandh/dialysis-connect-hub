@@ -35,9 +35,9 @@ INSERT INTO roles (id, name) VALUES
 -- Note: id starting from 1000
 -- Admin users
 INSERT INTO users (id, role_id, first_name, last_name, email, password, mobile_no, is_active, last_login_at) VALUES
-(1000, 1000, 'Admin', 'User', 'admin@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '011-242-2335', 1, '2023-06-20 07:15:00'),
-(1001, 1000, 'Suwan', 'Rathnayake', 'suwan@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '077-912-4893', 1, '2023-06-19 10:30:00'),
-(1002, 1000, 'Yohan', 'Hirimuthugoda', 'yohan@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '077-727-8874', 1, '2023-06-18 14:45:00');
+(1000, 1000, 'Admin', 'User', 'admin@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '011-242-2335', 1, '2025-06-20 07:15:00'),
+(1001, 1000, 'Suwan', 'Rathnayake', 'suwan@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '077-912-4893', 1, '2025-06-19 10:30:00'),
+(1002, 1000, 'Yohan', 'Hirimuthugoda', 'yohan@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '077-727-8874', 1, '2025-06-18 14:45:00');
 
 -- Staff users
 INSERT INTO users (id, role_id, first_name, last_name, email, password, mobile_no, is_active, last_login_at) VALUES
@@ -310,25 +310,25 @@ INSERT INTO center_hours (center_id, weekday, open_time, close_time) VALUES
 (1, 'sun', NULL, NULL);
 
 -- Staff/Doctor users
-(1003, 1001, 'Sarah', 'Johnson', 'sarah.johnson@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-200-0001', 1, '2023-06-20 08:30:00'),
-(1004, 1001, 'David', 'Chen', 'david.chen@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-200-0002', 1, '2023-06-19 10:45:00'),
-(1005, 1002, 'Patricia', 'Garcia', 'patricia.garcia@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0001', 1, '2023-06-18 09:15:00'),
-(1006, 1002, 'Thomas', 'Brown', 'thomas.brown@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0002', 1, '2023-06-17 16:30:00'),
-(1007, 1002, 'Emma', 'Williams', 'emma.williams@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0003', 1, '2023-06-16 11:45:00'),
-(1008, 1002, 'Robert', 'Miller', 'robert.miller@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0004', 1, '2023-06-15 14:20:00'),
-(1009, 1002, 'James', 'Wilson', 'james.wilson@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0005', 1, '2023-06-14 09:10:00'),
-(1010, 1002, 'Linda', 'Martinez', 'linda.martinez@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0006', 1, '2023-06-13 15:30:00'),
-(1011, 1002, 'Michael', 'Johnson', 'michael.johnson@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0007', 1, '2023-06-12 10:45:00'),
-(1012, 1002, 'Susan', 'Lee', 'susan.lee@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0008', 1, '2023-06-11 13:20:00'),
-(1013, 1002, 'Jennifer', 'Adams', 'jennifer.adams@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0009', 1, '2023-06-10 09:15:00'),
-(1014, 1002, 'Richard', 'Taylor', 'richard.taylor@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0010', 1, '2023-06-09 14:30:00'),
-(1015, 1002, 'Elizabeth', 'Clark', 'elizabeth.clark@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0011', 1, '2023-06-08 11:45:00'),
+(1003, 1001, 'Sarah', 'Johnson', 'sarah.johnson@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-200-0001', 1, '2025-06-20 08:30:00'),
+(1004, 1001, 'David', 'Chen', 'david.chen@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-200-0002', 1, '2025-06-19 10:45:00'),
+(1005, 1002, 'Patricia', 'Garcia', 'patricia.garcia@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0001', 1, '2025-06-18 09:15:00'),
+(1006, 1002, 'Thomas', 'Brown', 'thomas.brown@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0002', 1, '2025-06-17 16:30:00'),
+(1007, 1002, 'Emma', 'Williams', 'emma.williams@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0003', 1, '2025-06-16 11:45:00'),
+(1008, 1002, 'Robert', 'Miller', 'robert.miller@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0004', 1, '2025-06-15 14:20:00'),
+(1009, 1002, 'James', 'Wilson', 'james.wilson@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0005', 1, '2025-06-14 09:10:00'),
+(1010, 1002, 'Linda', 'Martinez', 'linda.martinez@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0006', 1, '2025-06-13 15:30:00'),
+(1011, 1002, 'Michael', 'Johnson', 'michael.johnson@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0007', 1, '2025-06-12 10:45:00'),
+(1012, 1002, 'Susan', 'Lee', 'susan.lee@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0008', 1, '2025-06-11 13:20:00'),
+(1013, 1002, 'Jennifer', 'Adams', 'jennifer.adams@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0009', 1, '2025-06-10 09:15:00'),
+(1014, 1002, 'Richard', 'Taylor', 'richard.taylor@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0010', 1, '2025-06-09 14:30:00'),
+(1015, 1002, 'Elizabeth', 'Clark', 'elizabeth.clark@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-300-0011', 1, '2025-06-08 11:45:00'),
 
 -- Patient users
-(1016, 1003, 'John', 'Smith', 'john.smith@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-400-0001', 1, '2023-06-20 14:30:00'),
-(1017, 1003, 'Maria', 'Rodriguez', 'maria.rodriguez@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-400-0002', 1, '2023-06-18 09:45:00'),
-(1018, 1003, 'Robert', 'Johnson', 'robert.johnson@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-400-0003', 1, '2023-06-19 16:10:00'),
-(1019, 1003, 'Emily', 'Chen', 'emily.chen@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-400-0004', 1, '2023-06-17 13:25:00');
+(1016, 1003, 'John', 'Smith', 'john.smith@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-400-0001', 1, '2025-06-20 14:30:00'),
+(1017, 1003, 'Maria', 'Rodriguez', 'maria.rodriguez@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-400-0002', 1, '2025-06-18 09:45:00'),
+(1018, 1003, 'Robert', 'Johnson', 'robert.johnson@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-400-0003', 1, '2025-06-19 16:10:00'),
+(1019, 1003, 'Emily', 'Chen', 'emily.chen@dialyzeease.org', '$2b$10$l5Ms/jJcWZHFz62OZoJ84u9w1wsR.hXYQgpWeR0YiiSqXfHnL0ISm', '555-400-0004', 1, '2025-06-17 13:25:00');
 
 -- Insert patients
 INSERT INTO patients (id, user_id, address, dob, gender, blood_group, height, weight, allergies, chronic_conditions, emergency_contact_no, emergency_contact_name, emergency_contact_relation, insurance_provider) VALUES
@@ -541,20 +541,20 @@ INSERT INTO schedule_sessions (id, session_id, weekday) VALUES
 
 -- Insert appointments
 INSERT INTO appointments (id, patient_id, center_id, doctor_id, appointment_date, start_time, end_time, status, type, notes) VALUES
-(1000, 1016, 1000, 1000, '2023-06-01', '09:00:00', '12:00:00', 'completed', 'dialysis', 'Regular session, no complications'),
-(1001, 1017, 1000, 1000, '2023-06-05', '13:00:00', '16:00:00', 'booked', 'dialysis', NULL),
-(1002, 1018, 1001, 1005, '2023-06-02', '10:00:00', '13:00:00', 'canceled', 'dialysis', 'Patient requested cancelation due to feeling unwell'),
-(1003, 1016, 1000, 1000, '2023-06-08', '09:00:00', '12:00:00', 'booked', 'dialysis', NULL),
-(1004, 1019, 1002, 1006, '2023-06-03', '14:00:00', '15:00:00', 'completed', 'consultation', 'Discussed diet plan changes');
+(1000, 1016, 1000, 1000, '2025-06-01', '09:00:00', '12:00:00', 'completed', 'dialysis', 'Regular session, no complications'),
+(1001, 1017, 1000, 1000, '2025-06-05', '13:00:00', '16:00:00', 'booked', 'dialysis', NULL),
+(1002, 1018, 1001, 1005, '2025-06-02', '10:00:00', '13:00:00', 'canceled', 'dialysis', 'Patient requested cancelation due to feeling unwell'),
+(1003, 1016, 1000, 1000, '2025-06-08', '09:00:00', '12:00:00', 'booked', 'dialysis', NULL),
+(1004, 1019, 1002, 1006, '2025-06-03', '14:00:00', '15:00:00', 'completed', 'consultation', 'Discussed diet plan changes');
 
 -- Insert CKD records
 INSERT INTO ckd_records (id, patient_id, doctor_id, record_date, egfr, creatinine, stage, notes) VALUES
-(1000, 1016, 1000, '2023-01-15', 42, 1.8, 3, 'Patient showing stable kidney function.'),
-(1001, 1016, 1000, '2023-03-20', 38, 2.1, 3, 'Slight decrease in kidney function. Monitoring closely.'),
-(1002, 1016, 1000, '2023-05-10', 35, 2.3, 3, 'Consider adjusting medication regimen.'),
-(1003, 1017, 1005, '2023-02-10', 55, 1.3, 3, 'Kidney function improving with current treatment.'),
-(1004, 1018, 1006, '2023-04-05', 28, 2.5, 4, 'Significant decline in kidney function. Discussing dialysis options.'),
-(1005, 1019, 1012, '2023-03-15', 60, 1.2, 2, 'Early stage CKD. Implementing dietary changes and medication.');
+(1000, 1016, 1000, '2025-01-15', 42, 1.8, 3, 'Patient showing stable kidney function.'),
+(1001, 1016, 1000, '2025-03-20', 38, 2.1, 3, 'Slight decrease in kidney function. Monitoring closely.'),
+(1002, 1016, 1000, '2025-05-10', 35, 2.3, 3, 'Consider adjusting medication regimen.'),
+(1003, 1017, 1005, '2025-02-10', 55, 1.3, 3, 'Kidney function improving with current treatment.'),
+(1004, 1018, 1006, '2025-04-05', 28, 2.5, 4, 'Significant decline in kidney function. Discussing dialysis options.'),
+(1005, 1019, 1012, '2025-03-15', 60, 1.2, 2, 'Early stage CKD. Implementing dietary changes and medication.');
 
 -- Insert CKD stages educational content
 INSERT INTO ckd_stages (id, stage, egfr_range, description, diet_recommendations, lifestyle_recommendations, monitoring_recommendations) VALUES
@@ -566,11 +566,11 @@ INSERT INTO ckd_stages (id, stage, egfr_range, description, diet_recommendations
 
 -- Insert educational materials
 INSERT INTO education_materials (id, title, type, content_summary, target_audience, duration_minutes, last_updated) VALUES
-(1000, 'Understanding Chronic Kidney Disease', 'article', 'A comprehensive overview of CKD, its causes, stages, and management strategies.', 'newly diagnosed', 15, '2023-01-10'),
-(1001, 'Renal Diet Basics', 'video', 'Nutritionist explains dietary recommendations for CKD patients at different stages.', 'all patients', 22, '2023-02-15'),
-(1002, 'Preparing for Dialysis', 'guide', 'Step-by-step preparation guide for patients starting dialysis treatment.', 'stage 4-5', 30, '2023-03-20'),
-(1003, 'Medication Management for CKD', 'interactive', 'Interactive tool to help patients understand their medications and potential interactions.', 'all patients', 25, '2023-04-05'),
-(1004, 'Living Well with Kidney Disease', 'webinar', 'Recorded webinar featuring patients sharing their experiences and coping strategies.', 'all patients', 45, '2023-05-12');
+(1000, 'Understanding Chronic Kidney Disease', 'article', 'A comprehensive overview of CKD, its causes, stages, and management strategies.', 'newly diagnosed', 15, '2025-01-10'),
+(1001, 'Renal Diet Basics', 'video', 'Nutritionist explains dietary recommendations for CKD patients at different stages.', 'all patients', 22, '2025-02-15'),
+(1002, 'Preparing for Dialysis', 'guide', 'Step-by-step preparation guide for patients starting dialysis treatment.', 'stage 4-5', 30, '2025-03-20'),
+(1003, 'Medication Management for CKD', 'interactive', 'Interactive tool to help patients understand their medications and potential interactions.', 'all patients', 25, '2025-04-05'),
+(1004, 'Living Well with Kidney Disease', 'webinar', 'Recorded webinar featuring patients sharing their experiences and coping strategies.', 'all patients', 45, '2025-05-12');
 
 -- Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;

@@ -175,7 +175,7 @@ const PatientPortalLayout: React.FC<PatientPortalLayoutProps> = ({ children }) =
                 <address className="not-italic text-gray-300 space-y-2">
                   <p>DialyzeEase Support</p>
                   <p>349, Jayantha Weerasekara Mawatha<br />Colombo, Western Province 01000, Sri Lanka</p>
-                  <p>(94) 11 242 2335</p>
+                  <p>011 242 2335</p>
                   <p><a href="mailto:support@dialyzeease.org" className="hover:text-white">support@dialyzeease.org</a></p>
                 </address>
               </div>

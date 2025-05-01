@@ -26,7 +26,7 @@ const fetchPatientNotifications = async (patientId: string): Promise<PatientNoti
       id: "notif-1",
       title: "Upcoming Appointment",
       message: "You have a dialysis appointment scheduled for tomorrow at 10:00 AM.",
-      createdAt: "2023-06-01T10:00:00Z",
+      createdAt: "2025-06-01T10:00:00Z",
       type: "appointment",
       isRead: false
     },
@@ -34,7 +34,7 @@ const fetchPatientNotifications = async (patientId: string): Promise<PatientNoti
       id: "notif-2",
       title: "Lab Results Available",
       message: "Your recent lab results have been uploaded to your patient portal.",
-      createdAt: "2023-05-28T14:30:00Z",
+      createdAt: "2025-05-28T14:30:00Z",
       type: "medical",
       isRead: true
     }

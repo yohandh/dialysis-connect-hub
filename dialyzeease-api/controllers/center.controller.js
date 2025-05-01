@@ -303,3 +303,133 @@ exports.deleteCenter = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Get available time slots for a center on a specific date
+exports.getAvailableTimeSlots = async (req, res) => {
+  try {
+    const centerId = req.params.centerId;
+    const date = req.query.date;
+    
+    if (!centerId || !date) {
+      return res.status(400).json({ message: 'Center ID and date are required' });
+    }
+    
+    console.log(`Fetching available slots for center ${centerId} and date ${date}`);
+    
+    // Check if center exists
+    const [center] = await pool.query(
+      `SELECT * FROM centers WHERE id = ? AND is_active = 1`,
+      [centerId]
+    );
+    
+    if (!center || center.length === 0) {
+      return res.status(404).json({ message: 'Center not found or inactive' });
+    }
+    
+    // Get scheduled sessions for this center and date
+    console.log(`Searching for scheduled sessions for center ${centerId} and date ${date}`);
+    
+    const [scheduledSessions] = await pool.query(
+      `SELECT ss.id, ss.center_id, ss.start_time, ss.end_time, ss.session_date, ss.status, ss.available_beds,
+              c.name as center_name
+       FROM schedule_sessions ss
+       JOIN centers c ON ss.center_id = c.id
+       WHERE ss.center_id = ? AND ss.status = 'scheduled' AND ss.session_date = ?`,
+      [centerId, date]
+    );
+    
+    console.log(`Found ${scheduledSessions.length} scheduled sessions:`, scheduledSessions);
+    
+    if (!scheduledSessions || scheduledSessions.length === 0) {
+      return res.json([]);
+    }
+    
+    // Get existing appointments for these scheduled sessions to exclude already booked slots
+    const sessionIds = scheduledSessions.map(session => session.id);
+    const [bookedAppointments] = await pool.query(
+      `SELECT a.id, a.schedule_session_id, a.patient_id, ss.start_time, ss.end_time 
+       FROM appointments a
+       JOIN schedule_sessions ss ON a.schedule_session_id = ss.id
+       WHERE a.schedule_session_id IN (?) AND a.status != 'cancelled'`,
+      [sessionIds.length > 0 ? sessionIds : [0]]
+    );
+    
+    // Group booked appointments by session ID
+    const bookedAppointmentsBySession = {};
+    bookedAppointments.forEach(apt => {
+      if (!bookedAppointmentsBySession[apt.schedule_session_id]) {
+        bookedAppointmentsBySession[apt.schedule_session_id] = [];
+      }
+      bookedAppointmentsBySession[apt.schedule_session_id].push(apt);
+    });
+    
+    // Convert schedule sessions to available appointment slots
+    const availableSlots = [];
+    
+    scheduledSessions.forEach(session => {
+      // Skip sessions that are fully booked
+      const bookedCount = (bookedAppointmentsBySession[session.id] || []).length;
+      const availableBeds = session.available_beds || 0;
+      
+      if (bookedCount >= availableBeds) {
+        return; // Skip this session, it's fully booked
+      }
+      
+      // Generate a unique ID for the slot
+      const slotId = `slot-${centerId}-${session.id}-${date.replace(/-/g, '')}`;
+          
+      // Always use the requested date instead of the session_date
+      // This ensures the frontend displays the date the user selected
+      let formattedDate = date;
+      
+      console.log(`Using requested date: ${date} instead of session_date: ${session.session_date}`);
+      
+      // Format the date if needed
+      if (formattedDate instanceof Date) {
+        formattedDate = formattedDate.toISOString().split('T')[0];
+      } else if (typeof formattedDate === 'string' && formattedDate.includes('T')) {
+        formattedDate = formattedDate.split('T')[0];
+      }
+      
+      // Format the times as HH:MM:SS
+      let startTime = session.start_time;
+      let endTime = session.end_time;
+      
+      if (typeof startTime === 'object' && startTime !== null) {
+        startTime = startTime.toString().substring(0, 8);
+      }
+      
+      if (typeof endTime === 'object' && endTime !== null) {
+        endTime = endTime.toString().substring(0, 8);
+      }
+      
+      console.log(`Adding slot for ${formattedDate} from ${startTime} to ${endTime}`);
+      
+      availableSlots.push({
+        id: slotId,
+        centerId: parseInt(centerId),
+        centerName: session.center_name,
+        date: formattedDate,
+        startTime: startTime,
+        endTime: endTime,
+        status: 'available',
+        type: 'dialysis',
+        patientId: null,
+        notes: '',
+        sessionId: session.id,
+        availableBeds: session.available_beds,
+        bookedCount: (bookedAppointmentsBySession[session.id] || []).length
+      });
+    });
+    
+    // Sort slots by start time
+    availableSlots.sort((a, b) => a.startTime.localeCompare(b.startTime));
+    
+    console.log(`Found ${availableSlots.length} available slots for center ${centerId} on ${date}`);
+    
+    res.json(availableSlots);
+  } catch (error) {
+    console.error('Error fetching available time slots:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};

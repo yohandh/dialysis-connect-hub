@@ -65,7 +65,7 @@ export const getDialysisSessionsByPatient = async (patientId: string): Promise<D
         id: "session-1",
         appointmentId: "app-1",
         patientId,
-        date: "2023-04-01",
+        date: "2025-04-01",
         startTime: "09:00",
         endTime: "13:00",
         duration: 240,
@@ -92,7 +92,7 @@ export const getDialysisSessionsByPatient = async (patientId: string): Promise<D
         id: "session-2",
         appointmentId: "app-2",
         patientId,
-        date: "2023-04-04",
+        date: "2025-04-04",
         startTime: "09:00",
         endTime: "13:00",
         duration: 240,
@@ -184,7 +184,7 @@ export const getCkdMeasurementsByPatient = async (patientId: string): Promise<Ck
       {
         id: "ckd-1",
         patientId,
-        date: "2023-03-15",
+        date: "2025-03-15",
         eGFR: 35,
         creatinine: 1.9,
         calculatedStage: 3,
@@ -194,7 +194,7 @@ export const getCkdMeasurementsByPatient = async (patientId: string): Promise<Ck
       {
         id: "ckd-2",
         patientId,
-        date: "2023-02-15",
+        date: "2025-02-15",
         eGFR: 38,
         creatinine: 1.8,
         calculatedStage: 3,
@@ -204,7 +204,7 @@ export const getCkdMeasurementsByPatient = async (patientId: string): Promise<Ck
       {
         id: "ckd-3",
         patientId,
-        date: "2023-01-15",
+        date: "2025-01-15",
         eGFR: 32,
         creatinine: 2.1,
         calculatedStage: 3,
@@ -317,7 +317,7 @@ export const getAppointmentSlotsByCenter = async (centerId: string): Promise<App
       {
         id: "slot-1",
         centerId,
-        date: "2023-04-10",
+        date: "2025-04-10",
         startTime: "09:00",
         endTime: "12:00",
         type: "dialysis",
@@ -327,7 +327,7 @@ export const getAppointmentSlotsByCenter = async (centerId: string): Promise<App
       {
         id: "slot-2",
         centerId,
-        date: "2023-04-10",
+        date: "2025-04-10",
         startTime: "13:00",
         endTime: "16:00",
         type: "dialysis",
@@ -337,7 +337,7 @@ export const getAppointmentSlotsByCenter = async (centerId: string): Promise<App
       {
         id: "slot-3",
         centerId,
-        date: "2023-04-11",
+        date: "2025-04-11",
         startTime: "09:00",
         endTime: "10:00",
         type: "consultation",
@@ -365,7 +365,7 @@ export const bookAppointment = async (request: BookAppointmentRequest): Promise<
     return {
       id: request.slotId,
       centerId: "center-1", // Mock center ID
-      date: "2023-04-10",
+      date: "2025-04-10",
       startTime: "09:00",
       endTime: "12:00",
       type: "dialysis",
@@ -390,7 +390,7 @@ export const completeAppointment = async (slotId: string): Promise<AppointmentSl
     return {
       id: slotId,
       centerId: "center-1", // Mock center ID
-      date: "2023-04-10",
+      date: "2025-04-10",
       startTime: "09:00",
       endTime: "12:00",
       type: "dialysis",
@@ -414,7 +414,7 @@ export const cancelAppointment = async (slotId: string): Promise<AppointmentSlot
     return {
       id: slotId,
       centerId: "center-1", // Mock center ID
-      date: "2023-04-10",
+      date: "2025-04-10",
       startTime: "09:00",
       endTime: "12:00",
       type: "dialysis",

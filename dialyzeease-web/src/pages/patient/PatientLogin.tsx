@@ -5,20 +5,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
+import { loginUser } from '@/api/authApi';
+import { useAuth } from '@/hooks/useAuth';
 
 const PatientLogin = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("patient@dialyzeease.org");
+  const [password, setPassword] = useState("example.com");
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
   
   // Check for success message from registration in sessionStorage
   useEffect(() => {
     const successMessage = sessionStorage.getItem('registrationSuccess');
     if (successMessage) {
-      toast({
-        title: "Success",
+      toast.success("Registration Successful", {
         description: successMessage,
       });
       
@@ -27,22 +30,49 @@ const PatientLogin = () => {
     }
   }, []);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // In a real app, this would authenticate with a backend
-    if (email && password) {
-      toast({
-        title: "Login Successful",
-        description: "Welcome to the Patient Portal.",
-      });
-      navigate('/patient/dashboard');
-    } else {
-      toast({
-        title: "Login Failed",
+    if (!email || !password) {
+      toast.error("Login Failed", {
         description: "Please enter both email and password.",
-        variant: "destructive",
       });
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      // Call the backend API to authenticate
+      const response = await loginUser({ email, password });
+      
+      if (response && response.token) {
+        // Store the token and user data using the auth context
+        login({
+          user: response.user,
+          token: response.token,
+          role: response.user.role_id
+        });
+        
+        toast.success("Login Successful", {
+          description: "Welcome to the Patient Portal.",
+        });
+        
+        // Redirect to the intended page or dashboard
+        const from = location.state?.from?.pathname || '/patient/dashboard';
+        navigate(from);
+      } else {
+        toast.error("Login Failed", {
+          description: "Invalid credentials. Please try again.",
+        });
+      }
+    } catch (error: any) {
+      console.error('Login error:', error);
+      toast.error("Login Failed", {
+        description: error.response?.data?.message || "An error occurred during login. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
   
@@ -90,8 +120,12 @@ const PatientLogin = () => {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full bg-medical-blue hover:bg-medical-blue/90 text-white">
-              Login
+            <Button 
+              type="submit" 
+              className="w-full bg-medical-blue hover:bg-medical-blue/90 text-white"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </CardFooter>
         </form>

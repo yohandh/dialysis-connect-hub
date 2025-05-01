@@ -46,7 +46,7 @@ export const educationResources: EducationResource[] = [
     ckdStages: [3, 4],
     imageUrl: "/images/diet-kidney.jpg",
     author: "Dr. Susan Reynolds, RD",
-    datePublished: "2023-05-15",
+    datePublished: "2025-05-15",
     readTime: "8 min"
   },
   {
@@ -100,7 +100,7 @@ export const educationResources: EducationResource[] = [
     ckdStages: [1, 2, 3, 4, 5],
     imageUrl: "/images/medication.jpg",
     author: "Dr. Michael Chen, PharmD",
-    datePublished: "2023-06-22",
+    datePublished: "2025-06-22",
     readTime: "10 min"
   },
   {
@@ -156,7 +156,7 @@ export const educationResources: EducationResource[] = [
     ckdStages: [1, 2, 3, 4],
     imageUrl: "/images/exercise.jpg",
     author: "Dr. Jennifer Wilson, PT",
-    datePublished: "2023-04-10",
+    datePublished: "2025-04-10",
     readTime: "7 min"
   },
   {
@@ -203,7 +203,7 @@ export const educationResources: EducationResource[] = [
     `,
     type: "general",
     ckdStages: [1, 2, 3, 4, 5],
-    datePublished: "2023-03-05",
+    datePublished: "2025-03-05",
     readTime: "9 min"
   },
   {
@@ -252,7 +252,7 @@ export const educationResources: EducationResource[] = [
     `,
     type: "general",
     ckdStages: [1, 2, 3, 4, 5],
-    datePublished: "2023-07-12",
+    datePublished: "2025-07-12",
     readTime: "8 min"
   }
 ];

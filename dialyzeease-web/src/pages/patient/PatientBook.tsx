@@ -44,15 +44,39 @@ const PatientBook = () => {
     if (selectedCenter && centers.length > 0) {
       const center = centers.find(c => c.id === selectedCenter);
       if (center) {
+        console.log('Selected center data:', center);
+        
+        // Check if center has centerHours in the API format (array of objects)
+        if (center.centerHours && Array.isArray(center.centerHours)) {
+          const hoursMap: {[key: string]: string} = {};
+          center.centerHours.forEach((hour: any) => {
+            // Map weekday values to day names
+            const dayMap: {[key: string]: string} = {
+              'mon': 'Monday',
+              'tue': 'Tuesday',
+              'wed': 'Wednesday',
+              'thu': 'Thursday',
+              'fri': 'Friday',
+              'sat': 'Saturday',
+              'sun': 'Sunday'
+            };
+            
+            const day = dayMap[hour.weekday] || hour.weekday;
+            hoursMap[day] = `${formatTime(hour.openTime)} - ${formatTime(hour.closeTime)}`;
+          });
+          setCenterHours(hoursMap);
+          console.log('Set center hours from API data:', hoursMap);
+        }
         // Check if center has hours in the new format
-        if (center.hours) {
+        else if (center.hours) {
           const hoursMap: {[key: string]: string} = {};
           center.hours.forEach(hour => {
             hoursMap[hour.day] = `${hour.openTime} - ${hour.closeTime}`;
           });
           setCenterHours(hoursMap);
+          console.log('Set center hours from hours property:', hoursMap);
         } 
-        // Check if center has hours in the centerHours format
+        // Check if center has hours in the mock data centerHours format
         else if (center.centerHours && typeof center.centerHours === 'object' && !Array.isArray(center.centerHours)) {
           const centerHoursObj = center.centerHours as Record<string, string>;
           setCenterHours({
@@ -64,11 +88,81 @@ const PatientBook = () => {
             'Saturday': centerHoursObj.saturday,
             'Sunday': centerHoursObj.sunday
           });
+          console.log('Set center hours from mock data:', centerHoursObj);
         }
       }
     }
   }, [selectedCenter, centers]);
+  
+  // Helper function to format time from HH:MM:SS to HH:MM AM/PM
+  const formatTime = (timeStr: string): string => {
+    if (!timeStr) return '';
+    
+    try {
+      const [hours, minutes] = timeStr.split(':');
+      const hoursNum = parseInt(hours, 10);
+      const period = hoursNum >= 12 ? 'PM' : 'AM';
+      const hours12 = hoursNum % 12 || 12;
+      
+      return `${hours12}:${minutes} ${period}`;
+    } catch (error) {
+      console.error('Error formatting time:', error);
+      return timeStr;
+    }
+  };
 
+  // Format date for API calls (YYYY-MM-DD)
+  const formatDateForApi = (dateString: string): string => {
+    try {
+      // If it's already in YYYY-MM-DD format, return as is
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        return dateString;
+      }
+      
+      // Handle MM/DD/YYYY format
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+        const [month, day, year] = dateString.split('/');
+        return `${year}-${month}-${day}`;
+      }
+      
+      // Parse the date string and format as YYYY-MM-DD, accounting for timezone
+      // Use a method that preserves the day by working with local date parts
+      const dateParts = dateString.split(/[\s\/-]+/);
+      if (dateParts.length >= 3) {
+        // If we have at least 3 parts, assume MM/DD/YYYY or similar format
+        let month, day, year;
+        
+        // Determine which parts are which based on format
+        if (dateParts[0].length === 4) {
+          // YYYY-MM-DD format
+          [year, month, day] = dateParts;
+        } else {
+          // MM/DD/YYYY format
+          [month, day, year] = dateParts;
+        }
+        
+        // Ensure proper formatting with leading zeros
+        month = String(parseInt(month)).padStart(2, '0');
+        day = String(parseInt(day)).padStart(2, '0');
+        
+        return `${year}-${month}-${day}`;
+      }
+      
+      // Last resort: use the Date object but be careful with timezone
+      const date = new Date(dateString);
+      // Get the date in local timezone to avoid day shifting
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      
+      console.log(`Parsed date: ${dateString} -> ${year}-${month}-${day}`);
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateString;
+    }
+  };
+  
   // Get available time slots for selected center and date
   const { 
     data: availableSlots = [], 
@@ -76,7 +170,11 @@ const PatientBook = () => {
     refetch: refetchSlots
   } = useQuery({
     queryKey: ['availableSlots', selectedCenter, appointmentDate],
-    queryFn: () => getAvailableTimeSlots(selectedCenter, appointmentDate),
+    queryFn: () => {
+      const formattedDate = formatDateForApi(appointmentDate);
+      console.log('Formatted date for API call:', formattedDate);
+      return getAvailableTimeSlots(selectedCenter, formattedDate);
+    },
     enabled: !!selectedCenter && !!appointmentDate,
   });
   
@@ -84,7 +182,8 @@ const PatientBook = () => {
   useEffect(() => {
     if (selectedCenter && appointmentDate) {
       refetchSlots();
-      console.log('Fetching slots for center:', selectedCenter, 'and date:', appointmentDate);
+      const formattedDate = formatDateForApi(appointmentDate);
+      console.log('Fetching slots for center:', selectedCenter, 'and formatted date:', formattedDate);
     }
   }, [selectedCenter, appointmentDate, refetchSlots]);
   
@@ -298,7 +397,7 @@ const PatientBook = () => {
                       <div className="mt-2 text-sm text-medical-blue/80">
                         <p>
                           If you have any questions or need help with your appointment, please call our
-                          patient support line at (94) 11 242 2335.
+                          patient support line at 011 242 2335.
                         </p>
                       </div>
                     </div>

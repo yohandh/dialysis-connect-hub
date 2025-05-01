@@ -12,6 +12,9 @@ router.get('/', centerController.getAllCenters);
 // Get center by ID
 router.get('/:id', centerController.getCenterById);
 
+// Get available time slots for a center on a specific date
+router.get('/:centerId/available-slots', centerController.getAvailableTimeSlots);
+
 // Create new center
 router.post('/', [
   // Temporarily disable auth for testing

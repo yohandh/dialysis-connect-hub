@@ -162,7 +162,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
                 <address className="not-italic text-gray-300 space-y-2">
                   <p>DialyzeEase Headquarters</p>
                   <p>349, Jayantha Weerasekara Mawatha<br />Colombo, Western Province 01000, Sri Lanka</p>
-                  <p>(94) 11 242 2335</p>
+                  <p>011 242 2335</p>
                   <p><a href="mailto:dialyzeease@gmail.com" className="hover:text-white">dialyzeease@gmail.com</a></p>
                 </address>
               </div>              
