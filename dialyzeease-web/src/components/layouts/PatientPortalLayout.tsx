@@ -41,17 +41,17 @@ const PatientPortalLayout: React.FC<PatientPortalLayoutProps> = ({ children }) =
       name: 'CKD Stage',
       path: '/patient/ckd-stage',
       icon: <Activity className="h-4 w-4" />
-    },
-    {
-      name: 'Recommendations',
-      path: '/patient/recommendations',
-      icon: <Clipboard className="h-4 w-4" />
-    },
-    {
-      name: 'Education',
-      path: '/patient/education',
-      icon: <BookText className="h-4 w-4" />
     }
+    // {
+    //   name: 'Recommendations',
+    //   path: '/patient/recommendations',
+    //   icon: <Clipboard className="h-4 w-4" />
+    // },
+    // {
+    //   name: 'Education',
+    //   path: '/patient/education',
+    //   icon: <BookText className="h-4 w-4" />
+    // }
   ];
 
   return (

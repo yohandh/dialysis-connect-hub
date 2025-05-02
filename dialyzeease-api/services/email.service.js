@@ -35,7 +35,7 @@ const sendEmail = async (emailOptions) => {
     const transporter = await createTransporter();
     
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'your-email@gmail.com',
+      from: process.env.EMAIL_FROM || 'DialyzeEase" <dialyzeease@gmail.com>',
       to: emailOptions.to,
       subject: emailOptions.subject,
       text: emailOptions.text,
@@ -59,16 +59,36 @@ const sendEmail = async (emailOptions) => {
  */
 const sendNotificationEmail = async (notification, recipientEmail) => {
   try {
+    // Get recipient name from the notification if available
+    const recipientName = notification.recipient_name || 'Valued Patient';
+    
     const emailOptions = {
       to: recipientEmail,
       subject: notification.title,
       text: notification.message,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-          <h2 style="color: #3b82f6;">${notification.title}</h2>
-          <p style="font-size: 16px; line-height: 1.5;">${notification.message}</p>
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="https://i.imgur.com/example-logo.png" alt="DialyzeEase Logo" style="max-width: 200px;">
+          </div>
+          
+          <h2 style="color: #0066cc; text-align: center;">${notification.title}</h2>
+          
+          <p style="font-size: 16px; line-height: 1.5;">Dear ${recipientName},</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p style="font-size: 16px; line-height: 1.5;">${notification.message}</p>
+          </div>
+          
+          <p style="font-size: 16px; line-height: 1.5;">If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+          
           <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-            <p style="color: #6b7280; font-size: 14px;">This is an automated message from DialyzeEase. Please do not reply to this email.</p>
+            <p style="color: #666;">Best regards,</p>
+            <p style="color: #666;">The DialyzeEase Team</p>
+            <p style="font-size: 12px; color: #999; margin-top: 20px;">
+              This is an automated message. Please do not reply directly to this email.
+              For assistance, contact us at <a href="mailto:support@dialyzeease.com">support@dialyzeease.com</a> or call <a href="tel:0112422335">0112422335</a>.
+            </p>
           </div>
         </div>
       `
@@ -86,67 +106,99 @@ const sendNotificationEmail = async (notification, recipientEmail) => {
  */
 const emailTemplates = {
   appointmentConfirmation: (data) => {
-    const { patientName, centerName, date, startTime, endTime, bedCode, isForManager = false } = data;
+    const { patientName, centerName, date, startTime, endTime, bedCode, isForManager = false, isManagerEmail = false } = data;
+    
+    // Check for manager email using either flag
+    const isManager = isForManager || isManagerEmail;
     
     // Different subject for manager vs patient
-    const subject = isForManager 
-      ? `DialyzeEase: New Appointment Booking at ${centerName}`
+    const subject = isManager 
+      ? `New Appointment Booking at ${centerName}`
       : `DialyzeEase: Your Dialysis Appointment Confirmation`;
     
-    // Different greeting based on recipient
-    const greeting = isForManager
-      ? `<p>Dear Center Manager,</p><p>A new appointment has been booked at your center. Here are the details:</p>`
-      : `<p>Dear ${patientName},</p><p>Your dialysis appointment has been successfully scheduled. Here are the details:</p>`;
-    
-    // Different footer based on recipient
-    const footer = isForManager
-      ? `<p>Please ensure that all necessary preparations are made for this appointment.</p>`
-      : `<p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:0112422335">0112422335</a> or reply to this email.</p>`;
-    
-    return {
-      subject,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-          <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color: #0066cc;">DialyzeEase</h1>
+    if (isManager) {
+      // Manager email template
+      return {
+        subject,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="https://dialyzeease.com/logo.png" alt="DialyzeEase Logo" style="max-width: 200px;">
+            </div>
+            
+            <h2 style="color: #0066cc; text-align: center;">New Appointment Notification</h2>
+            
+            <p>Dear Center Manager,</p>
+            
+            <p>A new dialysis appointment has been booked at your center. Here are the details:</p>
+            
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Patient:</strong> ${patientName}</p>
+              <p><strong>Center:</strong> ${centerName}</p>
+              <p><strong>Date:</strong> ${date}</p>
+              <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+              ${bedCode ? `<p><strong>Bed/Machine:</strong> ${bedCode}</p>` : ''}
+            </div>
+            
+            <p>Please ensure all necessary preparations are made for this appointment.</p>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+              <p style="color: #666;">Best regards,</p>
+              <p style="color: #666;">The DialyzeEase Team</p>
+              <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                This is an automated message. Please do not reply directly to this email.
+                For assistance, contact us at <a href="mailto:support@dialyzeease.com">support@dialyzeease.com</a> or call <a href="tel:0112422335">0112422335</a>.
+              </p>
+            </div>
           </div>
-          
-          <h2 style="color: #0066cc; text-align: center;">Appointment ${isForManager ? 'Notification' : 'Confirmation'}</h2>
-          
-          ${greeting}
-          
-          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <p><strong>Center:</strong> ${centerName}</p>
-            <p><strong>Date:</strong> ${date}</p>
-            <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
-            ${bedCode ? `<p><strong>Bed/Machine:</strong> ${bedCode}</p>` : ''}
-            ${isForManager ? `<p><strong>Patient:</strong> ${patientName}</p>` : ''}
+        `
+      };
+    } else {
+      // Patient email template - using the professional template from the second screenshot
+      return {
+        subject,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="https://dialyzeease.com/logo.png" alt="DialyzeEase Logo" style="max-width: 200px;">
+            </div>
+            
+            <h2 style="color: #0066cc; text-align: center;">Appointment Confirmation</h2>
+            
+            <p>Dear ${patientName},</p>
+            
+            <p>Your dialysis appointment has been successfully scheduled. Here are the details:</p>
+            
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Center:</strong> ${centerName}</p>
+              <p><strong>Date:</strong> ${date}</p>
+              <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+              ${bedCode ? `<p><strong>Bed/Machine:</strong> ${bedCode}</p>` : ''}
+            </div>
+            
+            <h3 style="color: #0066cc;">Preparation Instructions:</h3>
+            <ul>
+              <li>Please arrive 15 minutes before your appointment time.</li>
+              <li>Bring your identification and insurance card.</li>
+              <li>Wear comfortable clothing with easy access to your dialysis access site.</li>
+              <li>Bring a list of your current medications.</li>
+              <li>Consider bringing something to keep you occupied during treatment (book, tablet, etc.).</li>
+            </ul>
+            
+            <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:0112422335">0112422335</a> or reply to this email.</p>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+              <p style="color: #666;">Best regards,</p>
+              <p style="color: #666;">The DialyzeEase Team</p>
+              <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                This is an automated message. Please do not reply directly to this email.
+                For assistance, contact us at <a href="mailto:support@dialyzeease.com">support@dialyzeease.com</a> or call <a href="tel:0112422335">0112422335</a>.
+              </p>
+            </div>
           </div>
-          
-          ${isForManager ? '' : `
-          <h3 style="color: #0066cc;">Preparation Instructions:</h3>
-          <ul>
-            <li>Please arrive 15 minutes before your appointment time.</li>
-            <li>Bring your identification and insurance card.</li>
-            <li>Wear comfortable clothing with easy access to your dialysis access site.</li>
-            <li>Bring a list of your current medications.</li>
-            <li>Consider bringing something to keep you occupied during treatment (book, tablet, etc.).</li>
-          </ul>
-          `}
-          
-          ${footer}
-          
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-            <p style="color: #666;">Best regards,</p>
-            <p style="color: #666;">The DialyzeEase Team</p>
-            <p style="font-size: 12px; color: #999; margin-top: 20px;">
-              This is an automated message. Please do not reply directly to this email.
-              For assistance, contact us at <a href="mailto:support@dialyzeease.com">support@dialyzeease.com</a>
-            </p>
-          </div>
-        </div>
-      `
-    };
+        `
+      };
+    }
   }
 };
 
@@ -243,7 +295,7 @@ const sendAppointmentConfirmationEmails = async (appointmentId) => {
       try {
         const managerEmailData = {
           ...emailData,
-          isForManager: true
+          isManagerEmail: true
         };
         
         const emailOptions = {

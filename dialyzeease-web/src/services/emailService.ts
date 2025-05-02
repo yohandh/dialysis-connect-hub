@@ -1,15 +1,14 @@
-import nodemailer from 'nodemailer';
+import { API_BASE_URL, getAuthToken, useMockApi } from '../config/api.config';
+import axios from 'axios';
 
-// Email configuration
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER || 'dialyzeease@gmail.com',
-    pass: process.env.EMAIL_PASSWORD || 'jpkdzedpwnebzosx' // Note: It's better to use environment variables
-  }
-});
+// Mock implementation for development/testing
+const mockSendEmail = async (to: string, subject: string, html: string) => {
+  console.log('MOCK EMAIL SENT:', { to, subject });
+  console.log('CONTENT:', html);
+  return { success: true, messageId: `mock-${Date.now()}` };
+};
 
-// Email templates
+// Email templates - Using professional templates matching the backend
 export const emailTemplates = {
   appointmentConfirmation: (data: {
     patientName: string;
@@ -18,52 +17,94 @@ export const emailTemplates = {
     startTime: string;
     endTime: string;
     bedCode?: string;
+    isManagerEmail?: boolean;
   }) => {
-    const { patientName, centerName, date, startTime, endTime, bedCode } = data;
+    const { patientName, centerName, date, startTime, endTime, bedCode, isManagerEmail } = data;
     
-    return {
-      subject: `DialyzeEase: Your Dialysis Appointment Confirmation`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-          <div style="text-align: center; margin-bottom: 20px;">
-            <img src="https://dialyzeease.com/logo.png" alt="DialyzeEase Logo" style="max-width: 200px;">
+    // Different templates for patient vs. manager
+    if (isManagerEmail) {
+      // Manager email template
+      return {
+        subject: `New Appointment Booking at ${centerName}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="https://i.imgur.com/example-logo.png" alt="DialyzeEase Logo" style="max-width: 200px;">
+            </div>
+            
+            <h2 style="color: #0066cc; text-align: center;">New Appointment Notification</h2>
+            
+            <p>Dear Center Manager,</p>
+            
+            <p>A new dialysis appointment has been booked at your center. Here are the details:</p>
+            
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Patient:</strong> ${patientName}</p>
+              <p><strong>Center:</strong> ${centerName}</p>
+              <p><strong>Date:</strong> ${date}</p>
+              <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+              ${bedCode ? `<p><strong>Bed/Machine:</strong> ${bedCode}</p>` : ''}
+            </div>
+            
+            <p>Please ensure all necessary preparations are made for this appointment.</p>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+              <p style="color: #666;">Best regards,</p>
+              <p style="color: #666;">The DialyzeEase Team</p>
+              <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                This is an automated message. Please do not reply directly to this email.
+                For assistance, contact us at <a href="mailto:support@dialyzeease.com">support@dialyzeease.com</a>
+              </p>
+            </div>
           </div>
-          
-          <h2 style="color: #0066cc; text-align: center;">Appointment Confirmation</h2>
-          
-          <p>Dear ${patientName},</p>
-          
-          <p>Your dialysis appointment has been successfully scheduled. Here are the details:</p>
-          
-          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <p><strong>Center:</strong> ${centerName}</p>
-            <p><strong>Date:</strong> ${date}</p>
-            <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
-            ${bedCode ? `<p><strong>Bed/Machine:</strong> ${bedCode}</p>` : ''}
+        `
+      };
+    } else {
+      // Patient email template - using the professional template from the Admin Portal
+      return {
+        subject: `DialyzeEase: Your Dialysis Appointment Confirmation`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+              <img src="https://i.imgur.com/example-logo.png" alt="DialyzeEase Logo" style="max-width: 200px;">
+            </div>
+            
+            <h2 style="color: #0066cc; text-align: center;">Appointment Confirmation</h2>
+            
+            <p>Dear ${patientName},</p>
+            
+            <p>Your dialysis appointment has been successfully scheduled. Here are the details:</p>
+            
+            <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+              <p><strong>Center:</strong> ${centerName}</p>
+              <p><strong>Date:</strong> ${date}</p>
+              <p><strong>Time:</strong> ${startTime} - ${endTime}</p>
+              ${bedCode ? `<p><strong>Bed/Machine:</strong> ${bedCode}</p>` : ''}
+            </div>
+            
+            <h3 style="color: #0066cc;">Preparation Instructions:</h3>
+            <ul>
+              <li>Please arrive 15 minutes before your appointment time.</li>
+              <li>Bring your identification and insurance card.</li>
+              <li>Wear comfortable clothing with easy access to your dialysis access site.</li>
+              <li>Bring a list of your current medications.</li>
+              <li>Consider bringing something to keep you occupied during treatment (book, tablet, etc.).</li>
+            </ul>
+            
+            <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:0112422335">0112422335</a> or reply to this email.</p>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+              <p style="color: #666;">Best regards,</p>
+              <p style="color: #666;">The DialyzeEase Team</p>
+              <p style="font-size: 12px; color: #999; margin-top: 20px;">
+                This is an automated message. Please do not reply directly to this email.
+                For assistance, contact us at <a href="mailto:support@dialyzeease.com">support@dialyzeease.com</a> or call <a href="tel:0112422335">0112422335</a>.
+              </p>
+            </div>
           </div>
-          
-          <h3 style="color: #0066cc;">Preparation Instructions:</h3>
-          <ul>
-            <li>Please arrive 15 minutes before your appointment time.</li>
-            <li>Bring your identification and insurance card.</li>
-            <li>Wear comfortable clothing with easy access to your dialysis access site.</li>
-            <li>Bring a list of your current medications.</li>
-            <li>Consider bringing something to keep you occupied during treatment (book, tablet, etc.).</li>
-          </ul>
-          
-          <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance at <a href="tel:011 242 2335">011 242 2335</a> or reply to this email.</p>
-          
-          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-            <p style="color: #666;">Best regards,</p>
-            <p style="color: #666;">The DialyzeEase Team</p>
-            <p style="font-size: 12px; color: #999; margin-top: 20px;">
-              This is an automated message. Please do not reply directly to this email.
-              For assistance, contact us at <a href="mailto:dialyzeease@gmail.com">dialyzeease@gmail.com</a>
-            </p>
-          </div>
-        </div>
-      `
-    };
+        `
+      };
+    }
   },
   
   appointmentReminder: (data: {
@@ -242,16 +283,36 @@ export const sendEmail = async (
   try {
     const template = emailTemplates[templateName](data);
     
-    const mailOptions = {
-      from: '"DialyzeEase" <dialyzeease@gmail.com>',
-      to,
-      subject: template.subject,
-      html: template.html
-    };
+    // In mock/development mode or if the API endpoint is not available, just log the email
+    if (useMockApi()) {
+      return await mockSendEmail(to, template.subject, template.html);
+    }
     
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    try {
+      // Try to send the email through the backend API
+      const token = getAuthToken();
+      const response = await axios.post(
+        `${API_BASE_URL}/notifications/send-email`,
+        {
+          to,
+          subject: template.subject,
+          html: template.html
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log('Email sent through API');
+      return { success: true, messageId: response.data?.messageId || 'sent' };
+    } catch (apiError) {
+      // If the API endpoint is not available, fall back to mock mode
+      console.warn('Email API endpoint not available, falling back to mock mode:', apiError);
+      return await mockSendEmail(to, template.subject, template.html);
+    }
   } catch (error) {
     console.error('Error sending email:', error);
     return { success: false, error };

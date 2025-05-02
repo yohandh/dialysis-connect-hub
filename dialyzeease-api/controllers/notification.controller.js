@@ -2,6 +2,49 @@ const { pool } = require('../config/db');
 const emailService = require('../services/email.service');
 
 /**
+ * Send an email directly from the API
+ * This endpoint is used by the frontend to send emails
+ */
+exports.sendEmail = async (req, res) => {
+  try {
+    const { to, subject, html, text } = req.body;
+    
+    // Validate required fields
+    if (!to || !subject || !(html || text)) {
+      return res.status(400).json({ 
+        message: 'Missing required fields. Please provide to, subject, and either html or text content' 
+      });
+    }
+    
+    // Send the email
+    const result = await emailService.sendEmail({
+      to,
+      subject,
+      html,
+      text: text || ''
+    });
+    
+    if (result.success) {
+      res.status(200).json({ 
+        message: 'Email sent successfully', 
+        messageId: result.messageId 
+      });
+    } else {
+      res.status(500).json({ 
+        message: 'Failed to send email', 
+        error: result.error 
+      });
+    }
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ 
+      message: 'Error sending email', 
+      error: error.message 
+    });
+  }
+};
+
+/**
  * Get all notifications with recipient details
  */
 exports.getAllNotifications = async (req, res) => {

@@ -208,14 +208,52 @@ export const deleteAppointmentSlot = async (id: string) => {
 // Book an appointment
 export const bookAppointment = async (id: string, patientId: string) => {
   try {
-    const response = await axios.post(`/api/appointments/${id}/book`, { patientId }, {
+    return axios.post(`/api/appointments/${id}/book`, { patientId }, {
       headers: {
         'Authorization': 'Bearer mock-auth-token-for-testing'
       }
     });
+  } catch (error: any) {
+    console.error('Error booking appointment:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+// Book recurring appointments
+export const bookRecurringAppointments = async (slotId: string, patientId: string, dates: string[]) => {
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/appointments/recurring`, {
+      slotId,
+      patientId,
+      dates
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-auth-token-for-testing'}`
+      }
+    });
     return response.data;
   } catch (error: any) {
-    console.error(`Error booking appointment ${id}:`, error.response?.data || error.message);
+    console.error('Error booking recurring appointments:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+// Book multiple appointments
+export const bookMultipleAppointments = async (appointments: {date: string, slotId: string}[], patientId: string) => {
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/appointments/multiple`, {
+      appointments,
+      patientId
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token') || 'mock-auth-token-for-testing'}`
+      }
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Error booking multiple appointments:', error.response?.data || error.message);
     throw error;
   }
 };

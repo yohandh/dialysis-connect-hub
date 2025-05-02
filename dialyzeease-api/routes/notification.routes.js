@@ -18,6 +18,9 @@ router.patch('/:id/status', notificationController.updateNotificationStatus);
 // Create a new notification
 router.post('/', notificationController.createNotification);
 
+// Send an email
+router.post('/send-email', notificationController.sendEmail);
+
 // Delete a notification
 router.delete('/:id', notificationController.deleteNotification);
 
