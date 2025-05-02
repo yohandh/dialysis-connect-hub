@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getCkdHistory } from '@/api/patientApi';
 import PatientPortalLayout from '@/components/layouts/PatientPortalLayout';
@@ -12,6 +12,9 @@ import CkdInfoAlert from '@/components/patient/ckd/CkdInfoAlert';
 
 const PatientCkdStage = () => {
   const [calculatedStage, setCalculatedStage] = useState<number | null>(null);
+  const [showDetailedRecommendations, setShowDetailedRecommendations] = useState<boolean>(false);
+  const [autoExpandDetails, setAutoExpandDetails] = useState<boolean>(false);
+  const detailedRecommendationsRef = useRef<HTMLDivElement>(null);
   
   // Get CKD history
   const { 
@@ -34,6 +37,18 @@ const PatientCkdStage = () => {
     refetch();
   };
   
+  const handleViewDetailedRecommendations = () => {
+    setShowDetailedRecommendations(true);
+    setAutoExpandDetails(true);
+    
+    // Wait for the state to update and the component to render
+    setTimeout(() => {
+      if (detailedRecommendationsRef.current) {
+        detailedRecommendationsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+  
   const ckdStageInfo = ckdStages.find(s => s.stage === currentStage);
   
   return (
@@ -41,17 +56,25 @@ const PatientCkdStage = () => {
       <div className="space-y-6 bg-blue-50 p-6 rounded-lg">
         <h1 className="text-3xl font-bold tracking-tight text-medical-blue">CKD Stage Calculator & Information</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-1">
-            <CkdCalculatorForm onCalculate={handleCalculate} refetchHistory={refetch} />
+        <div className="grid grid-cols-1 gap-6">
+          <div>
+            <CkdCalculatorForm 
+              onCalculate={handleCalculate} 
+              refetchHistory={refetch} 
+              onViewDetailedRecommendations={handleViewDetailedRecommendations}
+            />
           </div>
           
-          <div className="md:col-span-2">
+          <div>
             {(calculatedStage || ckdHistory.length > 0) && ckdStageInfo && (
-              <CkdStageResult 
-                stage={currentStage} 
-                stageInfo={ckdStageInfo}
-              />
+              <div ref={detailedRecommendationsRef}>
+                <CkdStageResult 
+                  stage={currentStage} 
+                  stageInfo={ckdStageInfo}
+                  onViewDetailedRecommendations={handleViewDetailedRecommendations}
+                  autoExpandDetails={autoExpandDetails}
+                />
+              </div>
             )}
             
             {!calculatedStage && ckdHistory.length === 0 && (
@@ -60,13 +83,7 @@ const PatientCkdStage = () => {
           </div>
         </div>
         
-        <div className="mt-8">
-          <CkdHistory ckdHistory={ckdHistory} />
-        </div>
-        
-        <div className="mt-8">
-          <CkdStagesInfo currentStage={currentStage} />
-        </div>
+        {/* CKD History and CKD Stages Information cards are hidden */}
       </div>
     </PatientPortalLayout>
   );

@@ -9,18 +9,26 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 import { addCkdRecord, AddCkdRecordRequest } from '@/api/patientApi';
+import { ckdStages } from '@/data/ckdData';
+import CkdStageResultDialog from './CkdStageResultDialog';
 
 interface CkdCalculatorFormProps {
   onCalculate: (stage: number) => void;
   refetchHistory: () => void;
+  onViewDetailedRecommendations?: () => void;
 }
 
-const CkdCalculatorForm: React.FC<CkdCalculatorFormProps> = ({ onCalculate, refetchHistory }) => {
+const CkdCalculatorForm: React.FC<CkdCalculatorFormProps> = ({ onCalculate, refetchHistory, onViewDetailedRecommendations }) => {
   const [calculationMethod, setCalculationMethod] = useState<'egfr' | 'creatinine'>('egfr');
   const [egfr, setEgfr] = useState<string>('');
   const [creatinine, setCreatinine] = useState<string>('');
   const [gender, setGender] = useState<string>('male');
   const [age, setAge] = useState<string>('');
+  
+  // State for the result dialog
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [calculatedStage, setCalculatedStage] = useState<number | null>(null);
+  const [calculatedEgfrValue, setCalculatedEgfrValue] = useState<number>(0);
   
   // Mutation for adding new CKD record
   const addCkdRecordMutation = useMutation({
@@ -99,23 +107,42 @@ const CkdCalculatorForm: React.FC<CkdCalculatorFormProps> = ({ onCalculate, refe
           notes: `Calculated with ${calculationMethod} method`
         });
         
-        onCalculate(stage);
+        // Set the calculated values for the dialog
+        setCalculatedStage(stage);
+        setCalculatedEgfrValue(calculatedEgfr);
         
-        toast(`Your CKD Stage is: ${stage}`);
+        // Open the result dialog
+        setIsDialogOpen(true);
+        
+        // Call the onCalculate callback
+        onCalculate(stage);
       }
     } catch (error) {
       toast("There was an error calculating your CKD stage. Please try again.");
     }
   };
   
+  // Close the dialog
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+  
+  // Handle viewing detailed recommendations
+  const handleViewDetailedInfo = () => {
+    if (onViewDetailedRecommendations) {
+      onViewDetailedRecommendations();
+    }
+  };
+  
   return (
-    <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
-      <CardHeader className="border-b border-blue-100">
-        <CardTitle className="text-medical-blue">Calculate Your CKD Stage</CardTitle>
-        <CardDescription>
-          Enter your lab values to determine your current CKD stage
-        </CardDescription>
-      </CardHeader>
+    <>
+      <Card className="border-t-4 border-medical-blue shadow-md hover:shadow-lg transition-shadow">
+        <CardHeader className="border-b border-blue-100">
+          <CardTitle className="text-medical-blue">Calculate Your CKD Stage</CardTitle>
+          <CardDescription>
+            Enter your lab values to determine your current CKD stage
+          </CardDescription>
+        </CardHeader>
       <CardContent>
         <Tabs defaultValue="egfr" onValueChange={(v) => setCalculationMethod(v as 'egfr' | 'creatinine')}>
           <TabsList className="grid w-full grid-cols-2 bg-medical-blue/10">
@@ -190,6 +217,19 @@ const CkdCalculatorForm: React.FC<CkdCalculatorFormProps> = ({ onCalculate, refe
         </Button>
       </CardContent>
     </Card>
+    
+    {/* CKD Stage Result Dialog */}
+    {calculatedStage !== null && (
+      <CkdStageResultDialog 
+        isOpen={isDialogOpen}
+        onClose={handleCloseDialog}
+        stage={calculatedStage}
+        stageInfo={ckdStages.find(s => s.stage === calculatedStage) || ckdStages[2]} // Default to stage 3 if not found
+        egfrValue={calculatedEgfrValue}
+        onViewDetailedInfo={handleViewDetailedInfo}
+      />
+    )}
+    </>
   );
 };
 
